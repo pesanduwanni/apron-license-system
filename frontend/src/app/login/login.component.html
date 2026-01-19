@@ -1,0 +1,87 @@
+<div class="login-page">
+  <div class="login-left">
+    <div class="login-left-inner">
+      <header class="brand-header">
+        <div class="brand-icon">
+          <img src="assests/images/logo-icon.png"
+               alt="Logo"
+               class="brand-logo-img" />
+        </div>
+        <div class="brand-text">
+          <span class="brand-main"><strong>Apron</strong>License</span>
+        </div>
+      </header>
+
+      <hr class="brand-divider" />
+
+      <section class="login-form-section">
+        <h2 class="login-title">Sign In to your account here</h2>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
+          <div *ngIf="authError" class="auth-error">
+            {{ authError }}
+          </div>
+
+          <div class="form-group">
+            <label class="sr-only" for="staffId">Staff ID</label>
+            <div class="input-wrapper">
+              <span class="input-icon" aria-hidden="true">👤</span>
+              <input id="staffId"
+                     type="text"
+                     class="form-control has-icon"
+                     placeholder="Staff ID"
+                     formControlName="staffId"
+                     [class.is-invalid]="f['staffId'].touched && f['staffId'].invalid" />
+            </div>
+            <div class="field-error" *ngIf="f['staffId'].touched && f['staffId'].hasError('required')">
+              Staff ID is required.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="sr-only" for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon" aria-hidden="true">🔒</span>
+              <input id="password"
+                     type="password"
+                     class="form-control has-icon"
+                     placeholder="Password"
+                     formControlName="password"
+                     [class.is-invalid]="f['password'].touched && f['password'].invalid" />
+            </div>
+            <div class="field-error" *ngIf="f['password'].touched && f['password'].hasError('required')">
+              Password is required.
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" [disabled]="submitting">
+            {{ submitting ? 'Signing In...' : 'Sign In' }}
+          </button>
+        </form>
+
+        <div class="footer-logo">
+          <img src="assests/images/SLITS-Logo.png"
+               alt="SriLankan IT Systems"
+               class="partner-logo-img" />
+        </div>
+      </section>
+
+      <footer class="login-footer">
+        <div class="footer-copy">
+          <span class="copyright-symbol">©</span>
+          <span>2025 SriLankan IT Systems. All rights reserved</span>
+        </div>
+
+        <hr class="footer-divider" />
+
+        <div class="footer-version">Version 0.1</div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <img src="assests/images/login-airport.jpg"
+         alt="Apron operations"
+         class="hero-bg-img" />
+  </div>
+</div>

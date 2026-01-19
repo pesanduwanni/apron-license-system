@@ -1,0 +1,15 @@
+/* You can add global styles to this file, and also import other style files */
+
+
+/* Global CSS Variables */
+:root {
+  --primary-color: #005a9e;
+  --primary-color-hover: #004377;
+  --text-color: #1b1f27;
+  --muted-color: #6f7685;
+  --border-color: #cfd5e1;
+  --background-light: #ffffff;
+  --canvas-color: #f4f6fb;
+  --divider-color: #000000;
+  --font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
