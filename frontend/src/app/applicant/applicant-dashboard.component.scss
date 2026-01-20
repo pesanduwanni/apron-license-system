@@ -1,0 +1,584 @@
+/* Fixed header */
+
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.top-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-logo {
+  height: 32px;
+  width: auto;
+}
+
+.brand-text {
+  font-size: 1.3rem;
+  color: #111827;
+}
+
+.top-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.top-profile-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.top-hello {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.top-staff {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.top-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #0d63d6;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* Welcome strip directly under header */
+
+.welcome-strip {
+  position: relative;
+  margin-top: 56px;
+  background: linear-gradient(
+      90deg,
+      rgba(0, 72, 114, 1) 0%,
+      rgba(0, 72, 114, 1) 60%,
+      rgba(0, 72, 114, 0) 100%
+    ),
+    url('/assests/images/login-airport.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #ffffff;
+}
+
+
+
+.welcome-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  padding: 1.75rem 1.25rem;
+}
+
+/* Text can now take full width if you remove the side image */
+.welcome-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcome-eyebrow {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.welcome-title {
+  margin: 0.25rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* Optional: if you no longer need the right-side image, you can hide it */
+.welcome-image-wrapper {
+  display: none;
+}
+
+/* Page body & single form card */
+
+.page-body {
+  max-width: 1200px;
+  margin: 1.5rem auto 3rem;
+  padding: 0 1.25rem;
+}
+
+.form-card {
+  margin-top: 0.5rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 1.25rem 1.5rem 2rem;
+}
+
+.form-intro {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+/* History section re-used inside card */
+
+.history-banner {
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 4px;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.history-panel {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e4e9ff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+
+/* History box (separate from form card) */
+.history-box {
+  margin-bottom: 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 1.25rem 1.5rem;
+}
+
+.history-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.history-empty {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 1.5rem 0;
+}
+
+.history-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e6ebff;
+  background: #ffffff;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.history-id {
+  font-weight: 600;
+  margin: 0;
+}
+
+.history-date {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #475467;
+}
+
+.history-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.history-type {
+  font-weight: 500;
+}
+
+.status-chip {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #e0e7ff;
+  color: #2439c6;
+}
+
+.status-chip.pending {
+  background: #fff4e5;
+  color: #e68600;
+}
+
+.status-chip.rejected {
+  background: #ffe5e5;
+  color: #c62828;
+}
+
+.status-chip.approved {
+  background: #e5f9ec;
+  color: #107944;
+}
+
+
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.section-body {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* Form section with divider */
+.form-section {
+  margin-top: 1.5rem;
+  padding: 1.75rem;
+
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  flex: 1;
+}
+
+.section-body {
+  margin-top: 0;
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* Grid helpers ----------------------------------------------------------- */
+.field-grid-2,
+.field-grid-3,
+.field-grid-4 {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.field-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.field-grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+/* License type rendered as tickable squares ------------------------------ */
+.license-type-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 0.35rem;
+}
+
+.license-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  color: #111827;
+  position: relative;
+}
+
+.license-checkbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.license-checkbox .checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+}
+
+.license-checkbox input:checked + .checkbox-custom {
+  border-color: #0d63d6;
+  background: #0d63d6;
+}
+
+.license-checkbox input:checked + .checkbox-custom::after {
+  content: '✓';
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Equipment grid for license details */
+.equipment-grid {
+  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.equipment-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.equipment-chip input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #0d63d6;
+}
+
+.equipment-chip label {
+  margin: 0;
+  cursor: pointer;
+  font-weight: 500;
+  color: #111827;
+  font-size: 0.9rem;
+}
+
+/* Attachment grid for document uploads */
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.attachment-card {
+  border: 1px solid #e4e9ff;
+  border-radius: 1rem;
+  padding: 1rem;
+  background: #fbfcff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.attachment-card h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.attachment-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: #475467;
+}
+
+.upload-tile {
+  position: relative;
+  border: 1px dashed #b8c1e9;
+  border-radius: 0.85rem;
+  background: #ffffff;
+  padding: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.upload-tile:hover {
+  border-color: #0d63d6;
+  background: #f3f7ff;
+}
+
+.upload-tile input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.file-name.placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.form-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: #0d63d6;
+  color: #ffffff;
+  box-shadow: 0 15px 35px rgba(13, 99, 214, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #c8cfed;
+  color: #0f172a;
+}
+
+.collapse-btn {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  color: #0f172a;
+}
+
+.chevron {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(-135deg);
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .equipment-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .top-bar-inner,
+  .welcome-inner {
+    padding-inline: 0.75rem;
+  }
+
+  .welcome-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .top-profile-text {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 992px) {
+  .field-grid-3,
+  .field-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .field-grid-2,
+  .field-grid-3,
+  .field-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .license-type-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

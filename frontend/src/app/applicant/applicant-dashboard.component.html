@@ -1,0 +1,274 @@
+
+<ng-container *ngIf="user as activeUser">
+  <!-- Fixed full-width header -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand">
+        <img class="brand-logo"
+             src="assests/images/logo-icon.png"
+             alt="Apron License" />
+        <span class="brand-text"><strong>Apron</strong>License</span>
+      </div>
+
+      <div class="top-profile">
+        <div class="top-profile-text">
+          <div class="top-hello">Hello, {{ activeUser.name }}</div>
+          <div class="top-staff">({{ activeUser.staffNumber }})</div>
+        </div>
+        <div class="top-avatar">{{ initials }}</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Full-width welcome strip under header -->
+  <section class="welcome-strip">
+    <div class="welcome-inner">
+      <div class="welcome-text">
+        <p class="welcome-eyebrow">Welcome to,</p>
+        <h1 class="welcome-title">SriLankan Apron License Issue System</h1>
+      </div>
+      <div class="welcome-image-wrapper">
+        <img class="welcome-image"
+             src="assests/images/login-airport.jpg"
+             alt="Airport Apron" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Page content area (centered) -->
+  <div class="page-body">
+    <!-- Previously Submitted Requests Box -->
+    <div class="history-box">
+      <div class="history-box-header">
+        <div>
+          <p class="eyebrow text-primary">Previously Submitted Requests</p>
+          <p class="history-subtitle">View and monitor the history of your submitted requests.</p>
+        </div>
+        <button type="button" class="btn btn-outline" (click)="toggleHistory()">
+          {{ showHistory ? 'Hide History' : 'View History' }}
+        </button>
+      </div>
+
+      <div class="history-panel" *ngIf="showHistory">
+        <div class="history-card" *ngFor="let entry of historyEntries">
+          <div>
+            <p class="history-id">{{ entry.id }}</p>
+            <p class="history-date">{{ entry.submittedOn | date: 'longDate' }}</p>
+          </div>
+          <div class="history-meta">
+            <span class="history-type">{{ entry.licenseType }}</span>
+            <span class="status-chip"
+                  [class.approved]="entry.status === 'Approved'"
+                  [class.pending]="entry.status === 'Pending'"
+                  [class.rejected]="entry.status === 'Rejected'">
+              {{ entry.status }}
+            </span>
+          </div>
+        </div>
+        <p class="history-empty" *ngIf="!historyEntries.length">You have not submitted any requests yet.</p>
+      </div>
+    </div>
+
+    <!-- Application Form Box -->
+    <div class="form-card">
+      <p class="form-intro">
+        Please provide all required information and upload the necessary documents for verification to ensure smooth
+        processing of your Apron Driving Application.
+      </p>
+
+      <!-- Single form box that contains all sections -->
+      <form class="applicant-form" [formGroup]="applicantForm" (ngSubmit)="onSubmit()" novalidate>
+        <!-- BASIC INFORMATION -->
+        <section class="form-section" [class.collapsed]="collapsedSections.basic">
+          <header class="section-header">
+            <h2>Basic Information</h2>
+            <button type="button" class="collapse-btn" (click)="toggleSection('basic')">
+              <span class="chevron" [class.open]="!collapsedSections.basic"></span>
+            </button>
+          </header>
+
+          <div class="section-body" *ngIf="!collapsedSections.basic" formGroupName="basicInfo">
+            <!-- Row 1: License Type + Current ADP No + Date of First Issue -->
+            <div class="field-grid-3">
+              <div class="field">
+                <label>License Type</label>
+                <div class="license-type-group">
+                  <label class="license-checkbox">
+                    <input type="radio" formControlName="licenseType" value="extension" />
+                    <span class="checkbox-custom"></span>
+                    Extension License
+                  </label>
+                  <label class="license-checkbox">
+                    <input type="radio" formControlName="licenseType" value="new" />
+                    <span class="checkbox-custom"></span>
+                    New License
+                  </label>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="currentAdpNo">Current ADP No</label>
+                <input id="currentAdpNo" type="text" formControlName="currentAdpNo" placeholder="Current ADP No" />
+              </div>
+
+              <div class="field">
+                <label for="dateOfFirstIssue">Date of First Issue</label>
+                <input id="dateOfFirstIssue" type="date" formControlName="dateOfFirstIssue" />
+              </div>
+            </div>
+
+            <!-- Row 2: Safety Orientation + AASL Access P/No + AASL Access Permit Expiry -->
+            <div class="field-grid-3">
+              <div class="field">
+                <label for="safetyOrientationDate">Date Participation of Safety Orientation</label>
+                <input id="safetyOrientationDate" type="date" formControlName="safetyOrientationDate" />
+              </div>
+
+              <div class="field">
+                <label for="aaslAccessNo">AASL Access P/No</label>
+                <input id="aaslAccessNo" type="text" formControlName="aaslAccessNo" placeholder="AASL Access P/No" />
+              </div>
+
+              <div class="field">
+                <label for="aaslAccessExpiry">AASL Access Permit Expiry Date</label>
+                <input id="aaslAccessExpiry" type="date" formControlName="aaslAccessExpiry" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PERSONAL INFORMATION -->
+        <section class="form-section" [class.collapsed]="collapsedSections.personal">
+          <header class="section-header">
+            <h2>Personal Information</h2>
+            <button type="button" class="collapse-btn" (click)="toggleSection('personal')">
+              <span class="chevron" [class.open]="!collapsedSections.personal"></span>
+            </button>
+          </header>
+
+          <div class="section-body" *ngIf="!collapsedSections.personal" formGroupName="personalInfo">
+            <!-- Row 1: Name + Designation -->
+            <div class="field-grid-2">
+              <div class="field">
+                <label for="nameAndStaffNo">Name of Applicant and Staff No</label>
+                <input id="nameAndStaffNo" type="text" formControlName="nameAndStaffNo" readonly />
+              </div>
+
+              <div class="field">
+                <label for="designation">Designation</label>
+                <input id="designation" type="text" formControlName="designation" />
+              </div>
+            </div>
+
+            <!-- Row 2: Department + Contact No + NIC -->
+            <div class="field-grid-3">
+              <div class="field">
+                <label for="department">Section/ Department</label>
+                <input id="department" type="text" formControlName="department" readonly />
+              </div>
+
+              <div class="field">
+                <label for="contactNo">Contact No</label>
+                <input id="contactNo" type="text" formControlName="contactNo" />
+              </div>
+
+              <div class="field">
+                <label for="nic">NIC No</label>
+                <input id="nic" type="text" formControlName="nic" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LICENSE INFORMATION -->
+        <section class="form-section" [class.collapsed]="collapsedSections.license">
+          <header class="section-header">
+            <h2>License Information</h2>
+            <button type="button" class="collapse-btn" (click)="toggleSection('license')">
+              <span class="chevron" [class.open]="!collapsedSections.license"></span>
+            </button>
+          </header>
+
+          <div class="section-body" *ngIf="!collapsedSections.license">
+            <div class="field-grid-4" formGroupName="licenseInfo">
+              <div class="field">
+                <label for="civilLicenseNo">Civil License No. (RMV)</label>
+                <input id="civilLicenseNo" type="text" formControlName="civilLicenseNo" />
+              </div>
+
+              <div class="field">
+                <label for="category">Category</label>
+                <input id="category" type="text" formControlName="category" />
+              </div>
+
+              <div class="field">
+                <label for="issueDate">Date of Issue</label>
+                <input id="issueDate" type="date" formControlName="issueDate" />
+              </div>
+
+              <div class="field">
+                <label for="expiryDate">Date of Expiry</label>
+                <input id="expiryDate" type="date" formControlName="expiryDate" />
+              </div>
+            </div>
+
+            <div class="field full">
+              <label>Select manager recommendation for equipment type / vehicle</label>
+              <div class="equipment-grid" formGroupName="equipment">
+                <label class="equipment-checkbox" *ngFor="let option of equipmentOptions">
+                  <input type="checkbox" [formControlName]="option.key" />
+                  <span class="checkbox-custom"></span>
+                  {{ option.label }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ATTACHMENTS -->
+        <section class="form-section" [class.collapsed]="collapsedSections.attachments">
+          <header class="section-header">
+            <h2>Attachments</h2>
+            <button type="button" class="collapse-btn" (click)="toggleSection('attachments')">
+              <span class="chevron" [class.open]="!collapsedSections.attachments"></span>
+            </button>
+          </header>
+
+          <div class="section-body" *ngIf="!collapsedSections.attachments">
+            <div class="attachment-grid">
+              <div class="attachment-card" *ngFor="let group of attachmentGroups">
+                <h4>{{ group.title }}</h4>
+                <div class="attachment-slot" *ngFor="let control of group.controls">
+                  <span>{{ control.label }}</span>
+                  <label class="upload-tile">
+                    <input type="file"
+                           [attr.accept]="control.accept || '.png,.jpg,.jpeg,.pdf'"
+                           (change)="handleFileChange(control.key, $event)" />
+                    <span class="file-name" [class.placeholder]="!attachmentNames[control.key]">
+                      {{ attachmentNames[control.key] || '+ Add file' }}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="onClear()">Clear</button>
+          <button type="submit" class="btn btn-primary" [disabled]="formStatus === 'saving'">
+            {{ formStatus === 'saving' ? 'Saving...' : 'Submit' }}
+          </button>
+        </div>
+      </form>
+
+      <div class="form-status success" *ngIf="formStatus === 'submitted'">
+        <div class="status-icon">✓</div>
+        <div>
+          <h4>Application saved successfully</h4>
+          <p>Your submission has been recorded and is now listed under history.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

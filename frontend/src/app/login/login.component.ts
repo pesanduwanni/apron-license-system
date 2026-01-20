@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +16,11 @@ export class LoginComponent {
   submitting = false;
   authError: string | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       staffId: ['', [Validators.required]],
       password: ['', [Validators.required]]
@@ -35,20 +41,26 @@ export class LoginComponent {
 
     this.submitting = true;
 
-    const { staffId, password } = this.loginForm.value;
+    const staffId = (this.loginForm.value.staffId ?? '').trim();
+    const password = this.loginForm.value.password ?? '';
 
-    // Stub until API/AD/AppSec is wired
-    const isValidUlUser = staffId === 'UL123' && password === 'Password!';
+    const authenticated = this.authService.login(staffId, password);
 
-    setTimeout(() => {
-      if (!isValidUlUser) {
-        this.authError = 'Invalid Staff ID or Password. Please try again.';
-        this.submitting = false;
-        return;
-      }
+    this.submitting = false;
 
-      this.submitting = false;
-      alert('Login successful (stub). Replace with navigation to dashboard.');
-    }, 600);
+    if (!authenticated) {
+      this.authError = 'Invalid Staff ID or Password. Please try again.';
+      return;
+    }
+
+    const user = this.authService.currentUser;
+
+    if (user?.role !== 'applicant') {
+      this.authService.logout();
+      this.authError = 'Only applicant accounts are supported at the moment.';
+      return;
+    }
+
+    this.router.navigate(['/applicant']);
   }
 }

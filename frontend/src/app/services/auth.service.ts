@@ -1,28 +1,43 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+export type UserRole =
+  | 'applicant'
+  | 'sectional_manager'
+  | 'safety_manager'
+  | 'trainer'
+  | 'nurse'
+  | 'doctor';
+
 export interface User {
   username: string;
   password: string;
-  role: 'applicant' | 'sectional_manager' | 'safety_manager' | 'trainer' | 'nurse' | 'doctor';
+  role: UserRole;
   name: string;
   staffNumber: string;
   department: string;
+  designation?: string;
+  contactNumber?: string;
+  nic?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  // Mock accounts for testing
+  private readonly storageKey = 'currentUser';
+
   private mockAccounts: User[] = [
     {
-      username: 'applicant@ul.com',
+      username: 'olivia.isabella@ul.com',
       password: 'applicant123',
       role: 'applicant',
-      name: 'John Perera',
-      staffNumber: 'STF001',
-      department: 'Ground Operations'
+      name: 'Olivia Isabella',
+      staffNumber: '423231',
+      department: 'Information Technology',
+      designation: 'Senior Software Engineer',
+      contactNumber: '071 546 5645',
+      nic: '923836657V'
     },
     {
       username: 'sectional@ul.com',
@@ -75,14 +90,18 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  login(username: string, password: string): boolean {
+  login(identifier: string, password: string): boolean {
+    const normalizedIdentifier = identifier.trim().toLowerCase();
+
     const user = this.mockAccounts.find(
-      (account) => account.username === username && account.password === password
+      (account) =>
+        (account.staffNumber.toLowerCase() === normalizedIdentifier ||
+          account.username.toLowerCase() === normalizedIdentifier) &&
+        account.password === password
     );
 
     if (user) {
-      // Store user in localStorage for persistence
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem(this.storageKey, JSON.stringify(user));
       this.currentUserSubject.next(user);
       return true;
     }
@@ -91,7 +110,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem(this.storageKey);
     this.currentUserSubject.next(null);
   }
 
@@ -99,12 +118,12 @@ export class AuthService {
     return this.currentUser !== null;
   }
 
-  hasRole(role: string): boolean {
+  hasRole(role: UserRole): boolean {
     return this.currentUser?.role === role;
   }
 
   private getStoredUser(): User | null {
-    const storedUser = localStorage.getItem('currentUser');
-    return storedUser ? JSON.parse(storedUser) : null;
+    const storedUser = localStorage.getItem(this.storageKey);
+    return storedUser ? (JSON.parse(storedUser) as User) : null;
   }
 }
