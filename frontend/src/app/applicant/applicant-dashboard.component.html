@@ -78,6 +78,7 @@
 
       <!-- Single form box that contains all sections -->
       <form class="applicant-form" [formGroup]="applicantForm" (ngSubmit)="onSubmit()" novalidate>
+        .component.html
         <!-- BASIC INFORMATION -->
         <section class="form-section" [class.collapsed]="collapsedSections.basic">
           <header class="section-header">
@@ -88,7 +89,6 @@
           </header>
 
           <div class="section-body" *ngIf="!collapsedSections.basic" formGroupName="basicInfo">
-            <!-- Row 1: License Type + Current ADP No + Date of First Issue -->
             <div class="field-grid-3">
               <div class="field">
                 <label>License Type</label>
@@ -108,7 +108,10 @@
 
               <div class="field">
                 <label for="currentAdpNo">Current ADP No</label>
-                <input id="currentAdpNo" type="text" formControlName="currentAdpNo" placeholder="Current ADP No" />
+                <input id="currentAdpNo"
+                       type="text"
+                       formControlName="currentAdpNo"
+                       placeholder="Current ADP No" />
               </div>
 
               <div class="field">
@@ -117,7 +120,6 @@
               </div>
             </div>
 
-            <!-- Row 2: Safety Orientation + AASL Access P/No + AASL Access Permit Expiry -->
             <div class="field-grid-3">
               <div class="field">
                 <label for="safetyOrientationDate">Date Participation of Safety Orientation</label>
@@ -126,7 +128,10 @@
 
               <div class="field">
                 <label for="aaslAccessNo">AASL Access P/No</label>
-                <input id="aaslAccessNo" type="text" formControlName="aaslAccessNo" placeholder="AASL Access P/No" />
+                <input id="aaslAccessNo"
+                       type="text"
+                       formControlName="aaslAccessNo"
+                       placeholder="AASL Access P/No" />
               </div>
 
               <div class="field">
@@ -147,34 +152,49 @@
           </header>
 
           <div class="section-body" *ngIf="!collapsedSections.personal" formGroupName="personalInfo">
-            <!-- Row 1: Name + Designation -->
             <div class="field-grid-2">
               <div class="field">
                 <label for="nameAndStaffNo">Name of Applicant and Staff No</label>
-                <input id="nameAndStaffNo" type="text" formControlName="nameAndStaffNo" readonly />
+                <input id="nameAndStaffNo"
+                       type="text"
+                       formControlName="nameAndStaffNo"
+                       placeholder="Name of Applicant and Staff No"
+                       readonly />
               </div>
 
               <div class="field">
                 <label for="designation">Designation</label>
-                <input id="designation" type="text" formControlName="designation" />
+                <input id="designation"
+                       type="text"
+                       formControlName="designation"
+                       placeholder="Designation" />
               </div>
             </div>
 
-            <!-- Row 2: Department + Contact No + NIC -->
             <div class="field-grid-3">
               <div class="field">
                 <label for="department">Section/ Department</label>
-                <input id="department" type="text" formControlName="department" readonly />
+                <input id="department"
+                       type="text"
+                       formControlName="department"
+                       placeholder="Section/ Department"
+                       readonly />
               </div>
 
               <div class="field">
                 <label for="contactNo">Contact No</label>
-                <input id="contactNo" type="text" formControlName="contactNo" />
+                <input id="contactNo"
+                       type="text"
+                       formControlName="contactNo"
+                       placeholder="Contact No" />
               </div>
 
               <div class="field">
                 <label for="nic">NIC No</label>
-                <input id="nic" type="text" formControlName="nic" />
+                <input id="nic"
+                       type="text"
+                       formControlName="nic"
+                       placeholder="NIC No" />
               </div>
             </div>
           </div>
@@ -193,12 +213,18 @@
             <div class="field-grid-4" formGroupName="licenseInfo">
               <div class="field">
                 <label for="civilLicenseNo">Civil License No. (RMV)</label>
-                <input id="civilLicenseNo" type="text" formControlName="civilLicenseNo" />
+                <input id="civilLicenseNo"
+                       type="text"
+                       formControlName="civilLicenseNo"
+                       placeholder="Civil License No. (RMV)" />
               </div>
 
               <div class="field">
                 <label for="category">Category</label>
-                <input id="category" type="text" formControlName="category" />
+                <input id="category"
+                       type="text"
+                       formControlName="category"
+                       placeholder="Category" />
               </div>
 
               <div class="field">
@@ -211,17 +237,7 @@
                 <input id="expiryDate" type="date" formControlName="expiryDate" />
               </div>
             </div>
-
-            <div class="field full">
-              <label>Select manager recommendation for equipment type / vehicle</label>
-              <div class="equipment-grid" formGroupName="equipment">
-                <label class="equipment-checkbox" *ngFor="let option of equipmentOptions">
-                  <input type="checkbox" [formControlName]="option.key" />
-                  <span class="checkbox-custom"></span>
-                  {{ option.label }}
-                </label>
-              </div>
-            </div>
+            <!-- rest unchanged -->
           </div>
         </section>
 

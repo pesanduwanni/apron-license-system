@@ -89,8 +89,6 @@
   color: #ffffff;
 }
 
-
-
 .welcome-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -99,7 +97,6 @@
   padding: 1.75rem 1.25rem;
 }
 
-/* Text can now take full width if you remove the side image */
 .welcome-text {
   flex: 1;
   display: flex;
@@ -119,7 +116,10 @@
   font-weight: 700;
 }
 
-/* Optional: if you no longer need the right-side image, you can hide it */
+.eyebrow.text-primary {
+  font-weight: 700;
+}
+
 .welcome-image-wrapper {
   display: none;
 }
@@ -169,7 +169,6 @@
   flex-direction: column;
   gap: 0.75rem;
 }
-
 
 /* History box (separate from form card) */
 .history-box {
@@ -252,28 +251,6 @@
   color: #107944;
 }
 
-
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.section-body {
-  margin-top: 1.5rem;
-  display: grid;
-  gap: 1.25rem;
-}
-
-/* Form section with divider */
-.form-section {
-  margin-top: 1.5rem;
-  padding: 1.75rem;
-
-}
-
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -297,6 +274,12 @@
   margin-top: 0;
   display: grid;
   gap: 1.25rem;
+}
+
+/* Form section with divider */
+.form-section {
+  margin-top: 1.5rem;
+  padding: 1.75rem;
 }
 
 /* Grid helpers ----------------------------------------------------------- */
@@ -327,6 +310,47 @@
 
 .field.full {
   grid-column: 1 / -1;
+}
+
+.field label {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.field input[type="text"],
+.field input[type="date"],
+.field input[type="email"],
+.field input[type="number"] {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #e0e7f1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  transition: border-color 0.2s ease;
+}
+
+.field input[type="text"]:focus,
+.field input[type="date"]:focus,
+.field input[type="email"]:focus,
+.field input[type="number"]:focus {
+  outline: none;
+  border-color: #0d63d6;
+  box-shadow: 0 0 0 3px rgba(13, 99, 214, 0.1);
+}
+
+.field input::placeholder {
+  color: #e0e7f1;
+  opacity: 1;
+}
+
+.field input[type="text"]:readonly,
+.field input[type="date"]:readonly {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
 }
 
 /* License type rendered as tickable squares ------------------------------ */
@@ -406,66 +430,142 @@
   font-size: 0.9rem;
 }
 
-/* Attachment grid for document uploads */
-.attachment-grid {
+/* NEW Attachment Styles -------------------------------------------------- */
+.attachment-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
 }
 
-.attachment-card {
-  border: 1px solid #e4e9ff;
-  border-radius: 1rem;
-  padding: 1rem;
-  background: #fbfcff;
+.attachment-group {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.5rem;
 }
 
-.attachment-card h4 {
+.attachment-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111827;
 }
 
-.attachment-slot {
+.attachment-boxes {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.attachment-box {
+  flex: 1;
+}
+
+.upload-box {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.85rem;
-  color: #475467;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  min-height: 70px;
+  text-align: center;
 }
 
-.upload-tile {
-  position: relative;
-  border: 1px dashed #b8c1e9;
-  border-radius: 0.85rem;
+.upload-box:hover {
+  border-color: #0d63d6;
+  background: #f8faff;
+}
+
+.upload-box.has-file {
+  border-color: #0d63d6;
+  background: #e8f0fe;
+}
+
+.upload-box input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.box-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.box-icon {
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: #9ca3af;
+  line-height: 1;
+}
+
+.box-format {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+/* Signature row */
+.signature-row {
+  grid-template-columns: 1fr;
+  margin-top: 0.5rem;
+}
+
+.signature-group {
+  max-width: 250px;
+}
+
+.signature-upload {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.choose-file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
   background: #ffffff;
-  padding: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374151;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.upload-tile:hover {
+.choose-file-btn:hover {
   border-color: #0d63d6;
-  background: #f3f7ff;
+  background: #f8faff;
 }
 
-.upload-tile input {
+.choose-file-btn input[type="file"] {
   position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-.file-name {
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.file-name.placeholder {
-  color: #94a3b8;
-  font-weight: 500;
+.signature-format {
+  font-size: 0.75rem;
+  color: #6b7280;
 }
 
 .form-actions {
@@ -479,7 +579,7 @@
 .btn {
   border: none;
   border-radius: 999px;
-  padding: 0.75rem 1.75rem;
+  padding: 0.85rem 1.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -503,8 +603,10 @@
 
 .btn-outline {
   background: transparent;
-  border: 1px solid #c8cfed;
-  color: #0f172a;
+  font-weight: 700;
+  border: 2px solid #004872;
+  color: #004872;
+  border-radius: 6px;
 }
 
 .collapse-btn {
@@ -560,6 +662,11 @@
 
   .top-profile-text {
     align-items: flex-start;
+  }
+
+  .attachment-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 }
 

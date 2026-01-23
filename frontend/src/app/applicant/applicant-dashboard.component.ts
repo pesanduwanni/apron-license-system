@@ -265,24 +265,24 @@ export class ApplicantDashboardComponent implements OnInit {
     this.applicantForm.patchValue({
       basicInfo: {
         licenseType: 'extension',
-        currentAdpNo: 'ADP-00921',
-        dateOfFirstIssue: '2018-03-14',
-        safetyOrientationDate: '2024-09-20',
-        aaslAccessNo: 'AASL-9876',
-        aaslAccessExpiry: '2026-09-19'
+        currentAdpNo: '',
+        dateOfFirstIssue: '',
+        safetyOrientationDate: '',
+        aaslAccessNo: '',
+        aaslAccessExpiry: ''
       },
       personalInfo: {
-        nameAndStaffNo: `${this.user.name} (${this.user.staffNumber})`,
-        designation: this.user.designation ?? 'Senior Software Engineer',
-        department: this.user.department,
-        contactNo: this.user.contactNumber ?? '071 546 5645',
-        nic: this.user.nic ?? '923836657V'
+        nameAndStaffNo: '',
+        designation: '',
+        department: '',
+        contactNo: '',
+        nic: ''
       },
       licenseInfo: {
-        civilLicenseNo: 'B/1234567',
-        category: 'Heavy Equipment',
-        issueDate: '2023-02-01',
-        expiryDate: '2026-02-01'
+        civilLicenseNo: '',
+        category: '',
+        issueDate: '',
+        expiryDate: ''
       }
     });
   }
