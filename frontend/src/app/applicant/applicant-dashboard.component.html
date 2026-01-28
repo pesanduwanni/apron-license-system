@@ -78,7 +78,7 @@
 
       <!-- Single form box that contains all sections -->
       <form class="applicant-form" [formGroup]="applicantForm" (ngSubmit)="onSubmit()" novalidate>
-        .component.html
+
         <!-- BASIC INFORMATION -->
         <section class="form-section" [class.collapsed]="collapsedSections.basic">
           <header class="section-header">
@@ -158,8 +158,7 @@
                 <input id="nameAndStaffNo"
                        type="text"
                        formControlName="nameAndStaffNo"
-                       placeholder="Name of Applicant and Staff No"
-                       readonly />
+                       placeholder="Name of Applicant and Staff No" />
               </div>
 
               <div class="field">
@@ -177,8 +176,7 @@
                 <input id="department"
                        type="text"
                        formControlName="department"
-                       placeholder="Section/ Department"
-                       readonly />
+                       placeholder="Section/ Department" />
               </div>
 
               <div class="field">
@@ -237,7 +235,19 @@
                 <input id="expiryDate" type="date" formControlName="expiryDate" />
               </div>
             </div>
-            <!-- rest unchanged -->
+
+            <!-- Equipment type / vehicle selection -->
+            <div class="field full">
+              <label>Select manager recommendation for equipment type / vehicle</label>
+              <div class="equipment-grid" formGroupName="equipment">
+                <label class="equipment-chip"
+                       *ngFor="let option of equipmentOptions">
+                  <input type="checkbox"
+                         [formControlName]="option.key" />
+                  <span>{{ option.label }}</span>
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -251,19 +261,40 @@
           </header>
 
           <div class="section-body" *ngIf="!collapsedSections.attachments">
-            <div class="attachment-grid">
-              <div class="attachment-card" *ngFor="let group of attachmentGroups">
-                <h4>{{ group.title }}</h4>
-                <div class="attachment-slot" *ngFor="let control of group.controls">
-                  <span>{{ control.label }}</span>
-                  <label class="upload-tile">
+            <div class="attachment-row" *ngFor="let row of attachmentRows">
+              <div class="attachment-group" *ngFor="let group of row">
+                <p class="attachment-title">{{ group.title }}</p>
+                <div class="attachment-boxes">
+                  <div class="attachment-box" *ngFor="let control of group.controls">
+                    <label class="upload-box"
+                           [class.has-file]="attachmentNames[control.key]">
+                      <input type="file"
+                             [attr.accept]="control.accept || '.png,.jpg,.jpeg'"
+                             (change)="handleFileChange(control.key, $event)" />
+                      <span class="box-label">{{ control.label }}</span>
+                      <span class="box-icon" aria-hidden="true">+</span>
+                      <span class="box-format">
+                        {{ attachmentNames[control.key] || '.png .jpg' }}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="attachment-row signature-row">
+              <div class="attachment-group signature-group">
+                <p class="attachment-title">Signature</p>
+                <div class="signature-upload">
+                  <label class="choose-file-btn">
+                    Choose File
                     <input type="file"
-                           [attr.accept]="control.accept || '.png,.jpg,.jpeg,.pdf'"
-                           (change)="handleFileChange(control.key, $event)" />
-                    <span class="file-name" [class.placeholder]="!attachmentNames[control.key]">
-                      {{ attachmentNames[control.key] || '+ Add file' }}
-                    </span>
+                           [attr.accept]="signatureControl.accept || '.png,.jpg,.jpeg'"
+                           (change)="handleFileChange(signatureControl.key, $event)" />
                   </label>
+                  <span class="signature-format">
+                    {{ attachmentNames[signatureControl.key] || '.png .jpg' }}
+                  </span>
                 </div>
               </div>
             </div>

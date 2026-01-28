@@ -353,6 +353,14 @@
   cursor: not-allowed;
 }
 
+/* Input shows light ash background when it has a value */
+.field input[type='text']:not(:placeholder-shown),
+.field input[type='email']:not(:placeholder-shown),
+.field input[type='number']:not(:placeholder-shown),
+.field input[type='date']:not(:placeholder-shown) {
+  background-color: #f3f4f6; /* light ash */
+}
+
 /* License type rendered as tickable squares ------------------------------ */
 .license-type-group {
   display: flex;
@@ -382,7 +390,7 @@
   height: 18px;
   border: 2px solid #d1d5db;
   border-radius: 4px;
-  background: #ffffff;
+  background: #e5e5e5; /* light grey when not checked */
   display: grid;
   place-items: center;
   transition: all 0.2s ease;
@@ -404,30 +412,50 @@
 .equipment-grid {
   margin-top: 0.5rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem 2.5rem;
 }
 
-.equipment-chip {
-  display: flex;
+.equipment-checkbox {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   cursor: pointer;
+  font-size: 0.9rem;
+  color: #111827;
+  position: relative;
 }
 
-.equipment-chip input[type="checkbox"] {
+/* hide native checkbox */
+.equipment-checkbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* LIGHT GREY box before ticking */
+.equipment-checkbox-custom {
   width: 18px;
   height: 18px;
-  cursor: pointer;
-  accent-color: #0d63d6;
+  border-radius: 4px;
+  border: 1px solid #d4d4d4;
+  background: #e5e5e5;  /* light grey */
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
 }
 
-.equipment-chip label {
-  margin: 0;
-  cursor: pointer;
-  font-weight: 500;
-  color: #111827;
-  font-size: 0.9rem;
+/* checked (sticked) state */
+.equipment-checkbox input:checked + .equipment-checkbox-custom {
+  border-color: #4b5563;
+  background: blue;  /* darker grey */
+}
+
+.equipment-checkbox input:checked + .equipment-checkbox-custom::after {
+  content: '✓';
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 /* NEW Attachment Styles -------------------------------------------------- */
@@ -466,9 +494,9 @@
   justify-content: center;
   gap: 0.15rem;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #b6b6b6;
   border-radius: 6px;
-  background: #ffffff;
+  background: #f7f7f7;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
   min-height: 70px;
@@ -538,17 +566,18 @@
   padding: 0.4rem 0.85rem;
   border: 1px solid #d1d5db;
   border-radius: 4px;
-  background: #ffffff;
+  background: black;
   font-size: 0.8rem;
   font-weight: 500;
-  color: #374151;
+  color: white;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .choose-file-btn:hover {
   border-color: #0d63d6;
-  background: #f8faff;
+  color: black;
+  background: white;
 }
 
 .choose-file-btn input[type="file"] {

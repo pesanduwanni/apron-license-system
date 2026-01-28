@@ -46,23 +46,23 @@ export class ApplicantDashboardComponent implements OnInit {
   readonly equipmentOptions = [
     { key: 'tractor', label: 'Tractor' },
     { key: 'transporter', label: 'Transporter' },
-    { key: 'aciuAsuGpu', label: 'ACIU ASU / GPU' },
-    { key: 'passCoach', label: 'Pass-coach' },
-    { key: 'forklift', label: 'Fork-lift/Pallet Mover' },
+    { key: 'aciuAsuGpu', label: 'ACU/ ASU/ GPU' },
+    { key: 'paxCoach', label: 'Pax-coach' },
+    { key: 'forkliftPalletMover', label: 'Fork-lift/Pallet Mover' },
     { key: 'buggy', label: 'Buggy' },
-    { key: 'pickup', label: 'Pick-up' },
-    { key: 'lorry', label: 'Lorry/ A/C Bus' },
+    { key: 'pickUp', label: 'Pick-up' },
+    { key: 'lorryAcBus', label: 'Lorry/ A/C Bus' },
     { key: 'toiletWaterCart', label: 'Toilet/ Water cart' },
-    { key: 'paxStop', label: 'Pax stop' },
+    { key: 'paxStep', label: 'Pax step' },
     { key: 'ambulift', label: 'Ambulift' },
     { key: 'van', label: 'Van' },
     { key: 'donkeyLift', label: 'Donkey-lift' },
-    { key: 'towTug', label: 'A/C Tow-Tug' },
-    { key: 'jcbLoader', label: 'JCB/Manitou Loader' },
-    { key: 'hiLift', label: 'Hi-lift (Catering)' },
+    { key: 'acTowTug', label: 'A/C Tow-Tug' },
+    { key: 'jcpMdLoader', label: 'JCP/MD/Loader' },
+    { key: 'hiLiftCatering', label: 'Hi-lift (Catering)' },
     { key: 'car', label: 'Car' },
     { key: 'snorkelLift', label: 'Snorkel-lift' },
-    { key: 'maintTruck', label: 'Maint-Rat-UE-Truck' },
+    { key: 'maintPlatLiftTruck', label: 'Maint-Plat-Lift-Truck' },
     { key: 'skyLoader', label: 'Sky loader' },
     { key: 'ev', label: 'EV' }
   ];
@@ -95,13 +95,18 @@ export class ApplicantDashboardComponent implements OnInit {
         { key: 'nicFront', label: 'Front View' },
         { key: 'nicBack', label: 'Back View' }
       ]
-    },
-    {
-      title: 'Signature',
-      controls: [
-        { key: 'signature', label: 'Upload Signature', accept: '.png,.jpg,.jpeg' }
-      ]
     }
+  ];
+
+  readonly signatureControl: AttachmentControl = {
+    key: 'signature',
+    label: 'Signature',
+    accept: '.png,.jpg,.jpeg'
+  };
+
+  readonly attachmentRows: AttachmentGroup[][] = [
+    this.attachmentGroups.slice(0, 2),
+    this.attachmentGroups.slice(2, 4)
   ];
 
   attachmentNames: Record<string, string> = {};
