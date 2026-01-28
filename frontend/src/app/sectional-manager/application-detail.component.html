@@ -1,0 +1,421 @@
+<ng-container *ngIf="user && application">
+  <!-- Page content area (layout header comes from sectional-layout) -->
+  <div class="page-body">
+    <!-- Back button & Header -->
+    <div class="page-header">
+      <button class="btn-back" (click)="goBack()">
+        ← Back to List
+      </button>
+      <div class="header-info">
+        <h1>Application Details</h1>
+        <div class="ref-badge">{{ application.referenceNumber }}</div>
+        <span
+          class="status-chip"
+          [class.pending]="isPending"
+          [class.approved]="isApproved"
+          [class.rejected]="isRejected"
+        >
+          {{ isPending ? 'Pending Review' : isApproved ? 'Approved' : 'Rejected' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="alert alert-success" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="alert alert-error" *ngIf="errorMessage">
+      ✗ {{ errorMessage }}
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      <!-- Left Column: Application Info -->
+      <div class="detail-card">
+        <h2 class="card-title">Applicant Information</h2>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Name</label>
+            <span>{{ application.applicantName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Staff Number</label>
+            <span>{{ application.staffNumber }}</span>
+          </div>
+          <div class="info-item">
+            <label>Department</label>
+            <span>{{ application.department }}</span>
+          </div>
+          <div class="info-item">
+            <label>Designation</label>
+            <span>{{ application.designation }}</span>
+          </div>
+          <div class="info-item">
+            <label>Contact Number</label>
+            <span>{{ application.contactNumber }}</span>
+          </div>
+          <div class="info-item">
+            <label>NIC</label>
+            <span>{{ application.nic }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h2 class="card-title">License Information</h2>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <label>License Type</label>
+            <span class="license-badge" [class.extension]="application.licenseType === 'extension'">
+              {{ application.licenseType === 'extension' ? 'Extension' : 'New License' }}
+            </span>
+          </div>
+          <div class="info-item" *ngIf="application.currentAdpNo">
+            <label>Current ADP No</label>
+            <span>{{ application.currentAdpNo }}</span>
+          </div>
+          <div class="info-item" *ngIf="application.dateOfFirstIssue">
+            <label>Date of First Issue</label>
+            <span>{{ formatDate(application.dateOfFirstIssue) }}</span>
+          </div>
+          <div class="info-item">
+            <label>AASL Access P/No</label>
+            <span>{{ application.aaslAccessNo }}</span>
+          </div>
+          <div class="info-item">
+            <label>AASL Access Expiry</label>
+            <span>{{ formatDate(application.aaslAccessExpiry) }}</span>
+          </div>
+          <div class="info-item">
+            <label>State License No</label>
+            <span>{{ application.stateLicenseNo }}</span>
+          </div>
+          <div class="info-item">
+            <label>State License Issue Date</label>
+            <span>{{ formatDate(application.stateLicenseIssueDate) }}</span>
+          </div>
+          <div class="info-item">
+            <label>State License Expiry</label>
+            <span>{{ formatDate(application.stateLicenseExpiryDate) }}</span>
+          </div>
+          <div class="info-item">
+            <label>Date Submitted</label>
+            <span>{{ formatDate(application.submittedDate) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attachments Card -->
+      <div class="detail-card full-width">
+        <h2 class="card-title">Attachments</h2>
+
+        <div class="attachments-grid">
+          <!-- Staff ID -->
+          <div class="attachment-group">
+            <h3>Staff ID</h3>
+            <div class="attachment-row">
+              <div class="attachment-item" *ngIf="application.attachments.staffIdFront">
+                <span class="attachment-label">Front View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.staffIdFront!.url, 'Staff ID - Front')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.staffIdFront!.url, application.attachments.staffIdFront!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+              <div class="attachment-item" *ngIf="application.attachments.staffIdBack">
+                <span class="attachment-label">Back View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.staffIdBack!.url, 'Staff ID - Back')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.staffIdBack!.url, application.attachments.staffIdBack!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- State License -->
+          <div class="attachment-group">
+            <h3>State License</h3>
+            <div class="attachment-row">
+              <div class="attachment-item" *ngIf="application.attachments.stateLicenseFront">
+                <span class="attachment-label">Front View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.stateLicenseFront!.url, 'State License - Front')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.stateLicenseFront!.url, application.attachments.stateLicenseFront!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+              <div class="attachment-item" *ngIf="application.attachments.stateLicenseBack">
+                <span class="attachment-label">Back View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.stateLicenseBack!.url, 'State License - Back')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.stateLicenseBack!.url, application.attachments.stateLicenseBack!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aviation Pass -->
+          <div class="attachment-group" *ngIf="application.attachments.aviationPassFront || application.attachments.aviationPassBack">
+            <h3>Aviation Pass</h3>
+            <div class="attachment-row">
+              <div class="attachment-item" *ngIf="application.attachments.aviationPassFront">
+                <span class="attachment-label">Front View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.aviationPassFront!.url, 'Aviation Pass - Front')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.aviationPassFront!.url, application.attachments.aviationPassFront!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+              <div class="attachment-item" *ngIf="application.attachments.aviationPassBack">
+                <span class="attachment-label">Back View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.aviationPassBack!.url, 'Aviation Pass - Back')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.aviationPassBack!.url, application.attachments.aviationPassBack!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NIC -->
+          <div class="attachment-group">
+            <h3>NIC</h3>
+            <div class="attachment-row">
+              <div class="attachment-item" *ngIf="application.attachments.nicFront">
+                <span class="attachment-label">Front View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.nicFront!.url, 'NIC - Front')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.nicFront!.url, application.attachments.nicFront!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+              <div class="attachment-item" *ngIf="application.attachments.nicBack">
+                <span class="attachment-label">Back View</span>
+                <div class="attachment-actions">
+                  <button
+                    class="btn-sm btn-preview"
+                    (click)="previewAttachment(application.attachments.nicBack!.url, 'NIC - Back')"
+                  >
+                    👁 Preview
+                  </button>
+                  <button
+                    class="btn-sm btn-download"
+                    (click)="downloadAttachment(application.attachments.nicBack!.url, application.attachments.nicBack!.name)"
+                  >
+                    ⬇ Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories Card -->
+      <div class="detail-card full-width">
+        <h2 class="card-title">Vehicle Categories</h2>
+        <p class="card-subtitle" *ngIf="isPending">
+          You can modify the categories selected by the applicant. Categories with a blue border are originally selected by the applicant.
+        </p>
+
+        <div class="categories-grid">
+          <label
+            *ngFor="let cat of vehicleCategories"
+            class="category-checkbox"
+            [class.selected]="isCategorySelected(cat.key)"
+            [class.original]="isCategoryOriginal(cat.key)"
+            [class.disabled]="!isPending"
+          >
+            <input
+              type="checkbox"
+              [checked]="isCategorySelected(cat.key)"
+              (change)="toggleCategory(cat.key)"
+              [disabled]="!isPending"
+            />
+            <span class="checkbox-custom"></span>
+            <span class="category-label">{{ cat.label }}</span>
+          </label>
+        </div>
+
+        <!-- Remarks -->
+        <div class="remarks-section" *ngIf="isPending || remarks">
+          <label for="remarks">Remarks</label>
+          <textarea
+            id="remarks"
+            [(ngModel)]="remarks"
+            placeholder="Enter remarks for category changes or approval decisions..."
+            [readonly]="!isPending"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- Update button -->
+        <div class="action-row" *ngIf="isPending">
+          <button class="btn btn-secondary" (click)="updateCategories()">
+            Update Categories
+          </button>
+        </div>
+      </div>
+
+      <!-- Approval Info (if already processed) -->
+      <div class="detail-card full-width" *ngIf="!isPending">
+        <h2 class="card-title">Approval Information</h2>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Processed By</label>
+            <span>{{ application.sectionalManagerName || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Processing Date</label>
+            <span>{{ formatDate(application.sectionalApprovalDate) }}</span>
+          </div>
+          <div class="info-item full" *ngIf="application.sectionalRemarks">
+            <label>Remarks</label>
+            <span>{{ application.sectionalRemarks }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" *ngIf="isPending">
+      <button class="btn btn-reject" (click)="openRejectModal()">
+        ✗ Reject Application
+      </button>
+      <button class="btn btn-approve" (click)="openApproveConfirm()">
+        ✓ Approve Application
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <div class="footer-inner">
+      <div class="footer-copy">
+        <span class="copyright-symbol">©</span>
+        <span>2025 SriLankan IT Systems. All rights reserved</span>
+      </div>
+      <div class="footer-version">Version 0.1</div>
+    </div>
+  </footer>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" *ngIf="showConfirmModal" (click)="closeModals()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Confirm Approval</h3>
+      <p>
+        Are you sure you want to approve this application?
+        The applicant and Safety Manager will be notified via email.
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+        <button class="btn btn-approve" (click)="confirmApprove()">Yes, Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Modal -->
+  <div class="modal-overlay" *ngIf="showRejectModal" (click)="closeModals()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Reject Application</h3>
+      <p>Please provide a reason for rejecting this application:</p>
+      <textarea
+        [(ngModel)]="rejectReason"
+        placeholder="Enter rejection reason..."
+        rows="4"
+        class="reject-textarea"
+      ></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+        <button
+          class="btn btn-reject"
+          [disabled]="!rejectReason.trim()"
+          (click)="confirmReject()"
+        >
+          Reject Application
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="modal-overlay preview-overlay" *ngIf="showPreviewModal" (click)="closePreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <div class="preview-header">
+        <h3>{{ previewTitle }}</h3>
+        <button class="btn-close" (click)="closePreview()">✕</button>
+      </div>
+      <div class="preview-body">
+        <img [src]="previewUrl" [alt]="previewTitle" />
+      </div>
+    </div>
+  </div>
+</ng-container>

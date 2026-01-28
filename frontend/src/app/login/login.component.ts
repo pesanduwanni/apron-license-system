@@ -55,14 +55,18 @@ export class LoginComponent {
 
     const user = this.authService.currentUser;
 
-    if (user?.role !== 'applicant') {
-      this.authService.logout();
-      this.authError = 'Only applicant accounts are supported at the moment.';
-      return;
+    // Route based on user role
+    switch (user?.role) {
+      case 'applicant':
+        this.router.navigate(['/applicant']);
+        break;
+      case 'sectional_manager':
+        this.router.navigate(['/sectional-manager']);
+        break;
+      default:
+        this.authService.logout();
+        this.authError = 'Your role is not supported yet. Please contact the administrator.';
+        return;
     }
-
-    this.router.navigate(['/applicant']);
-
-
   }
 }

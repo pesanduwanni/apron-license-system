@@ -1,0 +1,261 @@
+.requests-page {
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+
+.requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.requests-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-box .search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.search-box input {
+  padding: 0.5rem 0.9rem 0.5rem 2.25rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+  min-width: 260px;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #0d63d6;
+  box-shadow: 0 0 0 3px rgba(13, 99, 214, 0.12);
+}
+
+.requests-tabs {
+  display: inline-flex;
+  background: #e5e7eb;
+  border-radius: 999px;
+  padding: 0.15rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  padding: 0.45rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #ffffff;
+  color: #111827;
+}
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.request-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.card-index {
+  font-weight: 600;
+  color: #374151;
+}
+
+.card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.ref-block {
+  min-width: 120px;
+}
+
+.ref-number {
+  font-weight: 700;
+  color: #111827;
+}
+
+.ref-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.date-block {
+  text-align: right;
+}
+
+.date-text {
+  font-weight: 600;
+  color: #111827;
+}
+
+.date-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.applicant-block .name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.applicant-block .sub,
+.dept-block .sub {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.dept-block .dept {
+  font-weight: 600;
+  color: #111827;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-pill.new,
+.status-pill.extension {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.status-pill.ongoing {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-pill.rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-view {
+  padding: 0.45rem 1.2rem;
+  border-radius: 999px;
+  border: none;
+  background: #0d63d6;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-view:hover {
+  background: #0b52b4;
+}
+
+.empty-state {
+  padding: 2rem 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.page-btn {
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.page-number {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.page-number.active {
+  background: #0d63d6;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .request-card {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .card-index {
+    order: -1;
+  }
+
+  .card-actions {
+    align-items: flex-start;
+  }
+}

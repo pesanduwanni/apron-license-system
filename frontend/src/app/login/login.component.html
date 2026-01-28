@@ -23,18 +23,18 @@
           </div>
 
           <div class="form-group">
-            <label class="sr-only" for="staffId">Staff ID</label>
+            <label class="sr-only" for="staffId">Staff Number</label>
             <div class="input-wrapper">
               <span class="input-icon" aria-hidden="true">👤</span>
               <input id="staffId"
                      type="text"
                      class="form-control has-icon"
-                     placeholder="Staff ID"
+                     placeholder="Staff Number"
                      formControlName="staffId"
                      [class.is-invalid]="f['staffId'].touched && f['staffId'].invalid" />
             </div>
             <div class="field-error" *ngIf="f['staffId'].touched && f['staffId'].hasError('required')">
-              Staff ID is required.
+              Staff Number is required.
             </div>
           </div>
 

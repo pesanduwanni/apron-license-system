@@ -1,0 +1,191 @@
+/* Outer shell: top bar + content row */
+.layout-shell {
+  min-height: 100vh;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-root {
+  display: flex;
+  flex: 1;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(
+      90deg,
+      rgba(0, 72, 114, 1) 0%,
+      rgba(0, 72, 114, 1) 60%,
+      rgba(0, 72, 114, 0) 100%
+    ),
+    url('/assests/images/login-airport.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar-top {
+  padding: 1.25rem 1rem 0.5rem;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.brand-logo {
+  height: 32px;
+}
+
+.brand-text {
+  font-size: 1.25rem;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.active {
+  background: #ffffff;
+  color: #111827;
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+}
+
+.sidebar-bottom {
+  padding: 1rem;
+}
+
+.sidebar-footer-text {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  text-align: center;
+  opacity: 0.8;
+}
+
+/* Main column */
+.main-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar (matched to applicant screen) */
+.top-bar {
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  z-index: 10;
+}
+
+.top-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.top-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.top-profile-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.top-hello {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.top-staff {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.top-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #0d63d6;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.logout-icon {
+  font-size: 1.2rem;
+}
+
+.main-content {
+  max-width: 1400px;
+  margin: 1.5rem auto 2.5rem;
+  padding: 0 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .layout-root {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .sidebar-bottom {
+    display: none;
+  }
+}

@@ -1,0 +1,71 @@
+<ng-container *ngIf="user as activeUser">
+  <div class="layout-shell">
+    <!-- Top header (same style as applicant screen) -->
+    <header class="top-bar">
+      <div class="top-bar-inner">
+        <div class="brand">
+          <img class="brand-logo" src="assests/images/logo-icon.png" alt="Apron License" />
+          <span class="brand-text"><strong>Apron</strong>License</span>
+        </div>
+
+        <div class="top-profile">
+          <div class="top-profile-text">
+            <div class="top-hello">Hello, {{ activeUser.name }}</div>
+            <div class="top-staff">({{ activeUser.staffNumber }}) · Sectional Manager</div>
+          </div>
+          <div class="top-avatar">{{ initials }}</div>
+          <button class="btn-logout" (click)="logout()" title="Logout">
+            <span class="logout-icon">⎋</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout-root">
+      <!-- Sidebar below top bar -->
+      <aside class="sidebar">
+      <div class="sidebar-top">
+
+
+        <nav class="sidebar-nav">
+          <a
+            routerLink="/sectional-manager/dashboard"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Dashboard</span>
+          </a>
+          <a
+            routerLink="/sectional-manager/requests"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="nav-icon">📋</span>
+            <span class="nav-label">Requests</span>
+          </a>
+          <a
+            routerLink="/sectional-manager/rejected"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="nav-icon">✗</span>
+            <span class="nav-label">Rejected</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-footer-text">SriLankan Airlines</div>
+      </div>
+      </aside>
+
+      <!-- Main content area -->
+      <div class="main-column">
+        <main class="main-content">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,116 @@
+<section class="requests-page">
+  <header class="requests-header">
+    <h1>{{ getTitle() }}</h1>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Search by Ref No, name, staff no or department..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+  </header>
+
+  <!-- Tabs only in main Requests view -->
+  <div class="requests-tabs" *ngIf="mode === 'requests'">
+    <button
+      class="tab"
+      [class.active]="activeTab === 'all'"
+      (click)="setTab('all')"
+    >
+      All
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'newext'"
+      (click)="setTab('newext')"
+    >
+      New / Ext
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'ongoing'"
+      (click)="setTab('ongoing')"
+    >
+      On going
+    </button>
+  </div>
+
+  <div class="requests-list" *ngIf="filteredApplications.length; else emptyState">
+    <article
+      class="request-card"
+      *ngFor="let app of filteredApplications; let i = index"
+    >
+      <div class="card-index">{{ getItemIndex(i) }}.</div>
+
+      <div class="card-main">
+        <div class="card-row top-row">
+          <div class="ref-block">
+            <div class="ref-number">{{ app.referenceNumber }}</div>
+            <div class="ref-label">(Ref No)</div>
+          </div>
+
+          <div class="date-block">
+            <div class="date-text">{{ app.submittedDate | date: 'dd-MM-yyyy' }}</div>
+            <div class="date-label">Requested date</div>
+          </div>
+        </div>
+
+        <div class="card-row mid-row">
+          <div class="applicant-block">
+            <div class="name">{{ app.applicantName }}</div>
+            <div class="sub">({{ app.staffNumber }})</div>
+          </div>
+          <div class="dept-block">
+            <div class="dept">{{ app.department }}</div>
+            <div class="sub">Department</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <span class="status-pill" [ngClass]="getChipClass(app)">
+          {{ getChipLabel(app) }}
+        </span>
+        <button class="btn-view" (click)="viewApplication(app)">
+          View Form
+        </button>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">No applications found.</div>
+  </ng-template>
+
+  <!-- Pagination -->
+  <footer class="pagination" *ngIf="totalPages > 1">
+    <button
+      class="page-btn prev"
+      [disabled]="currentPage === 1"
+      (click)="goToPage(currentPage - 1)"
+    >
+      ← Previous
+    </button>
+
+    <div class="page-numbers">
+      <button
+        class="page-number"
+        *ngFor="let page of [].constructor(totalPages); let p = index"
+        [class.active]="p + 1 === currentPage"
+        (click)="goToPage(p + 1)"
+      >
+        {{ p + 1 }}
+      </button>
+    </div>
+
+    <button
+      class="page-btn next"
+      [disabled]="currentPage === totalPages"
+      (click)="goToPage(currentPage + 1)"
+    >
+      Next →
+    </button>
+  </footer>
+</section>
