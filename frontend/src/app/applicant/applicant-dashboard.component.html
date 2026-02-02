@@ -16,6 +16,9 @@
           <div class="top-staff">({{ activeUser.staffNumber }})</div>
         </div>
         <div class="top-avatar">{{ initials }}</div>
+        <button type="button" class="btn-logout" (click)="logout()" title="Logout">
+          <span class="logout-icon">⎋</span>
+        </button>
       </div>
     </div>
   </header>

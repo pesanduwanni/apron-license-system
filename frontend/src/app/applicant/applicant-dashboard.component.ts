@@ -190,6 +190,11 @@ export class ApplicantDashboardComponent implements OnInit {
     this.showHistory = !this.showHistory;
   }
 
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
   handleFileChange(controlKey: string, event: Event): void {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files?.[0] ?? null;
@@ -229,11 +234,6 @@ export class ApplicantDashboardComponent implements OnInit {
       this.showHistory = true;
       this.formStatus = 'submitted';
     }, 500);
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 
   private buildEquipmentGroup(): FormGroup {

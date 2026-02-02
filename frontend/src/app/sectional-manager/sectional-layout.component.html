@@ -1,6 +1,6 @@
 <ng-container *ngIf="user as activeUser">
-  <div class="layout-shell">
-    <!-- Top header (same style as applicant screen) -->
+  <div class="layout-container">
+    <!-- Top Bar (shared with applicant) -->
     <header class="top-bar">
       <div class="top-bar-inner">
         <div class="brand">
@@ -14,58 +14,53 @@
             <div class="top-staff">({{ activeUser.staffNumber }}) · Sectional Manager</div>
           </div>
           <div class="top-avatar">{{ initials }}</div>
-          <button class="btn-logout" (click)="logout()" title="Logout">
+          <button type="button" class="btn-logout" (click)="logout()" title="Logout">
             <span class="logout-icon">⎋</span>
           </button>
         </div>
       </div>
     </header>
 
-    <div class="layout-root">
-      <!-- Sidebar below top bar -->
+    <div class="main-wrapper">
+      <!-- Sidebar -->
       <aside class="sidebar">
-      <div class="sidebar-top">
-
-
-        <nav class="sidebar-nav">
-          <a
-            routerLink="/sectional-manager/dashboard"
-            routerLinkActive="active"
-            class="nav-item"
-          >
-            <span class="nav-icon">📊</span>
-            <span class="nav-label">Dashboard</span>
+        <nav class="nav-menu">
+          <a routerLink="/sectional-manager/dashboard" routerLinkActive="active" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Dashboard</span>
           </a>
-          <a
-            routerLink="/sectional-manager/requests"
-            routerLinkActive="active"
-            class="nav-item"
-          >
-            <span class="nav-icon">📋</span>
-            <span class="nav-label">Requests</span>
+          <a routerLink="/sectional-manager/requests" routerLinkActive="active" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Requests</span>
           </a>
-          <a
-            routerLink="/sectional-manager/rejected"
-            routerLinkActive="active"
-            class="nav-item"
-          >
-            <span class="nav-icon">✗</span>
-            <span class="nav-label">Rejected</span>
+          <a routerLink="/sectional-manager/rejected" routerLinkActive="active" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span>Rejected</span>
           </a>
         </nav>
-      </div>
-
-      <div class="sidebar-bottom">
-        <div class="sidebar-footer-text">SriLankan Airlines</div>
-      </div>
+        <div class="sidebar-footer">
+          <span class="airline-text">SriLankan Airlines</span>
+        </div>
       </aside>
 
-      <!-- Main content area -->
-      <div class="main-column">
-        <main class="main-content">
-          <router-outlet></router-outlet>
-        </main>
-      </div>
+      <!-- Main Content -->
+      <main class="main-content">
+        <router-outlet></router-outlet>
+      </main>
     </div>
   </div>
 </ng-container>
