@@ -1,12 +1,46 @@
 <ng-container *ngIf="user && application">
   <!-- Page content area (layout header comes from sectional-layout) -->
   <div class="page-body">
-    <!-- Success/Error Messages -->
-    <div class="alert alert-success" *ngIf="successMessage">
-      ✓ {{ successMessage }}
+    <!-- Success/Error Notification Modals -->
+    <div class="notify-overlay" *ngIf="errorMessage" (click)="closeAlert()">
+      <div class="notify-modal error" (click)="$event.stopPropagation()">
+        <div class="notify-top">
+          <div class="notify-icon error-icon">✕</div>
+        </div>
+        <div class="notify-body">
+          <h3>Error</h3>
+          <p>{{ errorMessage }}</p>
+          <div class="notify-actions">
+            <button class="btn btn-secondary" (click)="closeAlert()">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="alert alert-error" *ngIf="errorMessage">
-      ✗ {{ errorMessage }}
+
+    <div class="notify-overlay" *ngIf="successMessage" (click)="closeAlert()">
+      <div class="notify-modal success" (click)="$event.stopPropagation()">
+        <div class="notify-top">
+          <div class="notify-icon success-icon">✓</div>
+        </div>
+        <div class="notify-body">
+          <h3>Success</h3>
+          <p>{{ successMessage }}</p>
+          <div class="notify-actions">
+            <button class="btn btn-secondary" (click)="closeAlert()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top-right toast for quick feedback (e.g., categories updated) -->
+    <div class="toast-container" *ngIf="showToast">
+      <div class="toast" [class.success]="toastType === 'success'" [class.error]="toastType === 'error'">
+        <div class="toast-body">
+          <div class="toast-title">{{ toastType === 'success' ? 'Success' : 'Error' }}</div>
+          <div class="toast-message">{{ toastMessage }}</div>
+        </div>
+        <button class="toast-close" (click)="closeToast()">✕</button>
+      </div>
     </div>
 
     <!-- Read-only application form mirroring applicant layout -->
@@ -18,7 +52,11 @@
         </button>
         <div class="header-right">
           <span class="header-ref">{{ application.referenceNumber }}</span>
-          <button class="btn-new" type="button" *ngIf="isPending">New</button>
+          <ng-container>
+            <button class="badge badge-new" *ngIf="isPending">New</button>
+            <button class="badge badge-ongoing" *ngIf="isOngoing">On going</button>
+            <button class="badge badge-rejected" *ngIf="isRejectedStatus">Rejected</button>
+          </ng-container>
         </div>
       </div>
 
@@ -359,6 +397,40 @@
       </section>
     </div>
 
+    <div class="right-column">
+      <div class="summary-card">
+        <h4>Summery</h4>
+        <div class="summary-divider"></div>
+        <div class="timeline">
+          <div *ngFor="let item of historyItems" class="timeline-item">
+            <div class="avatar-col">
+              <div class="avatar-ring">
+                <div class="avatar-icon"></div>
+              </div>
+            </div>
+            <div class="item-col">
+                <div class="item-header">
+                <div class="title-block">
+                  <div class="name-row">
+                    <span class="actor">{{ item.actor }}</span>
+                    <span class="staff-id" *ngIf="item.staffId">({{ item.staffId }})</span>
+                  </div>
+                  <div class="role">{{ item.role }}</div>
+                </div>
+              </div>
+              <div class="item-body">
+                <div class="message-block">
+                  <div class="message">{{ item.message }}</div>
+                  <div class="date">{{ formatDate(item.date) }}</div>
+                </div>
+                <div class="time-ago">{{ getTimeAgo(item.date) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Footer -->
@@ -370,20 +442,7 @@
     </div>
   </footer>
 
-  <!-- Confirm Modal -->
-  <div class="modal-overlay" *ngIf="showConfirmModal" (click)="closeModals()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>Confirm Approval</h3>
-      <p>
-        Are you sure you want to approve this application?
-        The applicant and Safety Manager will be notified via email.
-      </p>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" (click)="closeModals()">Cancel</button>
-        <button class="btn btn-approve" (click)="confirmApprove()">Yes, Approve</button>
-      </div>
-    </div>
-  </div>
+  <!-- Confirm Modal removed per request: approvals now act immediately and show success notification -->
 
   <!-- Reject Modal -->
   <div class="modal-overlay" *ngIf="showRejectModal" (click)="closeModals()">

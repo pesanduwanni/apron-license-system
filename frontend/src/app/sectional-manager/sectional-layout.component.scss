@@ -99,7 +99,7 @@
 .sidebar {
   position: fixed;
   top: 72px; 
-  left: -10px;
+  left: 0; /* flush to the left edge */
   width: 200px;
   min-height: 400px;
   background: linear-gradient(
@@ -113,7 +113,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 14px;
+  border-radius: 0 14px 14px 0;
   padding: 10px 8px 18px;
   display: flex;
   flex-direction: column;
@@ -181,10 +181,10 @@
 
 /* Main Content */
 .main-content {
-  /* push content to the right and below fixed header */
-  margin-left: 200px; /* 260px sidebar + ~44px gap (visual) */
+  /* push content to the right and below fixed header; account for sidebar width */
+  margin-left: 200px;
   margin-top: -15px;
-  padding: 88px 32px 32px 24px; /* 72px top bar + 16px gap */
+  padding: 88px 0 32px 24px; /* no right padding so content and summary can reach window edge */
   min-height: 100vh;
   overflow-y: auto;
 }

@@ -32,6 +32,11 @@ export class ApplicationDetailComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
 
+  // Toast (top-right) for quick confirmations like category updates
+  showToast = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' = 'success';
+
   // Preview modal
   showPreviewModal = false;
   previewUrl = '';
@@ -102,6 +107,15 @@ export class ApplicationDetailComponent implements OnInit {
     return this.application?.status === 'rejected_sectional';
   }
 
+  get isOngoing(): boolean {
+    // Consider accepted by sectional manager or forwarded to safety as ongoing
+    return !!this.application && (this.application.status === 'approved_sectional' || this.application.status === 'pending_safety');
+  }
+
+  get isRejectedStatus(): boolean {
+    return !!this.application && (this.application.status === 'rejected_sectional' || this.application.status === 'rejected_safety');
+  }
+
   isCategorySelected(key: string): boolean {
     return this.editedCategories.includes(key);
   }
@@ -122,23 +136,38 @@ export class ApplicationDetailComponent implements OnInit {
   }
 
   updateCategories(): void {
-    if (!this.application || !this.isPending) return;
+    if (!this.application || !this.isPending || !this.user) return;
 
     const success = this.applicationsService.updateCategories(
       this.application.id,
+      this.user.staffNumber,
+      this.user.name,
       [...this.editedCategories],
       this.remarks
     );
 
     if (success) {
-      this.successMessage = 'Categories updated successfully.';
-      setTimeout(() => (this.successMessage = ''), 3000);
+      // show a small top-right toast for category updates
+      this.showToastMessage('You have updated equipment type / Vehicle successfully', 'success');
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
       this.errorMessage = 'Failed to update categories.';
       setTimeout(() => (this.errorMessage = ''), 3000);
     }
+  }
+
+  showToastMessage(message: string, type: 'success' | 'error' = 'success') {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    // auto-dismiss
+    setTimeout(() => this.closeToast(), 4500);
+  }
+
+  closeToast(): void {
+    this.showToast = false;
+    this.toastMessage = '';
   }
 
   openEquipmentEdit(): void {
@@ -157,7 +186,7 @@ export class ApplicationDetailComponent implements OnInit {
 
   openApproveConfirm(): void {
     this.confirmAction = 'approve';
-    this.showConfirmModal = true;
+    this.confirmApprove();
   }
 
   openRejectModal(): void {
@@ -185,7 +214,7 @@ export class ApplicationDetailComponent implements OnInit {
     this.closeModals();
 
     if (success) {
-      this.successMessage = 'Application approved successfully. Email notification sent to applicant and Safety Manager.';
+      this.successMessage = 'Task Updated and Sent to next level Successfully';
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -238,6 +267,11 @@ export class ApplicationDetailComponent implements OnInit {
     this.previewTitle = '';
   }
 
+  closeAlert(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
+
   downloadAttachment(url: string, filename: string): void {
     // In real app, this would trigger actual download
     const link = document.createElement('a');
@@ -262,5 +296,105 @@ export class ApplicationDetailComponent implements OnInit {
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const yyyy = d.getFullYear();
     return `${dd}-${mm}-${yyyy}`;
+  }
+
+  getTimeAgo(dateStr?: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    if (diffMs <= 0) return '0m';
+
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays >= 1) return `${diffDays}d`;
+
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    if (diffHours >= 1) return `${diffHours}h`;
+
+    const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
+    return `${diffMinutes}m`;
+  }
+
+  // Build a simple history/timeline from available application fields
+  get historyItems() {
+    if (!this.application) return [];
+    const items: Array<{ actor: string; role: string; staffId?: string; date?: string; message?: string }>
+      = [];
+
+    // Applicant submission
+    items.push({
+      actor: this.application.applicantName,
+      role: 'User',
+      staffId: this.application.staffNumber,
+      date: this.application.submittedDate,
+      message: 'Request sent'
+    });
+
+    // Sectional manager action (if present)
+    if (this.application.sectionalManagerName && this.application.sectionalApprovalDate) {
+      const approved = this.application.approvedCategories || [];
+      const original = this.application.selectedCategories || [];
+      const changed =
+        approved.length !== original.length ||
+        approved.some((k) => !original.includes(k));
+
+      let message = '';
+
+      if (this.application.status === 'approved_sectional') {
+        message = 'Accepted request';
+      } else if (this.application.status === 'rejected_sectional') {
+        message = 'Rejected request';
+      } else if (changed) {
+        message = 'Updated equipment recommendation';
+      } else {
+        message = 'Reviewed request';
+      }
+
+      if (this.application.sectionalRemarks) {
+        message += ` – ${this.application.sectionalRemarks}`;
+      }
+
+      items.push({
+        actor: this.application.sectionalManagerName,
+        role: 'Sectional Manager',
+        staffId: this.application.sectionalManagerId,
+        date: this.application.sectionalApprovalDate,
+        message
+      });
+    }
+
+    // Safety manager action (if present)
+    if (this.application.safetyManagerName && this.application.safetyApprovalDate) {
+      let message = '';
+
+      if (this.application.status === 'approved_safety') {
+        message = 'Accepted request';
+      } else if (this.application.status === 'rejected_safety') {
+        message = 'Rejected request';
+      } else {
+        message = 'Reviewed request';
+      }
+
+      if (this.application.safetyRemarks) {
+        message += ` – ${this.application.safetyRemarks}`;
+      }
+
+      items.push({
+        actor: this.application.safetyManagerName,
+        role: 'Safety Manager',
+        staffId: this.application.safetyManagerId,
+        date: this.application.safetyApprovalDate,
+        message
+      });
+    }
+
+    // Sort newest first by date if available
+    items.sort((a, b) => {
+      const da = a.date ? new Date(a.date).getTime() : 0;
+      const db = b.date ? new Date(b.date).getTime() : 0;
+      return db - da;
+    });
+
+    return items;
   }
 }

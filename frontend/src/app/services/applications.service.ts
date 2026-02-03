@@ -520,14 +520,23 @@ export class ApplicationsService {
     );
   }
 
-  // Update categories (sectional manager)
-  updateCategories(appId: string, categories: string[], remarks: string): boolean {
+  // Update categories (sectional manager) without changing status
+  updateCategories(
+    appId: string,
+    managerId: string,
+    managerName: string,
+    categories: string[],
+    remarks: string
+  ): boolean {
     const apps = this.getApplications();
     const idx = apps.findIndex(a => a.id === appId);
     if (idx === -1) return false;
 
     apps[idx].approvedCategories = categories;
     apps[idx].sectionalRemarks = remarks;
+    apps[idx].sectionalManagerId = managerId;
+    apps[idx].sectionalManagerName = managerName;
+    apps[idx].sectionalApprovalDate = new Date().toISOString().split('T')[0];
     this.saveApplications(apps);
     return true;
   }

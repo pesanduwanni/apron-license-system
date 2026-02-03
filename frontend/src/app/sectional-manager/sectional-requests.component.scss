@@ -63,12 +63,14 @@
 }
 
 .application-row {
-  display: flex;
+  display: grid;
+  /* columns: index | ref | applicant | department | date | status | action */
+  grid-template-columns: 32px 110px 1fr 1fr 100px 90px 100px;
   align-items: center;
   background: #ffffff;
   border-radius: 10px;
-  padding: 14px 18px;
-  gap: 24px;
+  padding: 14px 16px;
+  gap: 12px;
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
@@ -99,42 +101,53 @@
 .applicant-info {
   display: flex;
   flex-direction: column;
-  min-width: 120px;
+  min-width: 0; /* allow grid children to shrink/grow */
 }
 
 .applicant-name {
   font-size: 14px;
   font-weight: 600;
   color: #1a1a1a;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .applicant-id {
   font-size: 12px;
   color: #666;
+  white-space: nowrap;
 }
 
 .department-info {
   display: flex;
   flex-direction: column;
-  min-width: 120px;
+  min-width: 0;
 }
 
 .department-name {
   font-size: 14px;
   font-weight: 600;
   color: #1a1a1a;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .department-label {
   font-size: 11px;
   color: #888;
+  white-space: nowrap;
 }
+
+/* Keep rows on a single line; grid handles overflow */
+.application-row { white-space: normal; }
 
 .date-info {
   display: flex;
   flex-direction: column;
   min-width: 100px;
-  margin-left: auto;
+  justify-self: start;
 }
 
 .date-value {
@@ -180,14 +193,17 @@
 
 /* View Button */
 .view-btn {
-  padding: 8px 20px;
+  /* match height and overall size of status chip */
+  padding: 6px 18px;
+  min-width: 90px;
   background: #0066cc;
   color: #fff;
   border: none;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  text-align: center;
   transition: background 0.2s;
 
   &:hover {
