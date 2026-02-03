@@ -104,12 +104,12 @@
   min-height: 400px;
   background: linear-gradient(
       180deg,
-      rgba(0, 51, 102, 0.96) 0%,
-      rgba(0, 51, 102, 0.9) 35%,
-      rgba(0, 51, 102, 0.8) 65%,
-      rgba(0, 51, 102, 0.95) 100%
+      rgb(0, 72, 114) 0%,
+      rgba(0, 72, 114, 0.881) 35%,
+      rgba(0, 72, 114, 0.642) 65%,
+      rgb(0, 72, 114) 100%
     ),
-    url('/assests/images/login-airport.jpg');
+    url('/assets/images/login-airport.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -163,8 +163,13 @@
 }
 
 .airline-logo {
-  max-width: 120px;
+  max-width: 130px;
+  max-height: 24px;
+  width: auto;
   height: auto;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
 }
 
 .airline-text {

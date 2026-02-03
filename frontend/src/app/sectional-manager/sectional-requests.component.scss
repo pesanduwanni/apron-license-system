@@ -7,34 +7,45 @@
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
+.requests-header {
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e1e1e1; /* horizontal line directly under Applicants */
+  margin-bottom: 4px;
+}
+
 .page-title {
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 20px 0;
+  color: #004b80;
+  margin: 0;
 }
 
-/* Tabs */
+/* Tabs strip under the title, with its own bottom line and shadow */
+.tabs-wrapper {
+  border-bottom: 1px solid #d2d6dc; /* line attached to buttons */
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+  margin-bottom: 16px;
+}
+
 .tabs-container {
   display: inline-flex;
-  background: #e8e8e8;
-  border-radius: 4px;
-  padding: 4px;
-  margin-bottom: 24px;
+  gap: 4px;
+  padding-top: 8px;
 }
 
 .tab {
-  padding: 8px 24px;
+  padding: 6px 20px;
   border: none;
   background: transparent;
   font-size: 13px;
   font-weight: 600;
   color: #666;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px 8px 0 0;
   transition: all 0.2s;
 
   &:hover {
+    background: #f1f3f7;
     color: #333;
   }
 

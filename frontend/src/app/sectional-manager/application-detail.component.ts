@@ -37,6 +37,12 @@ export class ApplicationDetailComponent implements OnInit {
   previewUrl = '';
   previewTitle = '';
 
+  // Equipment edit modal
+  showEquipmentEditModal = false;
+
+  // Track images that failed to load so we can show placeholders instead
+  failedAttachments: { [key: string]: boolean } = {};
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -135,6 +141,20 @@ export class ApplicationDetailComponent implements OnInit {
     }
   }
 
+  openEquipmentEdit(): void {
+    if (!this.isPending) return;
+    this.showEquipmentEditModal = true;
+  }
+
+  closeEquipmentEdit(): void {
+    this.showEquipmentEditModal = false;
+  }
+
+  saveEquipmentEdit(): void {
+    this.updateCategories();
+    this.showEquipmentEditModal = false;
+  }
+
   openApproveConfirm(): void {
     this.confirmAction = 'approve';
     this.showConfirmModal = true;
@@ -200,6 +220,16 @@ export class ApplicationDetailComponent implements OnInit {
     this.previewUrl = url;
     this.previewTitle = title;
     this.showPreviewModal = true;
+  }
+
+  imageError(key: string): void {
+    this.failedAttachments[key] = true;
+  }
+
+  imageLoaded(key: string): void {
+    if (this.failedAttachments[key]) {
+      delete this.failedAttachments[key];
+    }
   }
 
   closePreview(): void {

@@ -101,7 +101,7 @@
       rgba(0, 72, 114, 1) 60%,
       rgba(0, 72, 114, 0) 100%
     ),
-    url('/assests/images/login-airport.jpg');
+    url('/assets/images/login-airport.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -149,6 +149,30 @@
   max-width: 1200px;
   margin: 1.5rem auto 3rem;
   padding: 0 1.25rem;
+}
+
+/* Footer styles (match global footer) */
+.page-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: #014a73;
+  padding: 0.4rem 1.25rem;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-copy {
+  font-size: 0.8rem;
+  color: #f9fafb;
 }
 
 .form-card {

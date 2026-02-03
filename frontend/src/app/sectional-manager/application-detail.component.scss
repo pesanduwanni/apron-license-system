@@ -91,13 +91,16 @@
 /* Page body */
 .page-body {
   max-width: 1400px;
-  margin: 80px auto 3rem;
+  margin: 8px auto 3rem;
   padding: 0 1.25rem;
 }
 
 /* Page header */
 .page-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .btn-back {
@@ -115,50 +118,30 @@
   text-decoration: underline;
 }
 
-.header-info {
+.header-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.header-info h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #111827;
-}
-
-.ref-badge {
-  background: #e0f2fe;
-  color: #0369a1;
-  padding: 0.35rem 0.85rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.status-chip {
-  display: inline-block;
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
+.header-ref {
   font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.btn-new {
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.8rem;
   font-weight: 600;
+  color: #374151;
+  cursor: pointer;
 }
 
-.status-chip.pending {
-  background: #fff4e5;
-  color: #e68600;
-}
-
-.status-chip.approved {
-  background: #e5f9ec;
-  color: #107944;
-}
-
-.status-chip.rejected {
-  background: #ffe5e5;
-  color: #c62828;
+.btn-new:hover {
+  background: #e5e7eb;
 }
 
 /* Alerts */
@@ -181,259 +164,300 @@
   border: 1px solid #fca5a5;
 }
 
-/* Content Grid */
-.content-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
+/* Form-style layout mirroring applicant form */
 
-.detail-card {
+.form-card {
+  margin-top: 0.5rem;
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 1.25rem 1.5rem 2rem;
 }
 
-.detail-card.full-width {
-  grid-column: 1 / -1;
+.form-section {
+  margin-top: 1.5rem;
+  padding: 1.75rem;
 }
 
-.card-title {
-  margin: 0 0 1rem;
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+  margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
   color: #111827;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e5e7eb;
+  flex: 1;
 }
 
-.card-subtitle {
-  margin: -0.5rem 0 1rem;
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-/* Info grid */
-.info-grid {
+.section-body {
+  margin-top: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
 }
 
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.field-grid-2,
+.field-grid-3,
+.field-grid-4 {
+  display: grid;
+  gap: 1.25rem;
 }
 
-.info-item.full {
+.field-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.field-grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field.full {
   grid-column: 1 / -1;
 }
 
-.info-item label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
+.field label {
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.95rem;
 }
 
-.info-item span {
+.field-value {
+  min-height: 2.5rem;
   font-size: 0.95rem;
   color: #111827;
-  font-weight: 500;
-}
-
-.license-badge {
-  display: inline-block;
-  padding: 0.25rem 0.65rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: #e0f2fe;
-  color: #0369a1;
-  width: fit-content;
-}
-
-.license-badge.extension {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-/* Attachments */
-.attachments-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-}
-
-.attachment-group h3 {
-  margin: 0 0 0.75rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-.attachment-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.attachment-item {
   display: flex;
   align-items: center;
+}
+
+/* Equipment grid & checkboxes (match applicant view) */
+
+.equipment-header {
+  display: flex;
   justify-content: space-between;
-  padding: 0.65rem 1rem;
-  background: #f9fafb;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-}
-
-.attachment-label {
-  font-size: 0.9rem;
-  color: #374151;
-}
-
-.attachment-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-sm {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-preview {
-  background: #e0f2fe;
-  color: #0369a1;
-}
-
-.btn-preview:hover {
-  background: #bae6fd;
-}
-
-.btn-download {
-  background: #e5e7eb;
-  color: #374151;
-}
-
-.btn-download:hover {
-  background: #d1d5db;
-}
-
-/* Categories */
-.categories-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-}
-
-.category-checkbox {
-  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1rem;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 6px;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0.75rem;
+}
+
+.equipment-header label {
+  margin: 0;
+}
+
+.equipment-edit-btn {
+  padding: 0.35rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.equipment-grid {
+  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem 2.5rem;
+}
+
+.equipment-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-size: 0.9rem;
+  color: #111827;
+  position: relative;
 }
 
-.category-checkbox:hover:not(.disabled) {
-  background: #f3f4f6;
-}
-
-.category-checkbox.selected {
-  background: #e5f9ec;
-  border-color: #10b981;
-}
-
-.category-checkbox.original {
-  border-color: #0d63d6;
-}
-
-.category-checkbox.disabled {
+.equipment-checkbox.disabled {
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-.category-checkbox input {
-  display: none;
+/* hide native checkbox */
+.equipment-checkbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.checkbox-custom {
+/* LIGHT GREY box before ticking */
+.equipment-checkbox-custom {
   width: 18px;
   height: 18px;
-  border: 2px solid #d1d5db;
   border-radius: 4px;
-  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  background: #e5e5e5;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
-.category-checkbox.selected .checkbox-custom {
-  background: #10b981;
-  border-color: #10b981;
+/* checked (ticked) state */
+.equipment-checkbox input:checked + .equipment-checkbox-custom {
+  border-color: #4b5563;
+  background: #004872;
 }
 
-.category-checkbox.selected .checkbox-custom::after {
+.equipment-checkbox input:checked + .equipment-checkbox-custom::after {
   content: '✓';
   color: #ffffff;
   font-size: 0.75rem;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-.category-label {
-  flex: 1;
-  color: #374151;
-  font-weight: 500;
+/* Attachments & signature */
+
+.attachment-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
 }
 
-/* Remarks */
-.remarks-section {
-  margin-top: 1.5rem;
+.attachment-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.remarks-section label {
-  display: block;
+.attachment-title {
+  margin: 0;
   font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: #111827;
 }
 
+.attachment-boxes {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.attachment-box {
+  flex: 1;
+}
+
+.attachment-image-box {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.attachment-image-box img {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+.attachment-placeholder {
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  padding: 0.5rem;
+}
+.signature-placeholder {
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
+
+.signature-image-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 40px;
+}
+
+.signature-image {
+  max-width: 120px;
+  max-height: 40px;
+  display: block;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
+
+/* Signature row layout: single column like applicant view */
+.signature-row {
+  grid-template-columns: 1fr;
+  margin-top: 1.25rem;
+}
+
+/* Make signature group narrower and add divider like applicant */
+.signature-group {
+  max-width: 260px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+.signature-title {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Remarks textarea styling to match applicant */
 .remarks-section textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
+  min-height: 80px;
+  padding: 1rem 1rem;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #6b7280;
   font-size: 0.95rem;
   resize: vertical;
-  font-family: inherit;
 }
 
-.remarks-section textarea:focus {
-  outline: none;
-  border-color: #0d63d6;
-  box-shadow: 0 0 0 3px rgba(13, 99, 214, 0.1);
+/* Action buttons: back on left, others on right */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e5e7eb;
 }
 
-.remarks-section textarea[readonly] {
-  background: #f9fafb;
-  cursor: not-allowed;
+.action-left {
+  display: flex;
+  align-items: center;
 }
+
+.action-right {
+  display: flex;
+  gap: 1rem;
+}
+
+
 
 .action-row {
   margin-top: 1rem;
@@ -484,40 +508,34 @@
   cursor: not-allowed;
 }
 
-/* Action buttons row */
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid #e5e7eb;
-}
+/* Action buttons row: layout handled above by .action-buttons (space-between) */
 
 /* Footer */
 .page-footer {
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
-  padding: 1rem 1.25rem;
-  margin-top: 3rem;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: #014a73; /* blue bar */
+  padding: 0.4rem 1.25rem;
 }
 
 .footer-inner {
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* center footer content */
+.footer-inner {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
 .footer-copy {
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.footer-version {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: #f9fafb;
 }
 
 /* Modals */
@@ -637,6 +655,127 @@
   max-width: 100%;
   max-height: 70vh;
   object-fit: contain;
+}
+
+/* Equipment edit modal - match "Request Information" UI */
+.equipment-modal {
+  max-width: 960px;
+  width: 90%;
+}
+
+.equipment-modal h3 {
+  margin-bottom: 0.75rem;
+}
+
+.equipment-modal p {
+  margin-bottom: 1.5rem;
+}
+
+.equipment-modal .equipment-grid {
+  margin-top: 0.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem 3rem;
+}
+
+.equipment-modal .remarks-section {
+  margin-top: 2rem;
+}
+
+.equipment-modal .remarks-section textarea {
+  min-height: 140px;
+}
+
+.equipment-modal .modal-actions {
+  margin-top: 2rem;
+  justify-content: flex-end;
+}
+
+/* Constrain modal height and allow internal scrolling so it fits viewport */
+.modal {
+  max-height: 90vh;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+/* Blue header bar for equipment modal */
+.equipment-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0b557a;
+  color: #fff;
+  padding: 0.45rem 0.9rem; /* slimmer header */
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.equipment-header-bar .modal-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.equipment-header-bar .modal-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+
+.modal-content {
+  padding: 0.9rem 1rem 1rem;
+  /* content becomes the flexible scrollable area inside the modal */
+  flex: 1 1 auto;
+  overflow: auto;
+  
+}
+
+.modal-subtitle {
+  margin: 0 0 0.75rem 0;
+  color: #111827;
+  font-weight: 600;
+}
+
+.equipment-modal {
+  max-width: 860px;
+  width: calc(100% - 48px);
+  padding: 0; /* remove modal's internal padding so header is flush */
+  border-radius: 12px; /* ensure rounded corners remain on the modal container */
+  overflow: hidden; /* clip to modal corners */
+  max-height: 78vh; /* shorter overall modal */
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.equipment-modal .equipment-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-top: 10px;
+  gap: 0.6rem 2.5rem;
+  border-top: 1px solid #e5e7eb;
+
+}
+
+.equipment-modal .remarks-section textarea {
+  min-height: 50px;
+  max-width: 750px;
+
+}
+
+.equipment-modal .modal-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  padding: 0.75rem 0;
+  background: transparent;
+}
+
+/* Single Update button size matching screenshot */
+.equipment-modal .modal-actions .btn-approve {
+  padding: 0.6rem 1.2rem;
+  min-width: 120px;
 }
 
 /* Responsive */

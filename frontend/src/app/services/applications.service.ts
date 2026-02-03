@@ -63,6 +63,7 @@ export interface Application {
     aviationPassBack?: Attachment;
     nicFront?: Attachment;
     nicBack?: Attachment;
+    signature?: Attachment;
   };
 
   // Sectional Manager fields
@@ -132,12 +133,13 @@ export class ApplicationsService {
       stateLicenseExpiryDate: '2028-05-20',
       selectedCategories: ['tractor', 'pickUp', 'van', 'car'],
       attachments: {
-        staffIdFront: { name: 'staff_id_front.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        staffIdBack: { name: 'staff_id_back.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        stateLicenseFront: { name: 'license_front.png', type: 'png', url: '/assets/mock/license.png' },
-        stateLicenseBack: { name: 'license_back.png', type: 'png', url: '/assets/mock/license.png' },
-        nicFront: { name: 'nic_front.png', type: 'png', url: '/assets/mock/nic.png' },
-        nicBack: { name: 'nic_back.png', type: 'png', url: '/assets/mock/nic.png' }
+        staffIdFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        staffIdBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        signature: { name: 'mock-signature.png', type: 'png', url: '/assets/mock-images/mock-signature.png' }
       },
       sectionalManagerId: 'STF002'
     },
@@ -160,14 +162,14 @@ export class ApplicationsService {
       stateLicenseExpiryDate: '2029-08-10',
       selectedCategories: ['transporter', 'paxCoach', 'buggy'],
       attachments: {
-        staffIdFront: { name: 'staff_id_front.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        staffIdBack: { name: 'staff_id_back.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        stateLicenseFront: { name: 'license_front.png', type: 'png', url: '/assets/mock/license.png' },
-        stateLicenseBack: { name: 'license_back.png', type: 'png', url: '/assets/mock/license.png' },
-        aviationPassFront: { name: 'aviation_front.png', type: 'png', url: '/assets/mock/aviation.png' },
-        aviationPassBack: { name: 'aviation_back.png', type: 'png', url: '/assets/mock/aviation.png' },
-        nicFront: { name: 'nic_front.png', type: 'png', url: '/assets/mock/nic.png' },
-        nicBack: { name: 'nic_back.png', type: 'png', url: '/assets/mock/nic.png' }
+        staffIdFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        staffIdBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        aviationPassFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        aviationPassBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' }
       },
       sectionalManagerId: 'STF002'
     },
@@ -190,12 +192,12 @@ export class ApplicationsService {
       stateLicenseExpiryDate: '2030-01-15',
       selectedCategories: ['forkliftPalletMover', 'jcpMdLoader', 'skyLoader'],
       attachments: {
-        staffIdFront: { name: 'staff_id_front.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        staffIdBack: { name: 'staff_id_back.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        stateLicenseFront: { name: 'license_front.png', type: 'png', url: '/assets/mock/license.png' },
-        stateLicenseBack: { name: 'license_back.png', type: 'png', url: '/assets/mock/license.png' },
-        nicFront: { name: 'nic_front.png', type: 'png', url: '/assets/mock/nic.png' },
-        nicBack: { name: 'nic_back.png', type: 'png', url: '/assets/mock/nic.png' }
+        staffIdFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        staffIdBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' }
       },
       sectionalManagerId: 'STF002'
     },
@@ -221,12 +223,12 @@ export class ApplicationsService {
       selectedCategories: ['maintPlatLiftTruck', 'snorkelLift', 'donkeyLift'],
       approvedCategories: ['maintPlatLiftTruck', 'snorkelLift', 'donkeyLift', 'hiLiftCatering'],
       attachments: {
-        staffIdFront: { name: 'staff_id_front.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        staffIdBack: { name: 'staff_id_back.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        stateLicenseFront: { name: 'license_front.png', type: 'png', url: '/assets/mock/license.png' },
-        stateLicenseBack: { name: 'license_back.png', type: 'png', url: '/assets/mock/license.png' },
-        nicFront: { name: 'nic_front.png', type: 'png', url: '/assets/mock/nic.png' },
-        nicBack: { name: 'nic_back.png', type: 'png', url: '/assets/mock/nic.png' }
+        staffIdFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        staffIdBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' }
       },
       sectionalManagerId: 'STF002',
       sectionalManagerName: 'Kamala Silva',
@@ -255,12 +257,12 @@ export class ApplicationsService {
       stateLicenseExpiryDate: '2027-01-10',
       selectedCategories: ['tractor', 'buggy'],
       attachments: {
-        staffIdFront: { name: 'staff_id_front.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        staffIdBack: { name: 'staff_id_back.png', type: 'png', url: '/assets/mock/staff_id.png' },
-        stateLicenseFront: { name: 'license_front.png', type: 'png', url: '/assets/mock/license.png' },
-        stateLicenseBack: { name: 'license_back.png', type: 'png', url: '/assets/mock/license.png' },
-        nicFront: { name: 'nic_front.png', type: 'png', url: '/assets/mock/nic.png' },
-        nicBack: { name: 'nic_back.png', type: 'png', url: '/assets/mock/nic.png' }
+        staffIdFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        staffIdBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        stateLicenseBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicFront: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' },
+        nicBack: { name: 'mock-id.jpeg', type: 'jpg', url: '/assets/mock-images/mock-id.jpeg' }
       },
       sectionalManagerId: 'STF002'
     },

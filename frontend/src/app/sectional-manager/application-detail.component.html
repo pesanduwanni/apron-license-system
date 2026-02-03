@@ -1,25 +1,6 @@
 <ng-container *ngIf="user && application">
   <!-- Page content area (layout header comes from sectional-layout) -->
   <div class="page-body">
-    <!-- Back button & Header -->
-    <div class="page-header">
-      <button class="btn-back" (click)="goBack()">
-        ← Back to List
-      </button>
-      <div class="header-info">
-        <h1>Application Details</h1>
-        <div class="ref-badge">{{ application.referenceNumber }}</div>
-        <span
-          class="status-chip"
-          [class.pending]="isPending"
-          [class.approved]="isApproved"
-          [class.rejected]="isRejected"
-        >
-          {{ isPending ? 'Pending Review' : isApproved ? 'Approved' : 'Rejected' }}
-        </span>
-      </div>
-    </div>
-
     <!-- Success/Error Messages -->
     <div class="alert alert-success" *ngIf="successMessage">
       ✓ {{ successMessage }}
@@ -28,342 +9,364 @@
       ✗ {{ errorMessage }}
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="content-grid">
-      <!-- Left Column: Application Info -->
-      <div class="detail-card">
-        <h2 class="card-title">Applicant Information</h2>
-
-        <div class="info-grid">
-          <div class="info-item">
-            <label>Name</label>
-            <span>{{ application.applicantName }}</span>
-          </div>
-          <div class="info-item">
-            <label>Staff Number</label>
-            <span>{{ application.staffNumber }}</span>
-          </div>
-          <div class="info-item">
-            <label>Department</label>
-            <span>{{ application.department }}</span>
-          </div>
-          <div class="info-item">
-            <label>Designation</label>
-            <span>{{ application.designation }}</span>
-          </div>
-          <div class="info-item">
-            <label>Contact Number</label>
-            <span>{{ application.contactNumber }}</span>
-          </div>
-          <div class="info-item">
-            <label>NIC</label>
-            <span>{{ application.nic }}</span>
-          </div>
+    <!-- Read-only application form mirroring applicant layout -->
+    <div class="form-card">
+      <!-- Back link and small reference/"New" strip like applicant view -->
+      <div class="page-header">
+        <button class="btn-back" (click)="goBack()">
+          ← Back to List
+        </button>
+        <div class="header-right">
+          <span class="header-ref">{{ application.referenceNumber }}</span>
+          <button class="btn-new" type="button" *ngIf="isPending">New</button>
         </div>
       </div>
 
-      <div class="detail-card">
-        <h2 class="card-title">License Information</h2>
+      <!-- Personal Information -->
+      <section class="form-section">
+        <header class="section-header">
+          <h2>Personal Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-2">
+            <div class="field">
+              <label>Name of Applicant, Staff No and Designation</label>
+              <div class="field-value">
+                {{ application.applicantName }} - {{ application.staffNumber }} ({{ application.designation }})
+              </div>
+            </div>
+          </div>
 
-        <div class="info-grid">
-          <div class="info-item">
-            <label>License Type</label>
-            <span class="license-badge" [class.extension]="application.licenseType === 'extension'">
-              {{ application.licenseType === 'extension' ? 'Extension' : 'New License' }}
-            </span>
-          </div>
-          <div class="info-item" *ngIf="application.currentAdpNo">
-            <label>Current ADP No</label>
-            <span>{{ application.currentAdpNo }}</span>
-          </div>
-          <div class="info-item" *ngIf="application.dateOfFirstIssue">
-            <label>Date of First Issue</label>
-            <span>{{ formatDate(application.dateOfFirstIssue) }}</span>
-          </div>
-          <div class="info-item">
-            <label>AASL Access P/No</label>
-            <span>{{ application.aaslAccessNo }}</span>
-          </div>
-          <div class="info-item">
-            <label>AASL Access Expiry</label>
-            <span>{{ formatDate(application.aaslAccessExpiry) }}</span>
-          </div>
-          <div class="info-item">
-            <label>State License No</label>
-            <span>{{ application.stateLicenseNo }}</span>
-          </div>
-          <div class="info-item">
-            <label>State License Issue Date</label>
-            <span>{{ formatDate(application.stateLicenseIssueDate) }}</span>
-          </div>
-          <div class="info-item">
-            <label>State License Expiry</label>
-            <span>{{ formatDate(application.stateLicenseExpiryDate) }}</span>
-          </div>
-          <div class="info-item">
-            <label>Date Submitted</label>
-            <span>{{ formatDate(application.submittedDate) }}</span>
+          
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Section/ Department</label>
+              <div class="field-value">{{ application.department }}</div>
+            </div>
+            <div class="field">
+              <label>Contact No</label>
+              <div class="field-value">{{ application.contactNumber }}</div>
+            </div>
+            <div class="field">
+              <label>NIC No</label>
+              <div class="field-value">{{ application.nic }}</div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Attachments Card -->
-      <div class="detail-card full-width">
-        <h2 class="card-title">Attachments</h2>
+      <!-- Basic Information -->
+      <section class="form-section">
+        <header class="section-header">
+          <h2>Basic Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-4">
+            <div class="field">
+              <label>License Type</label>
+              <div class="field-value">
+                {{ application.licenseType === 'extension' ? 'Extension License' : 'New License' }}
+              </div>
+            </div>
+            <div class="field">
+              <label>Current ADP No</label>
+              <div class="field-value">{{ application.currentAdpNo || '—' }}</div>
+            </div>
+            <div class="field">
+              <label>Date of First Issue</label>
+              <div class="field-value">
+                {{ application.dateOfFirstIssue ? formatDate(application.dateOfFirstIssue) : '—' }}
+              </div>
+            </div>
+            <div class="field">
+              <label>AASL Access P/No</label>
+              <div class="field-value">{{ application.aaslAccessNo }}</div>
+            </div>
+          </div>
 
-        <div class="attachments-grid">
-          <!-- Staff ID -->
-          <div class="attachment-group">
-            <h3>Staff ID</h3>
-            <div class="attachment-row">
-              <div class="attachment-item" *ngIf="application.attachments.staffIdFront">
-                <span class="attachment-label">Front View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.staffIdFront!.url, 'Staff ID - Front')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.staffIdFront!.url, application.attachments.staffIdFront!.name)"
-                  >
-                    ⬇ Download
-                  </button>
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Date Participation of Safety Orientation</label>
+              <div class="field-value">—</div>
+            </div>
+            <div class="field">
+              <label>AASL Access Permit Expiry Date</label>
+              <div class="field-value">{{ formatDate(application.aaslAccessExpiry) }}</div>
+            </div>
+            <div class="field">
+              <label>Requested Date</label>
+              <div class="field-value">{{ formatDate(application.submittedDate) }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- License Information -->
+      <section class="form-section">
+        <header class="section-header">
+          <h2>License Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-4">
+            <div class="field">
+              <label>Civil License No. (RMV)</label>
+              <div class="field-value">{{ application.stateLicenseNo }}</div>
+            </div>
+            <div class="field">
+              <label>Category</label>
+              <div class="field-value">—</div>
+            </div>
+            <div class="field">
+              <label>Date of Issue</label>
+              <div class="field-value">{{ formatDate(application.stateLicenseIssueDate) }}</div>
+            </div>
+            <div class="field">
+              <label>Date of Expiry</label>
+              <div class="field-value">{{ formatDate(application.stateLicenseExpiryDate) }}</div>
+            </div>
+          </div>
+
+          <div class="field full">
+            <div class="equipment-header">
+              <label>Select manager recommendation for equipment type / vehicle</label>
+              <button
+                class="btn btn-secondary equipment-edit-btn"
+                type="button"
+                *ngIf="isPending"
+                (click)="openEquipmentEdit()"
+              >
+                Edit
+              </button>
+            </div>
+            <div class="equipment-grid">
+              <label
+                *ngFor="let cat of vehicleCategories"
+                class="equipment-checkbox"
+                [class.disabled]="true"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="isCategorySelected(cat.key)"
+                  [disabled]="true"
+                />
+                <span class="equipment-checkbox-custom"></span>
+                <span>{{ cat.label }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Attachments and Signature -->
+      <section class="form-section">
+        <header class="section-header">
+          <h2>Attachments</h2>
+        </header>
+        <div class="section-body">
+          <div class="attachment-row">
+            <div class="attachment-group">
+              <p class="attachment-title">Staff ID</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.staffIdFront?.url && !failedAttachments['staffIdFront']"
+                      [src]="application.attachments.staffIdFront!.url"
+                      alt="Staff ID - Front"
+                      (error)="imageError('staffIdFront')"
+                      (load)="imageLoaded('staffIdFront')"
+                    />
+                    <div *ngIf="!application.attachments.staffIdFront?.url || failedAttachments['staffIdFront']" class="attachment-placeholder">Staff ID - Front</div>
+                  </div>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.staffIdBack?.url && !failedAttachments['staffIdBack']"
+                      [src]="application.attachments.staffIdBack!.url"
+                      alt="Staff ID - Back"
+                      (error)="imageError('staffIdBack')"
+                      (load)="imageLoaded('staffIdBack')"
+                    />
+                    <div *ngIf="!application.attachments.staffIdBack?.url || failedAttachments['staffIdBack']" class="attachment-placeholder">Staff ID - Back</div>
+                  </div>
                 </div>
               </div>
-              <div class="attachment-item" *ngIf="application.attachments.staffIdBack">
-                <span class="attachment-label">Back View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.staffIdBack!.url, 'Staff ID - Back')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.staffIdBack!.url, application.attachments.staffIdBack!.name)"
-                  >
-                    ⬇ Download
-                  </button>
+            </div>
+
+            <div class="attachment-group">
+              <p class="attachment-title">State License</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.stateLicenseFront?.url && !failedAttachments['stateLicenseFront']"
+                      [src]="application.attachments.stateLicenseFront!.url"
+                      alt="State License - Front"
+                      (error)="imageError('stateLicenseFront')"
+                      (load)="imageLoaded('stateLicenseFront')"
+                    />
+                    <div *ngIf="!application.attachments.stateLicenseFront?.url || failedAttachments['stateLicenseFront']" class="attachment-placeholder">State License - Front</div>
+                  </div>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.stateLicenseBack?.url && !failedAttachments['stateLicenseBack']"
+                      [src]="application.attachments.stateLicenseBack!.url"
+                      alt="State License - Back"
+                      (error)="imageError('stateLicenseBack')"
+                      (load)="imageLoaded('stateLicenseBack')"
+                    />
+                    <div *ngIf="!application.attachments.stateLicenseBack?.url || failedAttachments['stateLicenseBack']" class="attachment-placeholder">State License - Back</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- State License -->
-          <div class="attachment-group">
-            <h3>State License</h3>
-            <div class="attachment-row">
-              <div class="attachment-item" *ngIf="application.attachments.stateLicenseFront">
-                <span class="attachment-label">Front View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.stateLicenseFront!.url, 'State License - Front')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.stateLicenseFront!.url, application.attachments.stateLicenseFront!.name)"
-                  >
-                    ⬇ Download
-                  </button>
+          <div class="attachment-row">
+
+            <div class="attachment-group">
+              <p class="attachment-title">Aviation Pass</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                    <div class="attachment-image-box">
+                      <img
+                        *ngIf="application.attachments.aviationPassFront?.url && !failedAttachments['aviationPassFront']"
+                        [src]="application.attachments.aviationPassFront!.url"
+                        alt="Aviation Pass - Front"
+                        (error)="imageError('aviationPassFront')"
+                        (load)="imageLoaded('aviationPassFront')"
+                      />
+                      <div *ngIf="!application.attachments.aviationPassFront?.url || failedAttachments['aviationPassFront']" class="attachment-placeholder">Aviation Pass - Front</div>
+                    </div>
                 </div>
-              </div>
-              <div class="attachment-item" *ngIf="application.attachments.stateLicenseBack">
-                <span class="attachment-label">Back View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.stateLicenseBack!.url, 'State License - Back')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.stateLicenseBack!.url, application.attachments.stateLicenseBack!.name)"
-                  >
-                    ⬇ Download
-                  </button>
+                <div class="attachment-box">
+                    <div class="attachment-image-box">
+                      <img
+                        *ngIf="application.attachments.aviationPassBack?.url && !failedAttachments['aviationPassBack']"
+                        [src]="application.attachments.aviationPassBack!.url"
+                        alt="Aviation Pass - Back"
+                        (error)="imageError('aviationPassBack')"
+                        (load)="imageLoaded('aviationPassBack')"
+                      />
+                      <div *ngIf="!application.attachments.aviationPassBack?.url || failedAttachments['aviationPassBack']" class="attachment-placeholder">Aviation Pass - Back</div>
+                    </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Aviation Pass -->
-          <div class="attachment-group" *ngIf="application.attachments.aviationPassFront || application.attachments.aviationPassBack">
-            <h3>Aviation Pass</h3>
-            <div class="attachment-row">
-              <div class="attachment-item" *ngIf="application.attachments.aviationPassFront">
-                <span class="attachment-label">Front View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.aviationPassFront!.url, 'Aviation Pass - Front')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.aviationPassFront!.url, application.attachments.aviationPassFront!.name)"
-                  >
-                    ⬇ Download
-                  </button>
+            <div class="attachment-group">
+              <p class="attachment-title">NIC</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                            <img
+                              *ngIf="application.attachments.nicFront?.url && !failedAttachments['nicFront']"
+                              [src]="application.attachments.nicFront!.url"
+                              alt="NIC - Front"
+                              (error)="imageError('nicFront')"
+                              (load)="imageLoaded('nicFront')"
+                            />
+                            <div *ngIf="!application.attachments.nicFront?.url || failedAttachments['nicFront']" class="attachment-placeholder">NIC - Front</div>
+                  </div>
                 </div>
-              </div>
-              <div class="attachment-item" *ngIf="application.attachments.aviationPassBack">
-                <span class="attachment-label">Back View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.aviationPassBack!.url, 'Aviation Pass - Back')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.aviationPassBack!.url, application.attachments.aviationPassBack!.name)"
-                  >
-                    ⬇ Download
-                  </button>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                            <img
+                              *ngIf="application.attachments.nicBack?.url && !failedAttachments['nicBack']"
+                              [src]="application.attachments.nicBack!.url"
+                              alt="NIC - Back"
+                              (error)="imageError('nicBack')"
+                              (load)="imageLoaded('nicBack')"
+                            />
+                            <div *ngIf="!application.attachments.nicBack?.url || failedAttachments['nicBack']" class="attachment-placeholder">NIC - Back</div>
+                  </div>
                 </div>
               </div>
             </div>
+
+            
+
           </div>
 
-          <!-- NIC -->
-          <div class="attachment-group">
-            <h3>NIC</h3>
-            <div class="attachment-row">
-              <div class="attachment-item" *ngIf="application.attachments.nicFront">
-                <span class="attachment-label">Front View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.nicFront!.url, 'NIC - Front')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.nicFront!.url, application.attachments.nicFront!.name)"
-                  >
-                    ⬇ Download
-                  </button>
+          <div class="attachment-row signature-row">
+            <div class="attachment-group signature-group">
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="signature-image-box">
+                    <img
+                      *ngIf="application.attachments.signature?.url && !failedAttachments['signature']"
+                      [src]="application.attachments.signature?.url || ''"
+                      alt="Signature"
+                      class="signature-image"
+                      (error)="imageError('signature')"
+                      (load)="imageLoaded('signature')"
+                    />
+                    <div *ngIf="!application.attachments.signature?.url || failedAttachments['signature']" class="signature-placeholder"></div>
+                  </div>
                 </div>
               </div>
-              <div class="attachment-item" *ngIf="application.attachments.nicBack">
-                <span class="attachment-label">Back View</span>
-                <div class="attachment-actions">
-                  <button
-                    class="btn-sm btn-preview"
-                    (click)="previewAttachment(application.attachments.nicBack!.url, 'NIC - Back')"
-                  >
-                    👁 Preview
-                  </button>
-                  <button
-                    class="btn-sm btn-download"
-                    (click)="downloadAttachment(application.attachments.nicBack!.url, application.attachments.nicBack!.name)"
-                  >
-                    ⬇ Download
-                  </button>
-                </div>
-              </div>
+              <p class="attachment-title signature-title">Signature</p>
+            </div>
+          </div>
+
+          <div class="remarks-section">
+            <label for="remarks">Add your comment here</label>
+            <textarea
+              id="remarks"
+              [(ngModel)]="remarks"
+              rows="3"
+              [readonly]="!isPending"
+            ></textarea>
+          </div>
+
+          <div class="action-buttons" *ngIf="isPending">
+            <div class="action-left">
+              <button class="btn btn-secondary" (click)="goBack()">Back</button>
+            </div>
+            <div class="action-right">
+              <button class="btn btn-reject" (click)="openRejectModal()">Rejected</button>
+              <button class="btn btn-approve" (click)="openApproveConfirm()">Accepted</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Approval info (if already processed) -->
+      <section class="form-section" *ngIf="!isPending">
+        <header class="section-header">
+          <h2>Approval Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Processed By</label>
+              <div class="field-value">{{ application.sectionalManagerName || '—' }}</div>
+            </div>
+            <div class="field">
+              <label>Processing Date</label>
+              <div class="field-value">{{ formatDate(application.sectionalApprovalDate) }}</div>
+            </div>
+            <div class="field full" *ngIf="application.sectionalRemarks">
+              <label>Remarks</label>
+              <div class="field-value">{{ application.sectionalRemarks }}</div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Categories Card -->
-      <div class="detail-card full-width">
-        <h2 class="card-title">Vehicle Categories</h2>
-        <p class="card-subtitle" *ngIf="isPending">
-          You can modify the categories selected by the applicant. Categories with a blue border are originally selected by the applicant.
-        </p>
-
-        <div class="categories-grid">
-          <label
-            *ngFor="let cat of vehicleCategories"
-            class="category-checkbox"
-            [class.selected]="isCategorySelected(cat.key)"
-            [class.original]="isCategoryOriginal(cat.key)"
-            [class.disabled]="!isPending"
-          >
-            <input
-              type="checkbox"
-              [checked]="isCategorySelected(cat.key)"
-              (change)="toggleCategory(cat.key)"
-              [disabled]="!isPending"
-            />
-            <span class="checkbox-custom"></span>
-            <span class="category-label">{{ cat.label }}</span>
-          </label>
-        </div>
-
-        <!-- Remarks -->
-        <div class="remarks-section" *ngIf="isPending || remarks">
-          <label for="remarks">Remarks</label>
-          <textarea
-            id="remarks"
-            [(ngModel)]="remarks"
-            placeholder="Enter remarks for category changes or approval decisions..."
-            [readonly]="!isPending"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <!-- Update button -->
-        <div class="action-row" *ngIf="isPending">
-          <button class="btn btn-secondary" (click)="updateCategories()">
-            Update Categories
-          </button>
-        </div>
-      </div>
-
-      <!-- Approval Info (if already processed) -->
-      <div class="detail-card full-width" *ngIf="!isPending">
-        <h2 class="card-title">Approval Information</h2>
-
-        <div class="info-grid">
-          <div class="info-item">
-            <label>Processed By</label>
-            <span>{{ application.sectionalManagerName || '—' }}</span>
-          </div>
-          <div class="info-item">
-            <label>Processing Date</label>
-            <span>{{ formatDate(application.sectionalApprovalDate) }}</span>
-          </div>
-          <div class="info-item full" *ngIf="application.sectionalRemarks">
-            <label>Remarks</label>
-            <span>{{ application.sectionalRemarks }}</span>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons" *ngIf="isPending">
-      <button class="btn btn-reject" (click)="openRejectModal()">
-        ✗ Reject Application
-      </button>
-      <button class="btn btn-approve" (click)="openApproveConfirm()">
-        ✓ Approve Application
-      </button>
-    </div>
   </div>
 
   <!-- Footer -->
   <footer class="page-footer">
     <div class="footer-inner">
       <div class="footer-copy">
-        <span class="copyright-symbol">©</span>
-        <span>2025 SriLankan IT Systems. All rights reserved</span>
+        Ⓒ  2025 SriLankan IT Systems. All rights reserved
       </div>
-      <div class="footer-version">Version 0.1</div>
     </div>
   </footer>
 
@@ -415,6 +418,49 @@
       </div>
       <div class="preview-body">
         <img [src]="previewUrl" [alt]="previewTitle" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Equipment Edit Modal -->
+  <div class="modal-overlay" *ngIf="showEquipmentEditModal" (click)="closeEquipmentEdit()">
+    <div class="modal equipment-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header equipment-header-bar">
+        <div class="modal-title">Request Information</div>
+        <button class="modal-close" (click)="closeEquipmentEdit()">✕</button>
+      </div>
+
+      <div class="modal-content">
+        <p class="modal-subtitle">Select manager recommendation for equipment type / vehicle</p>
+
+        <div class="equipment-grid">
+          <label
+            *ngFor="let cat of vehicleCategories"
+            class="equipment-checkbox"
+          >
+            <input
+              type="checkbox"
+              [checked]="isCategorySelected(cat.key)"
+              (change)="toggleCategory(cat.key)"
+            />
+            <span class="equipment-checkbox-custom"></span>
+            <span>{{ cat.label }}</span>
+          </label>
+        </div>
+
+        <div class="remarks-section">
+          <label for="remarksEdit">Remark</label>
+          <textarea
+            id="remarksEdit"
+            [(ngModel)]="remarks"
+            rows="3"
+            placeholder="Add your comment here"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-approve" (click)="saveEquipmentEdit()">Update</button>
+        </div>
       </div>
     </div>
   </div>
