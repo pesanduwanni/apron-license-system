@@ -149,7 +149,7 @@ export class ApplicationsService {
       submittedDate: '2026-01-24',
       status: 'pending_sectional',
       applicantName: 'Nuwan Perera',
-      staffNumber: '423456',
+      staffNumber: '423456', 
       department: 'Ground Operations',
       designation: 'Operations Officer',
       contactNumber: '077 123 4567',

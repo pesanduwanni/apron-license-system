@@ -377,6 +377,22 @@
   flex: 1;
 }
 
+.expandable-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.expand-arrow {
+  font-size: 0.8rem;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+  margin-left: auto;
+}
+
+.expand-arrow.expanded {
+  transform: rotate(90deg);
+}
+
 .section-body {
   margin-top: 0;
   display: grid;

@@ -48,6 +48,9 @@ export class ApplicationDetailComponent implements OnInit {
   // Track images that failed to load so we can show placeholders instead
   failedAttachments: { [key: string]: boolean } = {};
 
+  // Attachments section expand/collapse
+  attachmentsExpanded = true;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -396,5 +399,9 @@ export class ApplicationDetailComponent implements OnInit {
     });
 
     return items;
+  }
+
+  toggleAttachments() {
+    this.attachmentsExpanded = !this.attachmentsExpanded;
   }
 }

@@ -197,10 +197,11 @@
 
       <!-- Attachments and Signature -->
       <section class="form-section">
-        <header class="section-header">
+        <header class="section-header expandable-header" (click)="toggleAttachments()">
           <h2>Attachments</h2>
+          <span class="expand-arrow" [class.expanded]="attachmentsExpanded">▶</span>
         </header>
-        <div class="section-body">
+        <div class="section-body" *ngIf="attachmentsExpanded">
           <div class="attachment-row">
             <div class="attachment-group">
               <p class="attachment-title">Staff ID</p>
@@ -328,7 +329,10 @@
             
 
           </div>
+        </div>
 
+        <!-- Signature section (always visible) -->
+        <div class="section-body">
           <div class="attachment-row signature-row">
             <div class="attachment-group signature-group">
               <div class="attachment-boxes">

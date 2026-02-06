@@ -193,20 +193,26 @@ body,
 /* Footer */
 .login-footer {
   margin-top: 32px;
-}
-
-.login-footer .footer-copy {
-  background: #014a73;
-  color: #f9fafb;
-  font-size: 11px;
-  padding: 0.4rem 0.75rem;
   text-align: center;
 }
 
-/* ensure footer-copy spans and centers inside the bar */
 .login-footer .footer-copy {
-  display: block;
-  width: 100%;
+  background: none;
+  color: grey;
+  font-size: 11px;
+  padding: 0;
+  text-align: center;
+}
+
+.footer-divider {
+  border: none;
+  border-top: 1px solid grey;
+  margin: 8px 0;
+}
+
+.footer-version {
+  color: grey;
+  font-size: 10px;
   text-align: center;
 }
 
