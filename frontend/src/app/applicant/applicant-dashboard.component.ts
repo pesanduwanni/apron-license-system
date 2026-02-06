@@ -43,29 +43,53 @@ export class ApplicantDashboardComponent implements OnInit {
   formStatus: 'idle' | 'saving' | 'submitted' = 'idle';
   user: User | null = null;
 
-  readonly equipmentOptions = [
-    { key: 'tractor', label: 'Tractor' },
-    { key: 'transporter', label: 'Transporter' },
-    { key: 'aciuAsuGpu', label: 'ACU/ ASU/ GPU' },
-    { key: 'paxCoach', label: 'Pax-coach' },
-    { key: 'forkliftPalletMover', label: 'Fork-lift/Pallet Mover' },
-    { key: 'buggy', label: 'Buggy' },
-    { key: 'pickUp', label: 'Pick-up' },
-    { key: 'lorryAcBus', label: 'Lorry/ A/C Bus' },
-    { key: 'toiletWaterCart', label: 'Toilet/ Water cart' },
-    { key: 'paxStep', label: 'Pax step' },
-    { key: 'ambulift', label: 'Ambulift' },
-    { key: 'van', label: 'Van' },
-    { key: 'donkeyLift', label: 'Donkey-lift' },
-    { key: 'acTowTug', label: 'A/C Tow-Tug' },
-    { key: 'jcpMdLoader', label: 'JCP/MD/Loader' },
-    { key: 'hiLiftCatering', label: 'Hi-lift (Catering)' },
-    { key: 'car', label: 'Car' },
-    { key: 'snorkelLift', label: 'Snorkel-lift' },
-    { key: 'maintPlatLiftTruck', label: 'Maint-Plat-Lift-Truck' },
-    { key: 'skyLoader', label: 'Sky loader' },
-    { key: 'ev', label: 'EV' }
+  get isAaslValid(): boolean {
+    const aaslExpiry = this.applicantForm.get('basicInfo.aaslAccessExpiry')?.value;
+    if (!aaslExpiry) return false;
+    const expiryDate = new Date(aaslExpiry);
+    const now = new Date();
+    return expiryDate > now;
+  }
+
+  readonly departmentOptions = [
+    'Information Technology',
+    'Operations Management',
+    'Safety Department',
+    'Training Department',
+    'Medical Unit',
+    'Human Resources',
+    'Finance',
+    'Engineering'
   ];
+
+  readonly licenseCategories = [
+    'Tractor',
+    'Pick-up',
+    'Van',
+    'Car',
+    'Transporter',
+    'Lorry/ AIC Bus',
+    'Donkey – lift',
+    'Snorkel – lift',
+    'ACU/ASU/GPU',
+    'Toilet/Water cart',
+    'A/C Tow-tug',
+    'Maint-Plat-Lift-Truck',
+    'Pax Coach',
+    'Pax Step',
+    'JCP/MD/Loader',
+    'Sky Loader',
+    'Fork-lift/Pallet Mover',
+    'Ambu lift',
+    'Hi-lift(catering)',
+    'ETV',
+    'Buggy'
+  ];
+
+  readonly equipmentOptions = this.licenseCategories.map((category: string) => ({
+    key: category.replace(/[^a-zA-Z0-9]/g, '').toLowerCase(),
+    label: category
+  }));
 
   readonly attachmentGroups: AttachmentGroup[] = [
     {
@@ -140,17 +164,18 @@ export class ApplicantDashboardComponent implements OnInit {
         aaslAccessExpiry: ['']
       }),
       personalInfo: this.fb.group({
-        nameAndStaffNo: [''],
-        designation: [''],
-        department: [''],
-        contactNo: [''],
-        nic: ['']
+        name: [{value: '', disabled: true}, Validators.required],
+        staffNumber: [{value: '', disabled: true}, Validators.required],
+        designation: [{value: '', disabled: true}, Validators.required],
+        department: ['', Validators.required],
+        contactNo: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        nic: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{12}$/)]],
+        currentDate: [{value: '', disabled: true}, Validators.required]
       }),
       licenseInfo: this.fb.group({
-        civilLicenseNo: [''],
-        category: [''],
-        issueDate: [''],
-        expiryDate: ['']
+        stateLicenseNo: ['', Validators.required],
+        issueDate: ['', Validators.required],
+        expiryDate: ['', Validators.required]
       }),
       equipment: this.buildEquipmentGroup(),
       attachments: this.buildAttachmentsGroup()
@@ -220,20 +245,25 @@ export class ApplicantDashboardComponent implements OnInit {
 
     setTimeout(() => {
       const submission = this.applicantForm.getRawValue();
+      const selectedDepartment = submission.personalInfo.department;
+      const referenceNumber = `AL-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000 + 1000)}`;
+
+      // Simulate sending to sectional manager
+      console.log(`Application submitted to sectional manager for department: ${selectedDepartment}`);
+      console.log(`Email sent to sectional manager: New application ${referenceNumber} submitted`);
+      console.log(`Email sent to applicant: Your application ${referenceNumber} has been submitted`);
+
       const newEntry: RequestHistory = {
-        id: `AL-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000 + 1000)}`,
+        id: referenceNumber,
         submittedOn: new Date().toISOString(),
         status: 'Pending',
-        licenseType:
-          submission.basicInfo.licenseType === 'extension'
-            ? 'Extension License'
-            : 'New License'
+        licenseType: submission.basicInfo.licenseType === 'extension' ? 'Extension License' : 'New License'
       };
 
       this.historyEntries = [newEntry, ...this.historyEntries];
       this.showHistory = true;
       this.formStatus = 'submitted';
-    }, 500);
+    }, 2000);
   }
 
   private buildEquipmentGroup(): FormGroup {
@@ -267,6 +297,8 @@ export class ApplicantDashboardComponent implements OnInit {
       return;
     }
 
+    const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
     this.applicantForm.patchValue({
       basicInfo: {
         licenseType: 'extension',
@@ -277,15 +309,16 @@ export class ApplicantDashboardComponent implements OnInit {
         aaslAccessExpiry: ''
       },
       personalInfo: {
-        nameAndStaffNo: '',
-        designation: '',
-        department: '',
-        contactNo: '',
-        nic: ''
+        name: this.user.name,
+        staffNumber: this.user.staffNumber,
+        designation: this.user.designation || '',
+        department: this.user.department,
+        contactNo: this.user.contactNumber || '',
+        nic: this.user.nic || '',
+        currentDate: currentDate
       },
       licenseInfo: {
-        civilLicenseNo: '',
-        category: '',
+        stateLicenseNo: '',
         issueDate: '',
         expiryDate: ''
       }

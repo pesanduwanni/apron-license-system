@@ -90,13 +90,13 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  // All users log in using STAFF NUMBER + password only
-  login(staffNumber: string, password: string): boolean {
-    const normalizedStaffNo = staffNumber.trim().toLowerCase();
+  // Login using username and password
+  login(username: string, password: string): boolean {
+    const normalizedUsername = username.trim().toLowerCase();
 
     const user = this.mockAccounts.find(
       (account) =>
-        account.staffNumber.toLowerCase() === normalizedStaffNo &&
+        account.username.toLowerCase() === normalizedUsername &&
         account.password === password
     );
 

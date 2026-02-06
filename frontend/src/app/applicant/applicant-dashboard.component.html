@@ -157,45 +157,69 @@
           <div class="section-body" *ngIf="!collapsedSections.personal" formGroupName="personalInfo">
             <div class="field-grid-2">
               <div class="field">
-                <label for="nameAndStaffNo">Name of Applicant and Staff No</label>
-                <input id="nameAndStaffNo"
+                <label for="name">Name of the Applicant</label>
+                <input id="name"
                        type="text"
-                       formControlName="nameAndStaffNo"
-                       placeholder="Name of Applicant and Staff No" />
+                       formControlName="name"
+                       readonly />
               </div>
 
               <div class="field">
-                <label for="designation">Designation</label>
-                <input id="designation"
+                <label for="staffNumber">Staff Number</label>
+                <input id="staffNumber"
                        type="text"
-                       formControlName="designation"
-                       placeholder="Designation" />
+                       formControlName="staffNumber"
+                       readonly />
               </div>
             </div>
 
             <div class="field-grid-3">
               <div class="field">
-                <label for="department">Section/ Department</label>
-                <input id="department"
+                <label for="designation">Designation</label>
+                <input id="designation"
                        type="text"
-                       formControlName="department"
-                       placeholder="Section/ Department" />
+                       formControlName="designation"
+                       readonly />
               </div>
 
               <div class="field">
-                <label for="contactNo">Contact No</label>
+                <label for="department">Department or Section</label>
+                <select id="department" formControlName="department">
+                  <option value="">Select Department</option>
+                  <option *ngFor="let dept of departmentOptions" [value]="dept">{{ dept }}</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="contactNo">Contact Number</label>
                 <input id="contactNo"
                        type="text"
                        formControlName="contactNo"
-                       placeholder="Contact No" />
+                       placeholder="Contact Number" />
+                <div class="field-error" *ngIf="applicantForm.get('personalInfo.contactNo')?.touched && applicantForm.get('personalInfo.contactNo')?.hasError('pattern')">
+                  Contact number must contain only numbers.
+                </div>
               </div>
+            </div>
 
+            <div class="field-grid-2">
               <div class="field">
-                <label for="nic">NIC No</label>
+                <label for="nic">NIC Number</label>
                 <input id="nic"
                        type="text"
                        formControlName="nic"
-                       placeholder="NIC No" />
+                       placeholder="NIC Number" />
+                <div class="field-error" *ngIf="applicantForm.get('personalInfo.nic')?.touched && applicantForm.get('personalInfo.nic')?.hasError('pattern')">
+                  NIC must be 12 alphanumeric characters.
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="currentDate">Current Date</label>
+                <input id="currentDate"
+                       type="date"
+                       formControlName="currentDate"
+                       readonly />
               </div>
             </div>
           </div>
@@ -213,35 +237,27 @@
           <div class="section-body" *ngIf="!collapsedSections.license">
             <div class="field-grid-4" formGroupName="licenseInfo">
               <div class="field">
-                <label for="civilLicenseNo">Civil License No. (RMV)</label>
-                <input id="civilLicenseNo"
+                <label for="stateLicenseNo">State License Number</label>
+                <input id="stateLicenseNo"
                        type="text"
-                       formControlName="civilLicenseNo"
-                       placeholder="Civil License No. (RMV)" />
+                       formControlName="stateLicenseNo"
+                       placeholder="State License Number" />
               </div>
 
               <div class="field">
-                <label for="category">Category</label>
-                <input id="category"
-                       type="text"
-                       formControlName="category"
-                       placeholder="Category" />
-              </div>
-
-              <div class="field">
-                <label for="issueDate">Date of Issue</label>
+                <label for="issueDate">Date of issuance of the State License</label>
                 <input id="issueDate" type="date" formControlName="issueDate" />
               </div>
 
               <div class="field">
-                <label for="expiryDate">Date of Expiry</label>
+                <label for="expiryDate">Date of Expiry of the State License</label>
                 <input id="expiryDate" type="date" formControlName="expiryDate" />
               </div>
             </div>
 
-            <!-- Equipment type / vehicle selection -->
+            <!-- Category Selection -->
             <div class="field full">
-              <label>Select manager recommendation for equipment type / vehicle</label>
+              <label>Category Selection</label>
               <div class="equipment-grid" formGroupName="equipment">
                 <label class="equipment-chip"
                        *ngFor="let option of equipmentOptions">
@@ -270,14 +286,16 @@
                 <div class="attachment-boxes">
                   <div class="attachment-box" *ngFor="let control of group.controls">
                     <label class="upload-box"
-                           [class.has-file]="attachmentNames[control.key]">
+                           [class.has-file]="attachmentNames[control.key]"
+                           [class.disabled]="group.title === 'Aviation Pass' && !isAaslValid">
                       <input type="file"
-                             [attr.accept]="control.accept || '.png,.jpg,.jpeg'"
-                             (change)="handleFileChange(control.key, $event)" />
+                             [attr.accept]="control.accept || '.png,.jpg,.jpeg,.pdf'"
+                             (change)="handleFileChange(control.key, $event)"
+                             [disabled]="group.title === 'Aviation Pass' && !isAaslValid" />
                       <span class="box-label">{{ control.label }}</span>
                       <span class="box-icon" aria-hidden="true">+</span>
                       <span class="box-format">
-                        {{ attachmentNames[control.key] || '.png .jpg' }}
+                        {{ attachmentNames[control.key] || '.png .jpg .pdf' }}
                       </span>
                     </label>
                   </div>

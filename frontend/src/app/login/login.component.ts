@@ -22,7 +22,7 @@ export class LoginComponent {
     private router: Router
   ) {
     this.loginForm = this.fb.group({
-      staffId: ['', [Validators.required]],
+      username: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
   }
@@ -41,15 +41,15 @@ export class LoginComponent {
 
     this.submitting = true;
 
-    const staffId = (this.loginForm.value.staffId ?? '').trim();
+    const username = (this.loginForm.value.username ?? '').trim();
     const password = this.loginForm.value.password ?? '';
 
-    const authenticated = this.authService.login(staffId, password);
+    const authenticated = this.authService.login(username, password);
 
     this.submitting = false;
 
     if (!authenticated) {
-      this.authError = 'Invalid Staff ID or Password. Please try again.';
+      this.authError = 'Invalid Username or Password. Please try again.';
       return;
     }
 
