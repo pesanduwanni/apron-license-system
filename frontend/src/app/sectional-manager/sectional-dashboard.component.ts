@@ -62,6 +62,20 @@ export class SectionalDashboardComponent implements OnInit {
         return 'Pending Review';
       case 'approved_sectional':
         return 'Approved';
+      case 'pending_safety':
+        return 'Sent to Safety';
+      case 'orientation_assigned':
+        return 'Orientation Assigned';
+      case 'orientation_completed':
+        return 'Orientation Completed';
+      case 'practical_assigned':
+        return 'Practical Assigned';
+      case 'practical_completed':
+        return 'Practical Completed';
+      case 'medical_pending':
+        return 'Medical Pending';
+      case 'medical_completed':
+        return 'Medical Completed';
       case 'rejected_sectional':
         return 'Rejected';
       default:
@@ -75,6 +89,15 @@ export class SectionalDashboardComponent implements OnInit {
         return 'pending';
       case 'approved_sectional':
         return 'approved';
+      case 'pending_safety':
+        return 'pending';
+      case 'orientation_assigned':
+      case 'orientation_completed':
+      case 'practical_assigned':
+      case 'practical_completed':
+      case 'medical_pending':
+      case 'medical_completed':
+        return 'approved';
       case 'rejected_sectional':
         return 'rejected';
       default:
@@ -87,7 +110,17 @@ export class SectionalDashboardComponent implements OnInit {
   }
 
   get approvedCount(): number {
-    return this.applications.filter(a => a.status === 'approved_sectional').length;
+    const inProgressStatuses = [
+      'approved_sectional',
+      'pending_safety',
+      'orientation_assigned',
+      'orientation_completed',
+      'practical_assigned',
+      'practical_completed',
+      'medical_pending',
+      'medical_completed'
+    ];
+    return this.applications.filter(a => inProgressStatuses.includes(a.status)).length;
   }
 
   get rejectedCount(): number {

@@ -1,0 +1,430 @@
+<ng-container *ngIf="user && application">
+  <div class="page-body">
+    <div class="notify-overlay" *ngIf="errorMessage" (click)="closeAlert()">
+      <div class="notify-modal error" (click)="$event.stopPropagation()">
+        <div class="notify-top">
+          <div class="notify-icon error-icon">✕</div>
+        </div>
+        <div class="notify-body">
+          <h3>Error</h3>
+          <p>{{ errorMessage }}</p>
+          <div class="notify-actions">
+            <button class="btn btn-secondary" (click)="closeAlert()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notify-overlay" *ngIf="successMessage" (click)="closeAlert()">
+      <div class="notify-modal success" (click)="$event.stopPropagation()">
+        <div class="notify-top">
+          <div class="notify-icon success-icon">✓</div>
+        </div>
+        <div class="notify-body">
+          <h3>Success</h3>
+          <p>{{ successMessage }}</p>
+          <div class="notify-actions">
+            <button class="btn btn-secondary" (click)="closeAlert()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" *ngIf="showToast">
+      <div class="toast" [class.success]="toastType === 'success'" [class.error]="toastType === 'error'">
+        <div class="toast-body">
+          <div class="toast-title">{{ toastType === 'success' ? 'Success' : 'Error' }}</div>
+          <div class="toast-message">{{ toastMessage }}</div>
+        </div>
+        <button class="toast-close" (click)="closeToast()">✕</button>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="page-header">
+        <button class="btn-back" (click)="goBack()">← Back to List</button>
+        <div class="header-right">
+          <span class="header-ref">{{ application.referenceNumber }}</span>
+          <ng-container>
+            <button class="badge badge-new" *ngIf="isSafetyPending">Pending</button>
+            <button class="badge badge-ongoing" *ngIf="!isSafetyPending && !isSafetyRejected">On going</button>
+            <button class="badge badge-rejected" *ngIf="isSafetyRejected">Rejected</button>
+          </ng-container>
+        </div>
+      </div>
+
+      <section class="form-section">
+        <header class="section-header">
+          <h2>Personal Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-2">
+            <div class="field">
+              <label>Name of Applicant, Staff No and Designation</label>
+              <div class="field-value">
+                {{ application.applicantName }} - {{ application.staffNumber }} ({{ application.designation }})
+              </div>
+            </div>
+          </div>
+
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Section/ Department</label>
+              <div class="field-value">{{ application.department }}</div>
+            </div>
+            <div class="field">
+              <label>Contact No</label>
+              <div class="field-value">{{ application.contactNumber }}</div>
+            </div>
+            <div class="field">
+              <label>NIC No</label>
+              <div class="field-value">{{ application.nic }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="section-header">
+          <h2>Basic Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-4">
+            <div class="field">
+              <label>License Type</label>
+              <div class="field-value">
+                {{ application.licenseType === 'extension' ? 'Extension License' : 'New License' }}
+              </div>
+            </div>
+            <div class="field">
+              <label>Current ADP No</label>
+              <div class="field-value">{{ application.currentAdpNo || '—' }}</div>
+            </div>
+            <div class="field">
+              <label>Date of First Issue</label>
+              <div class="field-value">{{ application.dateOfFirstIssue ? formatDate(application.dateOfFirstIssue) : '—' }}</div>
+            </div>
+            <div class="field">
+              <label>AASL Access P/No</label>
+              <div class="field-value">{{ application.aaslAccessNo }}</div>
+            </div>
+          </div>
+
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Date Participation of Safety Orientation</label>
+              <div class="field-value">{{ application.orientation?.classDate ? formatDate(application.orientation?.classDate) : '—' }}</div>
+            </div>
+            <div class="field">
+              <label>AASL Access Permit Expiry Date</label>
+              <div class="field-value">{{ formatDate(application.aaslAccessExpiry) }}</div>
+            </div>
+            <div class="field">
+              <label>Requested Date</label>
+              <div class="field-value">{{ formatDate(application.submittedDate) }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="section-header">
+          <h2>License Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-4">
+            <div class="field">
+              <label>Civil License No. (RMV)</label>
+              <div class="field-value">{{ application.stateLicenseNo }}</div>
+            </div>
+            <div class="field">
+              <label>Category</label>
+              <div class="field-value">—</div>
+            </div>
+            <div class="field">
+              <label>Date of Issue</label>
+              <div class="field-value">{{ formatDate(application.stateLicenseIssueDate) }}</div>
+            </div>
+            <div class="field">
+              <label>Date of Expiry</label>
+              <div class="field-value">{{ formatDate(application.stateLicenseExpiryDate) }}</div>
+            </div>
+          </div>
+
+          <div class="field full">
+            <div class="equipment-header">
+              <label>Manager recommendation for equipment type / vehicle</label>
+            </div>
+            <div class="equipment-grid">
+              <label *ngFor="let cat of vehicleCategories" class="equipment-checkbox" [class.disabled]="true">
+                <input
+                  type="checkbox"
+                  [checked]="(application!.approvedCategories?.includes(cat.key) ?? false) || application!.selectedCategories.includes(cat.key)"
+                  [disabled]="true"
+                />
+                <span class="equipment-checkbox-custom"></span>
+                <span>{{ cat.label }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="section-header expandable-header" (click)="toggleAttachments()">
+          <h2>Attachments</h2>
+          <span class="expand-arrow" [class.expanded]="attachmentsExpanded">▶</span>
+        </header>
+        <div class="section-body" *ngIf="attachmentsExpanded">
+          <div class="attachment-row">
+            <div class="attachment-group">
+              <p class="attachment-title">Staff ID</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.staffIdFront?.url || failedAttachments['staffIdFront']" class="attachment-placeholder">Staff ID - Front</div>
+                  </div>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.staffIdBack?.url || failedAttachments['staffIdBack']" class="attachment-placeholder">Staff ID - Back</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="attachment-group">
+              <p class="attachment-title">State License</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.stateLicenseFront?.url || failedAttachments['stateLicenseFront']" class="attachment-placeholder">State License - Front</div>
+                  </div>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.stateLicenseBack?.url || failedAttachments['stateLicenseBack']" class="attachment-placeholder">State License - Back</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="attachment-row">
+            <div class="attachment-group">
+              <p class="attachment-title">Aviation Pass</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.aviationPassFront?.url || failedAttachments['aviationPassFront']" class="attachment-placeholder">Aviation Pass - Front</div>
+                  </div>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.aviationPassBack?.url || failedAttachments['aviationPassBack']" class="attachment-placeholder">Aviation Pass - Back</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="attachment-group">
+              <p class="attachment-title">NIC</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.nicFront?.url || failedAttachments['nicFront']" class="attachment-placeholder">NIC - Front</div>
+                  </div>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <div *ngIf="!application.attachments.nicBack?.url || failedAttachments['nicBack']" class="attachment-placeholder">NIC - Back</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-body">
+          <div class="attachment-row signature-row">
+            <div class="attachment-group signature-group">
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="signature-image-box">
+                    <div *ngIf="!application.attachments.signature?.url || failedAttachments['signature']" class="signature-placeholder"></div>
+                  </div>
+                </div>
+              </div>
+              <p class="attachment-title signature-title">Signature</p>
+            </div>
+          </div>
+
+          <section class="safety-manager-card">
+            <header>
+              <h3>Safety Manager</h3>
+              <p>Assign applicant for orientation and training.</p>
+            </header>
+
+            <div class="safety-grid">
+              <div class="safety-block">
+                <h4>Assign for Class Room test</h4>
+                <div class="inline-grid">
+                  <label>
+                    <span>Select Class Date</span>
+                    <input type="date" [(ngModel)]="orientationForm.classDate" [disabled]="!canAssignOrientation" />
+                  </label>
+                  <label>
+                    <span>Class Room No</span>
+                    <select [(ngModel)]="orientationForm.classRoom" [disabled]="!canAssignOrientation">
+                      <option value="" disabled>Select room</option>
+                      <option *ngFor="let room of availableClassRooms" [value]="room">{{ room }}</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  <span>Select Trainer</span>
+                  <select [(ngModel)]="orientationForm.trainer" [disabled]="!canAssignOrientation">
+                    <option value="" disabled>Select trainer</option>
+                    <option *ngFor="let trainer of trainerOptions" [value]="trainer">{{ trainer }}</option>
+                  </select>
+                </label>
+                <div class="safety-actions">
+                  <button class="btn btn-secondary" (click)="assignOrientation()" [disabled]="!canAssignOrientation">Assign Classroom</button>
+                  <button class="btn btn-outline" (click)="markOrientation('completed')" [disabled]="!application!.orientation">Mark Complete</button>
+                  <button class="btn btn-outline" (click)="markOrientation('not_completed')" [disabled]="!application!.orientation">Not Completed</button>
+                </div>
+              </div>
+
+              <div class="safety-block">
+                <h4>Assign for Practical Test</h4>
+                <div class="inline-grid">
+                  <label>
+                    <span>Select Date</span>
+                    <input type="date" [(ngModel)]="practicalForm.date" [disabled]="!canAssignPractical" />
+                  </label>
+                  <label>
+                    <span>Select Trainer</span>
+                    <select [(ngModel)]="practicalForm.trainer" [disabled]="!canAssignPractical">
+                      <option value="" disabled>Select trainer</option>
+                      <option *ngFor="let trainer of trainerOptions" [value]="trainer">{{ trainer }}</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="safety-actions">
+                  <button class="btn btn-secondary" (click)="assignPractical()" [disabled]="!canAssignPractical">Assign Practical</button>
+                  <button class="btn btn-outline" (click)="markPractical('completed')" [disabled]="!application!.practical">Mark Complete</button>
+                  <button class="btn btn-outline" (click)="markPractical('not_completed')" [disabled]="!application!.practical">Not Completed</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="remarks-section">
+            <label for="remarks">Add your comment here</label>
+            <textarea id="remarks" [(ngModel)]="remarks" rows="3"></textarea>
+          </div>
+
+          <div class="safety-forward" *ngIf="canSendToMedical">
+            <button class="btn btn-outline" (click)="sendToMedical()">Send to Medical</button>
+          </div>
+
+          <div class="action-buttons">
+            <div class="action-left">
+              <button class="btn btn-secondary" (click)="goBack()">Back</button>
+            </div>
+            <div class="action-right" *ngIf="isSafetyPending">
+              <button class="btn btn-reject" (click)="openRejectModal()">Rejected</button>
+              <button class="btn btn-approve" (click)="acceptApplication()">Accepted</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section" *ngIf="application.sectionalManagerName">
+        <header class="section-header">
+          <h2>Sectional Manager</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Processed By</label>
+              <div class="field-value">{{ application.sectionalManagerName || '—' }}</div>
+            </div>
+            <div class="field">
+              <label>Processing Date</label>
+              <div class="field-value">{{ formatDate(application.sectionalApprovalDate) }}</div>
+            </div>
+            <div class="field full" *ngIf="application.sectionalRemarks">
+              <label>Remarks</label>
+              <div class="field-value">{{ application.sectionalRemarks }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="right-column">
+      <div class="summary-card">
+        <h4>Summary</h4>
+        <div class="summary-divider"></div>
+        <div class="timeline">
+          <div *ngFor="let item of historyItems" class="timeline-item">
+            <div class="avatar-col">
+              <div class="avatar-ring">
+                <div class="avatar-icon"></div>
+              </div>
+            </div>
+            <div class="item-col">
+              <div class="item-header">
+                <div class="title-block">
+                  <div class="name-row">
+                    <span class="actor">{{ item.actor }}</span>
+                    <span class="staff-id" *ngIf="item.staffId">({{ item.staffId }})</span>
+                  </div>
+                  <div class="role">{{ item.role }}</div>
+                </div>
+              </div>
+              <div class="item-body">
+                <div class="message-block">
+                  <div class="message">{{ item.message }}</div>
+                  <div class="date">{{ formatDate(item.date) }}</div>
+                </div>
+                <div class="time-ago">{{ getTimeAgo(item.date) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <div class="footer-inner">
+      <div class="footer-copy">Ⓒ  2025 SriLankan IT Systems. All rights reserved</div>
+    </div>
+  </footer>
+
+  <div class="modal-overlay" *ngIf="showRejectModal" (click)="closeRejectModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Reject Application</h3>
+      <p>Please provide a reason for rejecting this application:</p>
+      <textarea [(ngModel)]="rejectReason" placeholder="Enter rejection reason..." rows="4" class="reject-textarea"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeRejectModal()">Cancel</button>
+        <button class="btn btn-reject" [disabled]="!rejectReason.trim()" (click)="confirmReject()">Reject Application</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay preview-overlay" *ngIf="showPreviewModal" (click)="closePreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <div class="preview-header">
+        <h3>{{ previewTitle }}</h3>
+        <button class="btn-close" (click)="closePreview()">✕</button>
+      </div>
+      <div class="preview-body">
+        <img [src]="previewUrl" [alt]="previewTitle" />
+      </div>
+    </div>
+  </div>
+</ng-container>

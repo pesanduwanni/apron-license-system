@@ -1,0 +1,63 @@
+<ng-container *ngIf="user as activeUser">
+  <div class="layout-container">
+    <header class="top-bar">
+      <div class="top-bar-inner">
+        <div class="brand">
+          <img class="brand-logo" src="assets/images/logo-icon.png" alt="Apron License" />
+          <span class="brand-text"><strong>Apron</strong>License</span>
+        </div>
+
+        <div class="top-profile">
+          <div class="top-profile-text">
+            <div class="top-hello">Hello, {{ activeUser.name }}</div>
+            <div class="top-staff">({{ activeUser.staffNumber }}) · Safety Manager</div>
+          </div>
+          <div class="top-avatar">{{ initials }}</div>
+          <button type="button" class="btn-logout" (click)="logout()" title="Logout">
+            <span class="logout-icon">⎋</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-wrapper">
+      <aside class="sidebar">
+        <nav class="nav-menu">
+          <a routerLink="/safety-manager/dashboard" routerLinkActive="active" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+          <a routerLink="/safety-manager/requests" routerLinkActive="active" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Requests</span>
+          </a>
+          <a routerLink="/safety-manager/rejected" routerLinkActive="active" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span>Rejected</span>
+          </a>
+        </nav>
+        <div class="sidebar-footer">
+          <img src="assets/images/SideBar-Logo.png" alt="SriLankan Airlines" class="airline-logo" />
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+</ng-container>

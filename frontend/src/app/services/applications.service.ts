@@ -77,6 +77,29 @@ export interface Application {
   safetyManagerName?: string;
   safetyApprovalDate?: string;
   safetyRemarks?: string;
+
+  // Orientation assignment
+  orientation?: {
+    classDate?: string;
+    classRoom?: string;
+    trainer?: string;
+    status?: 'pending' | 'assigned' | 'completed' | 'not_completed';
+    remarks?: string;
+  };
+
+  // Practical assignment
+  practical?: {
+    date?: string;
+    trainer?: string;
+    status?: 'pending' | 'assigned' | 'completed' | 'not_completed';
+    remarks?: string;
+  };
+
+  // Medical assignment tracking
+  medical?: {
+    assignedDate?: string;
+    status?: 'pending' | 'completed';
+  };
 }
 
 @Injectable({
@@ -108,6 +131,21 @@ export class ApplicationsService {
     { key: 'maintPlatLiftTruck', label: 'Maint-Plat-Lift-Truck' },
     { key: 'skyLoader', label: 'Sky loader' },
     { key: 'ev', label: 'EV' }
+  ];
+
+  private readonly safetyPipelineStatuses: ApplicationStatus[] = [
+    'approved_sectional',
+    'pending_safety',
+    'approved_safety',
+    'rejected_safety',
+    'orientation_assigned',
+    'orientation_completed',
+    'practical_assigned',
+    'practical_completed',
+    'medical_pending',
+    'medical_completed',
+    'doctor_approved',
+    'license_issued'
   ];
 
   private mockApplications: Application[] = [
@@ -540,6 +578,17 @@ export class ApplicationsService {
     );
   }
 
+  // Get applications visible to a safety manager (anything that moved beyond sectional approval)
+  getApplicationsForSafetyManager(managerId: string): Application[] {
+    return this.applicationsSubject.value.filter(app => {
+      const inPipeline = this.safetyPipelineStatuses.includes(app.status);
+      const assignedToManager =
+        app.safetyManagerId === managerId ||
+        (!app.safetyManagerId && app.status === 'approved_sectional');
+      return inPipeline && assignedToManager;
+    });
+  }
+
   // Get pending applications for sectional manager
   getPendingForSectionalManager(managerId: string): Application[] {
     return this.applicationsSubject.value.filter(
@@ -608,6 +657,143 @@ export class ApplicationsService {
     apps[idx].sectionalManagerName = managerName;
     apps[idx].sectionalApprovalDate = new Date().toISOString().split('T')[0];
     apps[idx].sectionalRemarks = remarks;
+    this.saveApplications(apps);
+    return true;
+  }
+
+  // Safety manager accepts application after attachment validation
+  acceptApplicationSafety(
+    appId: string,
+    managerId: string,
+    managerName: string,
+    remarks?: string
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].status = 'pending_safety';
+    apps[idx].safetyManagerId = managerId;
+    apps[idx].safetyManagerName = managerName;
+    apps[idx].safetyApprovalDate = new Date().toISOString().split('T')[0];
+    if (remarks) {
+      apps[idx].safetyRemarks = remarks;
+    }
+    this.saveApplications(apps);
+    return true;
+  }
+
+  // Safety manager rejects application
+  rejectApplicationSafety(
+    appId: string,
+    managerId: string,
+    managerName: string,
+    remarks: string
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].status = 'rejected_safety';
+    apps[idx].safetyManagerId = managerId;
+    apps[idx].safetyManagerName = managerName;
+    apps[idx].safetyApprovalDate = new Date().toISOString().split('T')[0];
+    apps[idx].safetyRemarks = remarks;
+    this.saveApplications(apps);
+    return true;
+  }
+
+  assignOrientation(
+    appId: string,
+    managerId: string,
+    payload: { classDate: string; classRoom: string; trainer: string; remarks?: string }
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].orientation = {
+      classDate: payload.classDate,
+      classRoom: payload.classRoom,
+      trainer: payload.trainer,
+      status: 'assigned',
+      remarks: payload.remarks
+    };
+    apps[idx].safetyManagerId = managerId;
+    apps[idx].status = 'orientation_assigned';
+    this.saveApplications(apps);
+    return true;
+  }
+
+  updateOrientationStatus(
+    appId: string,
+    status: 'completed' | 'not_completed',
+    remarks?: string
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    const orientation = apps[idx].orientation || {};
+    orientation.status = status;
+    if (remarks) {
+      orientation.remarks = remarks;
+    }
+    apps[idx].orientation = orientation;
+    apps[idx].status = status === 'completed' ? 'orientation_completed' : 'pending_safety';
+    this.saveApplications(apps);
+    return true;
+  }
+
+  assignPractical(
+    appId: string,
+    payload: { date: string; trainer: string; remarks?: string }
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].practical = {
+      date: payload.date,
+      trainer: payload.trainer,
+      status: 'assigned',
+      remarks: payload.remarks
+    };
+    apps[idx].status = 'practical_assigned';
+    this.saveApplications(apps);
+    return true;
+  }
+
+  updatePracticalStatus(
+    appId: string,
+    status: 'completed' | 'not_completed',
+    remarks?: string
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    const practical = apps[idx].practical || {};
+    practical.status = status;
+    if (remarks) {
+      practical.remarks = remarks;
+    }
+    apps[idx].practical = practical;
+    apps[idx].status = status === 'completed' ? 'practical_completed' : 'orientation_completed';
+    this.saveApplications(apps);
+    return true;
+  }
+
+  sendForMedical(appId: string, assignedDate: string): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].medical = {
+      assignedDate,
+      status: 'pending'
+    };
+    apps[idx].status = 'medical_pending';
     this.saveApplications(apps);
     return true;
   }

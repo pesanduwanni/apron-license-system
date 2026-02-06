@@ -63,6 +63,9 @@ export class LoginComponent {
       case 'sectional_manager':
         this.router.navigate(['/sectional-manager']);
         break;
+      case 'safety_manager':
+        this.router.navigate(['/safety-manager']);
+        break;
       default:
         this.authService.logout();
         this.authError = 'Your role is not supported yet. Please contact the administrator.';

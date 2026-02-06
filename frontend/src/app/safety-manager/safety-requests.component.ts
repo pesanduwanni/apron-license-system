@@ -9,22 +9,23 @@ type RequestsTab = 'all' | 'newext' | 'ongoing';
 type Mode = 'requests' | 'rejected';
 
 @Component({
-  selector: 'app-sectional-requests',
+  selector: 'app-safety-requests',
   standalone: true,
   imports: [CommonModule, DatePipe],
-  templateUrl: './sectional-requests.component.html',
-  styleUrls: ['./sectional-requests.component.scss']
+  templateUrl: './safety-requests.component.html',
+  styleUrls: [
+    '../sectional-manager/sectional-requests.component.scss',
+    './safety-requests.component.scss'
+  ]
 })
-export class SectionalRequestsComponent implements OnInit {
+export class SafetyRequestsComponent implements OnInit {
   user: User | null = null;
   applications: Application[] = [];
   filteredApplications: Application[] = [];
 
-  // Tabs
   activeTab: RequestsTab = 'all';
   mode: Mode = 'requests';
 
-  // Pagination
   currentPage = 1;
   pageSize = 8;
   totalPages = 1;
@@ -44,21 +45,17 @@ export class SectionalRequestsComponent implements OnInit {
     }
 
     this.mode = (this.route.snapshot.data['mode'] as Mode) || 'requests';
-
     this.loadApplications();
   }
 
   loadApplications(): void {
     if (!this.user) return;
-
-    const all = this.appsService.getApplicationsForSectionalManager(this.user.staffNumber);
+    const all = this.appsService.getApplicationsForSafetyManager(this.user.staffNumber);
 
     if (this.mode === 'requests') {
-      // All non-rejected applications
-      this.applications = all.filter(a => a.status !== 'rejected_sectional');
+      this.applications = all.filter(app => app.status !== 'rejected_safety');
     } else {
-      // Rejected view
-      this.applications = all.filter(a => a.status === 'rejected_sectional');
+      this.applications = all.filter(app => app.status === 'rejected_safety');
     }
 
     this.applyFilters();
@@ -68,29 +65,17 @@ export class SectionalRequestsComponent implements OnInit {
     let result = [...this.applications];
 
     if (this.mode === 'requests') {
-      // Tab filters
       if (this.activeTab === 'newext') {
-        result = result.filter(a => a.status === 'pending_sectional');
+        result = result.filter(app => ['approved_sectional', 'pending_safety'].includes(app.status));
       } else if (this.activeTab === 'ongoing') {
-        result = result.filter(a =>
-          [
-            'approved_sectional',
-            'pending_safety',
-            'orientation_assigned',
-            'orientation_completed',
-            'practical_assigned',
-            'practical_completed',
-            'medical_pending',
-            'medical_completed'
-          ].includes(a.status)
+        result = result.filter(app =>
+          ['orientation_assigned', 'orientation_completed', 'practical_assigned', 'practical_completed', 'medical_pending', 'medical_completed'].includes(app.status)
         );
       }
     }
 
-    // Sort by submitted date desc (like design)
     result.sort((a, b) => new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime());
 
-    // Pagination
     this.totalPages = Math.ceil(result.length / this.pageSize) || 1;
     if (this.currentPage > this.totalPages) {
       this.currentPage = 1;
@@ -115,7 +100,7 @@ export class SectionalRequestsComponent implements OnInit {
   }
 
   viewApplication(app: Application): void {
-    this.router.navigate(['/sectional-manager/application', app.id]);
+    this.router.navigate(['/safety-manager/application', app.id]);
   }
 
   getChipLabel(app: Application): string {
@@ -136,7 +121,7 @@ export class SectionalRequestsComponent implements OnInit {
         return 'Medical Pending';
       case 'medical_completed':
         return 'Medical Completed';
-      case 'rejected_sectional':
+      case 'rejected_safety':
         return 'Rejected';
       default:
         return app.licenseType === 'extension' ? 'Extension' : 'New';
@@ -154,7 +139,7 @@ export class SectionalRequestsComponent implements OnInit {
         app.status === 'medical_completed') {
       return 'ongoing';
     }
-    if (app.status === 'rejected_sectional') {
+    if (app.status === 'rejected_safety') {
       return 'rejected';
     }
     if (app.licenseType === 'extension') {
@@ -178,25 +163,25 @@ export class SectionalRequestsComponent implements OnInit {
       }
     } else {
       pages.push(1);
-      
+
       if (current > 3) {
-        pages.push(-1); // ellipsis
+        pages.push(-1);
       }
-      
+
       const start = Math.max(2, current - 1);
       const end = Math.min(total - 1, current + 1);
-      
+
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
-      
+
       if (current < total - 2) {
-        pages.push(-1); // ellipsis
+        pages.push(-1);
       }
-      
+
       pages.push(total);
     }
-    
+
     return pages;
   }
 }

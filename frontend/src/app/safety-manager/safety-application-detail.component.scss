@@ -1,0 +1,83 @@
+.safety-manager-card {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.safety-manager-card header {
+  margin-bottom: 1rem;
+}
+
+.safety-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.safety-block {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.safety-block h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.inline-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 0.75rem;
+}
+
+.inline-grid label,
+.safety-block label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.inline-grid input,
+.inline-grid select,
+.safety-block select,
+.safety-block input {
+  margin-top: 0.35rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.9rem;
+}
+
+.safety-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.btn.btn-outline {
+  background: transparent;
+  border: 1px solid #0d63d6;
+  color: #0d63d6;
+}
+
+.btn.btn-outline:disabled {
+  border-color: #cbd5f5;
+  color: #94a3b8;
+}
+
+.safety-forward {
+  margin-bottom: 1rem;
+}
+
+.safety-forward .btn {
+  min-width: 180px;
+}

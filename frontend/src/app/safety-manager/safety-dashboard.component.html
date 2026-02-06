@@ -1,0 +1,62 @@
+<section class="dashboard-page" *ngIf="user">
+  <header class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Overview of your applicants and requests.</p>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat-card pending" (click)="navigateToTab('pending')">
+      <div class="stat-icon">�️</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ pendingCount }}</div>
+        <div class="stat-label">Awaiting Validation</div>
+      </div>
+    </div>
+
+    <div class="stat-card approved" (click)="navigateToTab('approved')">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ trainingCount }}</div>
+        <div class="stat-label">Training Queue</div>
+      </div>
+    </div>
+
+    <div class="stat-card rejected" (click)="navigateToTab('rejected')">
+      <div class="stat-icon">✕</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ rejectedCount }}</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+    </div>
+
+    <div class="stat-card total" (click)="navigateToTab('all')">
+      <div class="stat-icon">📁</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalCount }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="recent-card" *ngIf="filteredApplications.length">
+    <header class="recent-header">
+      <h2>Recent Activity</h2>
+      <button class="link-btn" (click)="goToRequests()">View all requests →</button>
+    </header>
+
+    <ul class="recent-list">
+      <li class="recent-row" *ngFor="let app of filteredApplications | slice:0:5">
+        <div class="recent-main">
+          <div class="ref">{{ app.referenceNumber }} <span>(Ref No)</span></div>
+          <div class="name">{{ app.applicantName }}</div>
+        </div>
+        <div class="recent-meta">
+          <span class="recent-date">{{ app.submittedDate | date: 'dd-MM-yyyy' }}</span>
+          <span class="status-chip" [ngClass]="getStatusClass(app.status)">
+            {{ getStatusLabel(app.status) }}
+          </span>
+        </div>
+      </li>
+    </ul>
+  </section>
+</section>
