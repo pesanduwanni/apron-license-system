@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
@@ -12,7 +12,7 @@ import { Application, ApplicationsService } from '../services/applications.servi
   templateUrl: './application-detail.component.html',
   styleUrls: ['./application-detail.component.scss']
 })
-export class ApplicationDetailComponent implements OnInit {
+export class ApplicationDetailComponent implements OnInit, OnDestroy {
   user: User | null = null;
   application: Application | null = null;
 
@@ -51,6 +51,9 @@ export class ApplicationDetailComponent implements OnInit {
   // Attachments section expand/collapse
   attachmentsExpanded = true;
 
+  private timeUpdateInterval: any;
+  timeUpdateTrigger = 0;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -80,6 +83,17 @@ export class ApplicationDetailComponent implements OnInit {
 
     if (!this.application) {
       this.router.navigate(['/sectional-manager']);
+    }
+
+    // Update time ago values every minute for real-time display
+    this.timeUpdateInterval = setInterval(() => {
+      this.timeUpdateTrigger++;
+    }, 60000); // Update every 60 seconds
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeUpdateInterval) {
+      clearInterval(this.timeUpdateInterval);
     }
   }
 
@@ -150,8 +164,10 @@ export class ApplicationDetailComponent implements OnInit {
     );
 
     if (success) {
-      // show a small top-right toast for category updates
-      this.showToastMessage('You have updated equipment type / Vehicle successfully', 'success');
+      // Determine message: if previously no approved categories, treat as "added"
+      const wasEmpty = !(this.application.approvedCategories && this.application.approvedCategories.length);
+      const msg = wasEmpty ? 'Categories added' : 'Details Updated Successfully';
+      this.showToastMessage(msg, 'success');
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -217,7 +233,11 @@ export class ApplicationDetailComponent implements OnInit {
     this.closeModals();
 
     if (success) {
-      this.successMessage = 'Task Updated and Sent to next level Successfully';
+      // Simulate email to applicant and notify safety manager
+      console.log('Email: Form Approved for', this.application.applicantName, this.application.referenceNumber);
+      // Move to safety pipeline (assign to safety manager) so it's visible to safety
+      this.applicationsService.acceptApplicationSafety(this.application.id, 'STF003', 'Nimal Fernando');
+      this.successMessage = 'Form Approved. Email sent to applicant.';
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -239,7 +259,8 @@ export class ApplicationDetailComponent implements OnInit {
     this.closeModals();
 
     if (success) {
-      this.successMessage = 'Application rejected. Email notification sent to applicant.';
+      console.log('Email: Form Rejected for', this.application.applicantName, this.application.referenceNumber);
+      this.successMessage = 'Form Rejected. Email sent to applicant.';
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -301,12 +322,12 @@ export class ApplicationDetailComponent implements OnInit {
     return `${dd}-${mm}-${yyyy}`;
   }
 
-  getTimeAgo(dateStr?: string): string {
+  getTimeAgo(dateStr?: string, trigger?: number): string {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    if (diffMs <= 0) return '0m';
+    if (diffMs <= 0) return '0s';
 
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     if (diffDays >= 1) return `${diffDays}d`;
@@ -314,8 +335,11 @@ export class ApplicationDetailComponent implements OnInit {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     if (diffHours >= 1) return `${diffHours}h`;
 
-    const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
-    return `${diffMinutes}m`;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    if (diffMinutes >= 1) return `${diffMinutes}m`;
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    return `${diffSeconds}s`;
   }
 
   // Build a simple history/timeline from available application fields

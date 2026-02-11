@@ -1,4 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
@@ -11,7 +12,7 @@ type Mode = 'requests' | 'rejected';
 @Component({
   selector: 'app-sectional-requests',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, FormsModule],
   templateUrl: './sectional-requests.component.html',
   styleUrls: ['./sectional-requests.component.scss']
 })
@@ -26,8 +27,11 @@ export class SectionalRequestsComponent implements OnInit {
 
   // Pagination
   currentPage = 1;
-  pageSize = 8;
+  pageSize = 10;
   totalPages = 1;
+  // Search & sort
+  searchTerm = '';
+  sortOrder: 'desc' | 'asc' = 'desc';
 
   constructor(
     private authService: AuthService,
@@ -67,6 +71,16 @@ export class SectionalRequestsComponent implements OnInit {
   applyFilters(): void {
     let result = [...this.applications];
 
+    // Search filter
+    const q = this.searchTerm?.trim().toLowerCase();
+    if (q) {
+      result = result.filter(a =>
+        (a.referenceNumber || '').toLowerCase().includes(q) ||
+        (a.applicantName || '').toLowerCase().includes(q) ||
+        (a.staffNumber || '').toLowerCase().includes(q)
+      );
+    }
+
     if (this.mode === 'requests') {
       // Tab filters
       if (this.activeTab === 'newext') {
@@ -87,8 +101,12 @@ export class SectionalRequestsComponent implements OnInit {
       }
     }
 
-    // Sort by submitted date desc (like design)
-    result.sort((a, b) => new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime());
+    // Sort by submitted date (default desc)
+    result.sort((a, b) => {
+      const da = new Date(a.submittedDate).getTime();
+      const db = new Date(b.submittedDate).getTime();
+      return this.sortOrder === 'desc' ? db - da : da - db;
+    });
 
     // Pagination
     this.totalPages = Math.ceil(result.length / this.pageSize) || 1;

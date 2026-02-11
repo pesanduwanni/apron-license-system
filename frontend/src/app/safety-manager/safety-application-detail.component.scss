@@ -50,10 +50,22 @@
 .safety-block select,
 .safety-block input {
   margin-top: 0.35rem;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  padding: 0.55rem 0.65rem;
-  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #e0e7f1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  transition: border-color 0.2s ease;
+}
+
+.inline-grid input:focus,
+.inline-grid select:focus,
+.safety-block select:focus,
+.safety-block input:focus {
+  outline: none;
+  border-color: #0d63d6;
+  box-shadow: 0 0 0 3px rgba(13, 99, 214, 0.1);
 }
 
 .safety-actions {
@@ -80,4 +92,18 @@
 
 .safety-forward .btn {
   min-width: 180px;
+}
+
+/* Equipment header styling */
+.equipment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0.75rem;
+}
+
+.equipment-header label {
+  margin: 0;
 }

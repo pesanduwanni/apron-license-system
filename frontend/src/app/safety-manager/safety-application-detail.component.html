@@ -46,9 +46,10 @@
         <div class="header-right">
           <span class="header-ref">{{ application.referenceNumber }}</span>
           <ng-container>
-            <button class="badge badge-new" *ngIf="isSafetyPending">Pending</button>
-            <button class="badge badge-ongoing" *ngIf="!isSafetyPending && !isSafetyRejected">On going</button>
             <button class="badge badge-rejected" *ngIf="isSafetyRejected">Rejected</button>
+            <button class="badge badge-ongoing" *ngIf="!isSafetyRejected && (isOrientationAssigned || isOrientationCompleted || isPracticalAssigned || isPracticalCompleted || isMedicalPending || isMedicalCompleted || isDoctorApproved || isLicenseIssued)">Ongoing</button>
+            <button class="badge badge-new" *ngIf="!isSafetyRejected && !(isOrientationAssigned || isOrientationCompleted || isPracticalAssigned || isPracticalCompleted || isMedicalPending || isMedicalCompleted || isDoctorApproved || isLicenseIssued) && application.licenseType === 'new'">New</button>
+            <button class="badge badge-new" *ngIf="!isSafetyRejected && !(isOrientationAssigned || isOrientationCompleted || isPracticalAssigned || isPracticalCompleted || isMedicalPending || isMedicalCompleted || isDoctorApproved || isLicenseIssued) && application.licenseType === 'extension'">Extension</button>
           </ng-container>
         </div>
       </div>
@@ -123,6 +124,14 @@
               <label>Requested Date</label>
               <div class="field-value">{{ formatDate(application.submittedDate) }}</div>
             </div>
+          </div>
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Current Date</label>
+              <div class="field-value">{{ formatDate(today) }}</div>
+            </div>
+            <div class="field"></div>
+            <div class="field"></div>
           </div>
         </div>
       </section>
@@ -259,6 +268,28 @@
             </div>
           </div>
 
+          <div class="field full" *ngIf="application.sectionalManagerName">
+            <div class="equipment-header">
+              <label>Sectional Manager</label>
+            </div>
+            <div class="section-body">
+              <div class="field-grid-3">
+                <div class="field">
+                  <label>Processed By</label>
+                  <div class="field-value">{{ application.sectionalManagerName || '—' }}</div>
+                </div>
+                <div class="field">
+                  <label>Processing Date</label>
+                  <div class="field-value">{{ formatDate(application.sectionalApprovalDate) }}</div>
+                </div>
+                <div class="field full" *ngIf="application.sectionalRemarks">
+                  <label>Remarks</label>
+                  <div class="field-value">{{ application.sectionalRemarks }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <section class="safety-manager-card">
             <header>
               <h3>Safety Manager</h3>
@@ -271,7 +302,7 @@
                 <div class="inline-grid">
                   <label>
                     <span>Select Class Date</span>
-                    <input type="date" [(ngModel)]="orientationForm.classDate" [disabled]="!canAssignOrientation" />
+                    <input type="date" [(ngModel)]="orientationForm.classDate" [disabled]="!canAssignOrientation" [min]="today" />
                   </label>
                   <label>
                     <span>Class Room No</span>
@@ -300,7 +331,7 @@
                 <div class="inline-grid">
                   <label>
                     <span>Select Date</span>
-                    <input type="date" [(ngModel)]="practicalForm.date" [disabled]="!canAssignPractical" />
+                    <input type="date" [(ngModel)]="practicalForm.date" [disabled]="!canAssignPractical" [min]="today" />
                   </label>
                   <label>
                     <span>Select Trainer</span>
@@ -339,28 +370,6 @@
           </div>
         </div>
       </section>
-
-      <section class="form-section" *ngIf="application.sectionalManagerName">
-        <header class="section-header">
-          <h2>Sectional Manager</h2>
-        </header>
-        <div class="section-body">
-          <div class="field-grid-3">
-            <div class="field">
-              <label>Processed By</label>
-              <div class="field-value">{{ application.sectionalManagerName || '—' }}</div>
-            </div>
-            <div class="field">
-              <label>Processing Date</label>
-              <div class="field-value">{{ formatDate(application.sectionalApprovalDate) }}</div>
-            </div>
-            <div class="field full" *ngIf="application.sectionalRemarks">
-              <label>Remarks</label>
-              <div class="field-value">{{ application.sectionalRemarks }}</div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
 
     <div class="right-column">
@@ -389,7 +398,7 @@
                   <div class="message">{{ item.message }}</div>
                   <div class="date">{{ formatDate(item.date) }}</div>
                 </div>
-                <div class="time-ago">{{ getTimeAgo(item.date) }}</div>
+                <div class="time-ago">{{ getTimeAgo(item.date, timeUpdateTrigger) }}</div>
               </div>
             </div>
           </div>

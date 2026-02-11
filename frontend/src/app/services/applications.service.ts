@@ -612,7 +612,7 @@ export class ApplicationsService {
     apps[idx].sectionalRemarks = remarks;
     apps[idx].sectionalManagerId = managerId;
     apps[idx].sectionalManagerName = managerName;
-    apps[idx].sectionalApprovalDate = new Date().toISOString().split('T')[0];
+    apps[idx].sectionalApprovalDate = new Date().toISOString();
     this.saveApplications(apps);
     return true;
   }
@@ -632,7 +632,7 @@ export class ApplicationsService {
     apps[idx].status = 'approved_sectional';
     apps[idx].sectionalManagerId = managerId;
     apps[idx].sectionalManagerName = managerName;
-    apps[idx].sectionalApprovalDate = new Date().toISOString().split('T')[0];
+    apps[idx].sectionalApprovalDate = new Date().toISOString();
     apps[idx].approvedCategories = categories;
     if (remarks) {
       apps[idx].sectionalRemarks = remarks;
@@ -655,7 +655,7 @@ export class ApplicationsService {
     apps[idx].status = 'rejected_sectional';
     apps[idx].sectionalManagerId = managerId;
     apps[idx].sectionalManagerName = managerName;
-    apps[idx].sectionalApprovalDate = new Date().toISOString().split('T')[0];
+    apps[idx].sectionalApprovalDate = new Date().toISOString();
     apps[idx].sectionalRemarks = remarks;
     this.saveApplications(apps);
     return true;
@@ -672,10 +672,11 @@ export class ApplicationsService {
     const idx = apps.findIndex(a => a.id === appId);
     if (idx === -1) return false;
 
-    apps[idx].status = 'pending_safety';
+    // Safety manager accepted the application -> mark as approved by safety
+    apps[idx].status = 'approved_safety';
     apps[idx].safetyManagerId = managerId;
     apps[idx].safetyManagerName = managerName;
-    apps[idx].safetyApprovalDate = new Date().toISOString().split('T')[0];
+    apps[idx].safetyApprovalDate = new Date().toISOString();
     if (remarks) {
       apps[idx].safetyRemarks = remarks;
     }
@@ -697,7 +698,7 @@ export class ApplicationsService {
     apps[idx].status = 'rejected_safety';
     apps[idx].safetyManagerId = managerId;
     apps[idx].safetyManagerName = managerName;
-    apps[idx].safetyApprovalDate = new Date().toISOString().split('T')[0];
+    apps[idx].safetyApprovalDate = new Date().toISOString();
     apps[idx].safetyRemarks = remarks;
     this.saveApplications(apps);
     return true;

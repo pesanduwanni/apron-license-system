@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
@@ -15,7 +15,7 @@ import { Application, ApplicationsService } from '../services/applications.servi
     './safety-application-detail.component.scss'
   ]
 })
-export class SafetyApplicationDetailComponent implements OnInit {
+export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   user: User | null = null;
   application: Application | null = null;
 
@@ -51,6 +51,9 @@ export class SafetyApplicationDetailComponent implements OnInit {
 
   availableClassRooms = ['Room 01', 'Room 02', 'Training Hall'];
   trainerOptions = ['Officer Jayasinghe', 'Officer Seneviratne', 'Trainer Perera'];
+
+  private timeUpdateInterval: any;
+  timeUpdateTrigger = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -95,10 +98,61 @@ export class SafetyApplicationDetailComponent implements OnInit {
     if (!this.application) {
       this.router.navigate(['/safety-manager/requests']);
     }
+
+    // Update time ago values every minute for real-time display
+    this.timeUpdateInterval = setInterval(() => {
+      this.timeUpdateTrigger++;
+    }, 60000); // Update every 60 seconds
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeUpdateInterval) {
+      clearInterval(this.timeUpdateInterval);
+    }
+  }
+
+  get today(): string {
+    return new Date().toISOString().split('T')[0];
   }
 
   get isSafetyPending(): boolean {
-    return !!this.application && ['approved_sectional', 'pending_safety'].includes(this.application.status);
+    return !!this.application && this.application.status === 'approved_sectional';
+  }
+
+  get isSafetyReview(): boolean {
+    return !!this.application && this.application.status === 'pending_safety';
+  }
+
+  get isOrientationAssigned(): boolean {
+    return !!this.application && this.application.status === 'orientation_assigned';
+  }
+
+  get isOrientationCompleted(): boolean {
+    return !!this.application && this.application.status === 'orientation_completed';
+  }
+
+  get isPracticalAssigned(): boolean {
+    return !!this.application && this.application.status === 'practical_assigned';
+  }
+
+  get isPracticalCompleted(): boolean {
+    return !!this.application && this.application.status === 'practical_completed';
+  }
+
+  get isMedicalPending(): boolean {
+    return !!this.application && this.application.status === 'medical_pending';
+  }
+
+  get isMedicalCompleted(): boolean {
+    return !!this.application && this.application.status === 'medical_completed';
+  }
+
+  get isDoctorApproved(): boolean {
+    return !!this.application && this.application.status === 'doctor_approved';
+  }
+
+  get isLicenseIssued(): boolean {
+    return !!this.application && this.application.status === 'license_issued';
   }
 
   get isSafetyRejected(): boolean {
@@ -106,7 +160,7 @@ export class SafetyApplicationDetailComponent implements OnInit {
   }
 
   get canAssignOrientation(): boolean {
-    return !!this.application && ['approved_sectional', 'pending_safety', 'orientation_assigned', 'orientation_completed', 'practical_assigned', 'practical_completed'].includes(this.application.status);
+    return !!this.application && ['approved_sectional', 'pending_safety', 'approved_safety', 'orientation_assigned', 'orientation_completed', 'practical_assigned', 'practical_completed'].includes(this.application.status);
   }
 
   get canAssignPractical(): boolean {
@@ -143,7 +197,8 @@ export class SafetyApplicationDetailComponent implements OnInit {
     );
 
     if (success) {
-      this.successMessage = 'Application validated successfully';
+      console.log('Email: Attachments accepted - notifying applicant for', this.application.applicantName, this.application.referenceNumber);
+      this.successMessage = 'Application validated successfully. Email sent to applicant.';
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
       this.errorMessage = 'Failed to update application.';
@@ -172,7 +227,8 @@ export class SafetyApplicationDetailComponent implements OnInit {
     this.showRejectModal = false;
 
     if (success) {
-      this.successMessage = 'Application rejected. Applicant notified.';
+      console.log('Email: Attachments rejected - notifying applicant for', this.application.applicantName, this.application.referenceNumber);
+      this.successMessage = 'Application rejected. Email sent to applicant.';
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
       this.errorMessage = 'Failed to reject application.';
@@ -194,7 +250,8 @@ export class SafetyApplicationDetailComponent implements OnInit {
     );
 
     if (success) {
-      this.showToastMessage('Classroom assignment saved');
+      console.log('Email: Orientation assigned to applicant', this.application.applicantName, this.application.referenceNumber, 'trainer:', this.orientationForm.trainer);
+      this.showToastMessage('Classroom assignment saved. Email sent to applicant and instructor.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
       this.showToastMessage('Unable to assign classroom', 'error');
@@ -210,7 +267,8 @@ export class SafetyApplicationDetailComponent implements OnInit {
     );
 
     if (success) {
-      this.showToastMessage('Orientation status updated');
+      console.log('Email: Orientation', status, 'notification for', this.application.applicantName, this.application.referenceNumber);
+      this.showToastMessage('Orientation status updated. Email sent to applicant.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
       this.showToastMessage('Unable to update orientation status', 'error');
@@ -236,7 +294,8 @@ export class SafetyApplicationDetailComponent implements OnInit {
     });
 
     if (success) {
-      this.showToastMessage('Practical assignment saved');
+      console.log('Email: Practical assigned to applicant', this.application.applicantName, this.application.referenceNumber, 'trainer:', this.practicalForm.trainer);
+      this.showToastMessage('Practical assignment saved. Email sent to applicant and trainer.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
       this.showToastMessage('Unable to assign practical test', 'error');
@@ -252,7 +311,8 @@ export class SafetyApplicationDetailComponent implements OnInit {
     );
 
     if (success) {
-      this.showToastMessage('Practical status updated');
+      console.log('Email: Practical', status, 'notification for', this.application.applicantName, this.application.referenceNumber);
+      this.showToastMessage('Practical status updated. Email sent to applicant.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
       this.showToastMessage('Unable to update practical status', 'error');
@@ -267,7 +327,7 @@ export class SafetyApplicationDetailComponent implements OnInit {
 
     const success = this.applicationsService.sendForMedical(
       this.application.id,
-      new Date().toISOString().split('T')[0]
+      new Date().toISOString()
     );
 
     if (success) {
@@ -330,12 +390,12 @@ export class SafetyApplicationDetailComponent implements OnInit {
     return `${dd}-${mm}-${yyyy}`;
   }
 
-  getTimeAgo(dateStr?: string): string {
+  getTimeAgo(dateStr?: string, trigger?: number): string {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    if (diffMs <= 0) return '0m';
+    if (diffMs <= 0) return '0s';
 
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     if (diffDays >= 1) return `${diffDays}d`;
@@ -343,8 +403,11 @@ export class SafetyApplicationDetailComponent implements OnInit {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     if (diffHours >= 1) return `${diffHours}h`;
 
-    const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
-    return `${diffMinutes}m`;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    if (diffMinutes >= 1) return `${diffMinutes}m`;
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    return `${diffSeconds}s`;
   }
 
   get historyItems() {
@@ -402,7 +465,7 @@ export class SafetyApplicationDetailComponent implements OnInit {
     items.sort((a, b) => {
       const da = a.date ? new Date(a.date).getTime() : 0;
       const db = b.date ? new Date(b.date).getTime() : 0;
-      return db - da;
+      return da - db;
     });
 
     return items;

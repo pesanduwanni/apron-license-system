@@ -1,6 +1,16 @@
 <div class="requests-container">
   <div class="requests-header">
     <h1 class="page-title">Applicants</h1>
+    <div class="header-meta">
+      <div class="total-count">Total: {{ applications.length }}</div>
+      <div class="search-sort">
+        <input type="text" placeholder="Search ref, name or staff #" [(ngModel)]="searchTerm" (input)="applyFilters()" />
+        <select [(ngModel)]="sortOrder" (change)="applyFilters()">
+          <option value="desc">Date: Newest first</option>
+          <option value="asc">Date: Oldest first</option>
+        </select>
+      </div>
+    </div>
   </div>
 
   <div class="tabs-wrapper" *ngIf="mode === 'requests'">

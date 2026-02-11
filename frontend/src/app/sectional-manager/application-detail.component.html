@@ -427,7 +427,7 @@
                   <div class="message">{{ item.message }}</div>
                   <div class="date">{{ formatDate(item.date) }}</div>
                 </div>
-                <div class="time-ago">{{ getTimeAgo(item.date) }}</div>
+                <div class="time-ago">{{ getTimeAgo(item.date, timeUpdateTrigger) }}</div>
               </div>
             </div>
           </div>
@@ -522,7 +522,9 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-approve" (click)="saveEquipmentEdit()">Update</button>
+          <button class="btn btn-approve" (click)="saveEquipmentEdit()">
+            {{ (application?.approvedCategories?.length || 0) === 0 ? 'Add' : 'Update' }}
+          </button>
         </div>
       </div>
     </div>
