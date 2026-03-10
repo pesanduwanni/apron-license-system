@@ -1,0 +1,527 @@
+<ng-container *ngIf="user && application">
+  <div class="page-body">
+    <div class="toast-container" *ngIf="showToast">
+      <div class="toast" [class.success]="toastType === 'success'" [class.error]="toastType === 'error'">
+        <div class="toast-body">
+          <div class="toast-title">{{ toastType === 'success' ? 'Success' : 'Error' }}</div>
+          <div class="toast-message">{{ toastMessage }}</div>
+        </div>
+        <button class="toast-close" (click)="closeToast()">x</button>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="page-header">
+        <button class="btn-back" (click)="goBack()"><- Back to List</button>
+        <div class="header-right">
+          <span class="header-ref">{{ application.referenceNumber }}</span>
+          <ng-container>
+            <button class="badge badge-new" *ngIf="application.licenseType === 'new'">New</button>
+            <button class="badge badge-ongoing" *ngIf="application.licenseType === 'extension'">Extension</button>
+          </ng-container>
+        </div>
+      </div>
+
+      <section class="form-section">
+        <header class="section-header">
+          <h2>Personal Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-2">
+            <div class="field">
+              <label>Name of Applicant, Staff No and Designation</label>
+              <div class="field-value">
+                {{ application.applicantName }} - {{ application.staffNumber }} ({{ application.designation }})
+              </div>
+            </div>
+          </div>
+
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Section/ Department</label>
+              <div class="field-value">{{ application.department }}</div>
+            </div>
+            <div class="field">
+              <label>Contact No</label>
+              <div class="field-value">{{ application.contactNumber }}</div>
+            </div>
+            <div class="field">
+              <label>NIC No</label>
+              <div class="field-value">{{ application.nic }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="section-header">
+          <h2>Basic Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-4">
+            <div class="field">
+              <label>License Type</label>
+              <div class="field-value">
+                {{ application.licenseType === 'extension' ? 'Extension License' : 'New License' }}
+              </div>
+            </div>
+            <div class="field">
+              <label>Current ADP No</label>
+              <div class="field-value">{{ application.currentAdpNo || 'N/A' }}</div>
+            </div>
+            <div class="field">
+              <label>Date of First Issue</label>
+              <div class="field-value">{{ application.dateOfFirstIssue ? formatDate(application.dateOfFirstIssue) : 'N/A' }}</div>
+            </div>
+            <div class="field">
+              <label>AASL Access P/No</label>
+              <div class="field-value">{{ application.aaslAccessNo }}</div>
+            </div>
+          </div>
+
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Date Participation of Safety Orientation</label>
+              <div class="field-value">{{ application.orientation?.classDate ? formatDate(application.orientation?.classDate) : 'N/A' }}</div>
+            </div>
+            <div class="field">
+              <label>AASL Access Permit Expiry Date</label>
+              <div class="field-value">{{ formatDate(application.aaslAccessExpiry) }}</div>
+            </div>
+            <div class="field">
+              <label>Requested Date</label>
+              <div class="field-value">{{ formatDate(application.submittedDate) }}</div>
+            </div>
+          </div>
+          <div class="field-grid-3">
+            <div class="field">
+              <label>Current Date</label>
+              <div class="field-value">{{ formatDate(today) }}</div>
+            </div>
+            <div class="field"></div>
+            <div class="field"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="section-header">
+          <h2>License Information</h2>
+        </header>
+        <div class="section-body">
+          <div class="field-grid-4">
+            <div class="field">
+              <label>Civil License No. (RMV)</label>
+              <div class="field-value">{{ application.stateLicenseNo }}</div>
+            </div>
+            <div class="field">
+              <label>Category</label>
+              <div class="field-value">N/A</div>
+            </div>
+            <div class="field">
+              <label>Date of Issue</label>
+              <div class="field-value">{{ formatDate(application.stateLicenseIssueDate) }}</div>
+            </div>
+            <div class="field">
+              <label>Date of Expiry</label>
+              <div class="field-value">{{ formatDate(application.stateLicenseExpiryDate) }}</div>
+            </div>
+          </div>
+
+          <div class="field full">
+            <div class="equipment-header">
+              <label>Manager recommendation for equipment type / vehicle</label>
+            </div>
+            <div class="equipment-grid">
+              <label *ngFor="let cat of vehicleCategories" class="equipment-checkbox" [class.disabled]="true">
+                <input
+                  type="checkbox"
+                  [checked]="(application!.approvedCategories?.includes(cat.key) ?? false) || application!.selectedCategories.includes(cat.key)"
+                  [disabled]="true"
+                />
+                <span class="equipment-checkbox-custom"></span>
+                <span>{{ cat.label }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="section-header expandable-header" (click)="toggleAttachments()">
+          <h2>Attachments</h2>
+          <span class="expand-arrow" [class.expanded]="attachmentsExpanded">></span>
+        </header>
+        <div class="section-body" *ngIf="attachmentsExpanded">
+          <div class="attachment-row">
+            <div class="attachment-group">
+              <p class="attachment-title">Staff ID</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.staffIdFront?.url && !failedAttachments['staffIdFront']"
+                      [src]="application.attachments.staffIdFront?.url"
+                      alt="Staff ID - Front"
+                      (click)="previewAttachment(application.attachments.staffIdFront?.url || '', 'Staff ID - Front')"
+                      (error)="imageError('staffIdFront')"
+                      (load)="imageLoaded('staffIdFront')"
+                    />
+                    <div *ngIf="!application.attachments.staffIdFront?.url || failedAttachments['staffIdFront']" class="attachment-placeholder">Staff ID - Front</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.staffIdFront?.url"
+                    (click)="downloadAttachment(application.attachments.staffIdFront?.url || '', application.attachments.staffIdFront?.name || 'staff-id-front')"
+                  >
+                    Download
+                  </button>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.staffIdBack?.url && !failedAttachments['staffIdBack']"
+                      [src]="application.attachments.staffIdBack?.url"
+                      alt="Staff ID - Back"
+                      (click)="previewAttachment(application.attachments.staffIdBack?.url || '', 'Staff ID - Back')"
+                      (error)="imageError('staffIdBack')"
+                      (load)="imageLoaded('staffIdBack')"
+                    />
+                    <div *ngIf="!application.attachments.staffIdBack?.url || failedAttachments['staffIdBack']" class="attachment-placeholder">Staff ID - Back</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.staffIdBack?.url"
+                    (click)="downloadAttachment(application.attachments.staffIdBack?.url || '', application.attachments.staffIdBack?.name || 'staff-id-back')"
+                  >
+                    Download
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="attachment-group">
+              <p class="attachment-title">State License</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.stateLicenseFront?.url && !failedAttachments['stateLicenseFront']"
+                      [src]="application.attachments.stateLicenseFront?.url"
+                      alt="State License - Front"
+                      (click)="previewAttachment(application.attachments.stateLicenseFront?.url || '', 'State License - Front')"
+                      (error)="imageError('stateLicenseFront')"
+                      (load)="imageLoaded('stateLicenseFront')"
+                    />
+                    <div *ngIf="!application.attachments.stateLicenseFront?.url || failedAttachments['stateLicenseFront']" class="attachment-placeholder">State License - Front</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.stateLicenseFront?.url"
+                    (click)="downloadAttachment(application.attachments.stateLicenseFront?.url || '', application.attachments.stateLicenseFront?.name || 'state-license-front')"
+                  >
+                    Download
+                  </button>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.stateLicenseBack?.url && !failedAttachments['stateLicenseBack']"
+                      [src]="application.attachments.stateLicenseBack?.url"
+                      alt="State License - Back"
+                      (click)="previewAttachment(application.attachments.stateLicenseBack?.url || '', 'State License - Back')"
+                      (error)="imageError('stateLicenseBack')"
+                      (load)="imageLoaded('stateLicenseBack')"
+                    />
+                    <div *ngIf="!application.attachments.stateLicenseBack?.url || failedAttachments['stateLicenseBack']" class="attachment-placeholder">State License - Back</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.stateLicenseBack?.url"
+                    (click)="downloadAttachment(application.attachments.stateLicenseBack?.url || '', application.attachments.stateLicenseBack?.name || 'state-license-back')"
+                  >
+                    Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="attachment-row">
+            <div class="attachment-group">
+              <p class="attachment-title">Aviation Pass</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.aviationPassFront?.url && !failedAttachments['aviationPassFront']"
+                      [src]="application.attachments.aviationPassFront?.url"
+                      alt="Aviation Pass - Front"
+                      (click)="previewAttachment(application.attachments.aviationPassFront?.url || '', 'Aviation Pass - Front')"
+                      (error)="imageError('aviationPassFront')"
+                      (load)="imageLoaded('aviationPassFront')"
+                    />
+                    <div *ngIf="!application.attachments.aviationPassFront?.url || failedAttachments['aviationPassFront']" class="attachment-placeholder">Aviation Pass - Front</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.aviationPassFront?.url"
+                    (click)="downloadAttachment(application.attachments.aviationPassFront?.url || '', application.attachments.aviationPassFront?.name || 'aviation-pass-front')"
+                  >
+                    Download
+                  </button>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.aviationPassBack?.url && !failedAttachments['aviationPassBack']"
+                      [src]="application.attachments.aviationPassBack?.url"
+                      alt="Aviation Pass - Back"
+                      (click)="previewAttachment(application.attachments.aviationPassBack?.url || '', 'Aviation Pass - Back')"
+                      (error)="imageError('aviationPassBack')"
+                      (load)="imageLoaded('aviationPassBack')"
+                    />
+                    <div *ngIf="!application.attachments.aviationPassBack?.url || failedAttachments['aviationPassBack']" class="attachment-placeholder">Aviation Pass - Back</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.aviationPassBack?.url"
+                    (click)="downloadAttachment(application.attachments.aviationPassBack?.url || '', application.attachments.aviationPassBack?.name || 'aviation-pass-back')"
+                  >
+                    Download
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="attachment-group">
+              <p class="attachment-title">NIC</p>
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.nicFront?.url && !failedAttachments['nicFront']"
+                      [src]="application.attachments.nicFront?.url"
+                      alt="NIC - Front"
+                      (click)="previewAttachment(application.attachments.nicFront?.url || '', 'NIC - Front')"
+                      (error)="imageError('nicFront')"
+                      (load)="imageLoaded('nicFront')"
+                    />
+                    <div *ngIf="!application.attachments.nicFront?.url || failedAttachments['nicFront']" class="attachment-placeholder">NIC - Front</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.nicFront?.url"
+                    (click)="downloadAttachment(application.attachments.nicFront?.url || '', application.attachments.nicFront?.name || 'nic-front')"
+                  >
+                    Download
+                  </button>
+                </div>
+                <div class="attachment-box">
+                  <div class="attachment-image-box">
+                    <img
+                      *ngIf="application.attachments.nicBack?.url && !failedAttachments['nicBack']"
+                      [src]="application.attachments.nicBack?.url"
+                      alt="NIC - Back"
+                      (click)="previewAttachment(application.attachments.nicBack?.url || '', 'NIC - Back')"
+                      (error)="imageError('nicBack')"
+                      (load)="imageLoaded('nicBack')"
+                    />
+                    <div *ngIf="!application.attachments.nicBack?.url || failedAttachments['nicBack']" class="attachment-placeholder">NIC - Back</div>
+                  </div>
+                  <button
+                    class="btn-download"
+                    *ngIf="application.attachments.nicBack?.url"
+                    (click)="downloadAttachment(application.attachments.nicBack?.url || '', application.attachments.nicBack?.name || 'nic-back')"
+                  >
+                    Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-body">
+          <div class="attachment-row signature-row">
+            <div class="attachment-group signature-group">
+              <div class="attachment-boxes">
+                <div class="attachment-box">
+                  <div class="signature-image-box">
+                    <img
+                      *ngIf="application.attachments.signature?.url && !failedAttachments['signature']"
+                      [src]="application.attachments.signature?.url"
+                      alt="Signature"
+                      (click)="previewAttachment(application.attachments.signature?.url || '', 'Signature')"
+                      (error)="imageError('signature')"
+                      (load)="imageLoaded('signature')"
+                    />
+                    <div *ngIf="!application.attachments.signature?.url || failedAttachments['signature']" class="signature-placeholder"></div>
+                  </div>
+                </div>
+              </div>
+              <p class="attachment-title signature-title">Signature</p>
+            </div>
+          </div>
+
+          <div class="field full" *ngIf="application.sectionalManagerName">
+            <div class="equipment-header">
+              <label>Sectional Manager</label>
+            </div>
+            <div class="section-body">
+              <div class="field-grid-3">
+                <div class="field">
+                  <label>Processed By</label>
+                  <div class="field-value">{{ application.sectionalManagerName || 'N/A' }}</div>
+                </div>
+                <div class="field">
+                  <label>Processing Date</label>
+                  <div class="field-value">{{ formatDate(application.sectionalApprovalDate) }}</div>
+                </div>
+                <div class="field">
+                  <label>Approval Status</label>
+                  <div class="field-value">{{ sectionalApprovalStatus }}</div>
+                </div>
+                <div class="field full" *ngIf="application.sectionalRemarks">
+                  <label>Remarks</label>
+                  <div class="field-value">{{ application.sectionalRemarks }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field full" *ngIf="application.safetyManagerName">
+            <div class="equipment-header">
+              <label>Safety Manager</label>
+            </div>
+            <div class="section-body">
+              <div class="field-grid-3">
+                <div class="field">
+                  <label>Processed By</label>
+                  <div class="field-value">{{ application.safetyManagerName || 'N/A' }}</div>
+                </div>
+                <div class="field">
+                  <label>Processing Date</label>
+                  <div class="field-value">{{ formatDate(application.safetyApprovalDate) }}</div>
+                </div>
+                <div class="field">
+                  <label>Approval Status</label>
+                  <div class="field-value">{{ safetyApprovalStatus }}</div>
+                </div>
+                <div class="field full" *ngIf="application.safetyRemarks">
+                  <label>Remarks</label>
+                  <div class="field-value">{{ application.safetyRemarks }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="trainer-section">
+            <header class="trainer-header">
+              <h3>Trainer</h3>
+            </header>
+
+            <div class="trainer-grid">
+              <div class="trainer-block">
+                <label class="trainer-label">Training Result</label>
+                <div class="toggle-group">
+                  <button
+                    class="toggle-btn pass"
+                    [class.active]="trainingResult === 'pass'"
+                    (click)="setTrainingResult('pass')"
+                  >
+                    Pass
+                  </button>
+                  <button
+                    class="toggle-btn fail"
+                    [class.active]="trainingResult === 'fail'"
+                    (click)="setTrainingResult('fail')"
+                  >
+                    Fail
+                  </button>
+                </div>
+              </div>
+
+              <div class="trainer-block">
+                <label class="trainer-label">Upload Report</label>
+                <div class="upload-row">
+                  <label class="file-input">
+                    <span class="file-label">Choose File</span>
+                    <input type="file" accept=".pdf,.png,.jpg,.jpeg" (change)="onTrainingReportSelected($event)" />
+                  </label>
+                  <button class="btn btn-approve" (click)="uploadTrainingReport()">Upload</button>
+                  <div class="upload-note" *ngIf="reportStatusMessage">{{ reportStatusMessage }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="trainer-remarks">
+              <label for="trainerRemarks">Remarks</label>
+              <textarea id="trainerRemarks" [(ngModel)]="trainingRemarks" rows="3"></textarea>
+            </div>
+
+            <div class="trainer-actions">
+              <button class="btn btn-secondary" (click)="goBack()">Back</button>
+              <div class="trainer-actions-right">
+                <button class="btn btn-reject" (click)="submitTrainerDecision('fail')">Rejected</button>
+                <button class="btn btn-approve" (click)="submitTrainerDecision('pass')">Accepted</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="right-column">
+      <div class="summary-card">
+        <h4>Summary</h4>
+        <div class="summary-divider"></div>
+        <div class="timeline">
+          <div *ngFor="let item of historyItems" class="timeline-item">
+            <div class="avatar-col">
+              <div class="avatar-ring">
+                <div class="avatar-icon"></div>
+              </div>
+            </div>
+            <div class="item-col">
+              <div class="item-header">
+                <div class="title-block">
+                  <div class="name-row">
+                    <span class="actor">{{ item.actor }}</span>
+                    <span class="staff-id" *ngIf="item.staffId">({{ item.staffId }})</span>
+                  </div>
+                  <div class="role">{{ item.role }}</div>
+                </div>
+              </div>
+              <div class="item-body">
+                <div class="message-block">
+                  <div class="message">{{ item.message }}</div>
+                  <div class="date">{{ formatDate(item.date) }}</div>
+                </div>
+                <div class="time-ago">{{ getTimeAgo(item.date, timeUpdateTrigger) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <div class="footer-inner">
+      <div class="footer-copy">(c) 2025 SriLankan IT Systems. All rights reserved</div>
+    </div>
+  </footer>
+
+  <div class="modal-overlay preview-overlay" *ngIf="showPreviewModal" (click)="closePreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <div class="preview-header">
+        <h3>{{ previewTitle }}</h3>
+        <button class="btn-close" (click)="closePreview()">x</button>
+      </div>
+      <div class="preview-body">
+        <img [src]="previewUrl" [alt]="previewTitle" />
+      </div>
+    </div>
+  </div>
+</ng-container>

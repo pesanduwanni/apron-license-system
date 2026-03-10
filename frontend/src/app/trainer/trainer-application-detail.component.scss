@@ -1,0 +1,112 @@
+.trainer-section {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.trainer-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.trainer-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trainer-label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.toggle-group {
+  display: inline-flex;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  padding: 0.45rem 1.25rem;
+  border: none;
+  background: #ffffff;
+  color: #111827;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle-btn.pass.active {
+  background: #0b7a0b;
+  color: #ffffff;
+}
+
+.toggle-btn.fail.active {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+.upload-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.file-input input {
+  display: none;
+}
+
+.file-label {
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  background: #374151;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.upload-note {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.trainer-remarks {
+  margin-top: 1rem;
+}
+
+.trainer-remarks textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e7f1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.trainer-actions {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.trainer-actions-right {
+  display: flex;
+  gap: 0.75rem;
+}

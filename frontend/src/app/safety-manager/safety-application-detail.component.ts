@@ -50,7 +50,7 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   };
 
   availableClassRooms = ['Room 01', 'Room 02', 'Training Hall'];
-  trainerOptions = ['Officer Jayasinghe', 'Officer Seneviratne', 'Trainer Perera'];
+  trainerOptions = ['Officer Jayasinghe', 'Officer Seneviratne', 'Trainer Perera', 'Sunil Jayawardena'];
 
   private timeUpdateInterval: any;
   timeUpdateTrigger = 0;

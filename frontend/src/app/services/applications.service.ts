@@ -100,6 +100,17 @@ export interface Application {
     assignedDate?: string;
     status?: 'pending' | 'completed';
   };
+
+  // Trainer review
+  trainer?: {
+    result?: 'pass' | 'fail';
+    remarks?: string;
+    reportName?: string;
+    reportUploadedAt?: string;
+    reviewedDate?: string;
+    trainerId?: string;
+    trainerName?: string;
+  };
 }
 
 @Injectable({
@@ -589,6 +600,14 @@ export class ApplicationsService {
     });
   }
 
+  // Get applications visible to a trainer
+  getApplicationsForTrainer(trainerName: string): Application[] {
+    return this.applicationsSubject.value.filter(app =>
+      app.status === 'approved_safety' ||
+      (app.practical?.trainer === trainerName && !!app.practical?.status)
+    );
+  }
+
   // Get pending applications for sectional manager
   getPendingForSectionalManager(managerId: string): Application[] {
     return this.applicationsSubject.value.filter(
@@ -795,6 +814,47 @@ export class ApplicationsService {
       status: 'pending'
     };
     apps[idx].status = 'medical_pending';
+    this.saveApplications(apps);
+    return true;
+  }
+
+  updateTrainerReport(appId: string, reportName: string): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    const trainer = apps[idx].trainer || {};
+    trainer.reportName = reportName;
+    trainer.reportUploadedAt = new Date().toISOString();
+    apps[idx].trainer = trainer;
+    this.saveApplications(apps);
+    return true;
+  }
+
+  submitTrainerDecision(
+    appId: string,
+    trainerId: string,
+    trainerName: string,
+    result: 'pass' | 'fail',
+    remarks?: string
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    const trainer = apps[idx].trainer || {};
+    trainer.result = result;
+    trainer.remarks = remarks;
+    trainer.reviewedDate = new Date().toISOString();
+    trainer.trainerId = trainerId;
+    trainer.trainerName = trainerName;
+    apps[idx].trainer = trainer;
+
+    const practical = apps[idx].practical || {};
+    practical.status = result === 'pass' ? 'completed' : 'not_completed';
+    apps[idx].practical = practical;
+    apps[idx].status = result === 'pass' ? 'practical_completed' : 'orientation_completed';
+
     this.saveApplications(apps);
     return true;
   }
