@@ -7,7 +7,8 @@ export type UserRole =
   | 'safety_manager'
   | 'trainer'
   | 'nurse'
-  | 'doctor';
+  | 'doctor'
+  | 'safety_officer';
 
 export interface User {
   username: string;
@@ -78,6 +79,14 @@ export class AuthService {
       name: 'Dr. Ranjan Wijesinghe',
       staffNumber: 'STF006',
       department: 'Medical Unit'
+    },
+    {
+      username: 'safetyofficer@ul.com',
+      password: 'safetyofficer123',
+      role: 'safety_officer',
+      name: 'Shanika Perera',
+      staffNumber: 'STF007',
+      department: 'Safety Department'
     }
   ];
 

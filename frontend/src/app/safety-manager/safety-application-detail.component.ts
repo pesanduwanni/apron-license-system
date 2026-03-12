@@ -171,6 +171,19 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     return !!this.application && this.application.practical?.status === 'completed';
   }
 
+  get trainerReportName(): string {
+    return this.application?.trainer?.report?.name || this.application?.trainer?.reportName || '';
+  }
+
+  get hasTrainerReport(): boolean {
+    return !!this.application?.trainer?.report?.url || !!this.application?.trainer?.reportName;
+  }
+
+  get canMarkPracticalCompleted(): boolean {
+    // Trainer report is mandatory; safety manager should only mark practical completed after report is uploaded.
+    return !!this.application?.practical && this.hasTrainerReport;
+  }
+
   toggleAttachments(): void {
     this.attachmentsExpanded = !this.attachmentsExpanded;
   }
@@ -339,6 +352,12 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   }
 
   previewAttachment(url: string, title: string): void {
+    // For PDFs, open in a new tab (image modal doesn't render PDFs).
+    if ((url || '').startsWith('data:application/pdf') || (url || '').toLowerCase().endsWith('.pdf')) {
+      window.open(url, '_blank');
+      return;
+    }
+
     this.previewUrl = url;
     this.previewTitle = title;
     this.showPreviewModal = true;

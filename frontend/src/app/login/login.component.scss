@@ -154,6 +154,15 @@ body,
   font-size: 13px;
 }
 
+.data-message {
+  padding: 8px 10px;
+  border-radius: 4px;
+  background-color: var(--canvas-color, #f4f6fb);
+  border: 1px solid var(--border-color, #cfd5e1);
+  color: var(--text-color, #1b1f27);
+  font-size: 13px;
+}
+
 /* Sign In Button */
 .btn-primary {
   width: 100%;
@@ -177,6 +186,43 @@ body,
 .btn-primary:not(:disabled):hover {
   background-color: #002236;
   box-shadow: 0 4px 12px rgba(0, 90, 158, 0.3);
+}
+
+.test-data {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-secondary,
+.btn-danger {
+  width: 100%;
+  padding: 10px 24px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  border: 1px solid var(--border-color, #cfd5e1);
+  background-color: var(--background-light, #ffffff);
+  color: #004872;
+}
+
+.btn-secondary:hover {
+  background-color: var(--canvas-color, #f4f6fb);
+}
+
+.btn-danger {
+  border: 1px solid #c53030;
+  background-color: var(--background-light, #ffffff);
+  color: #c53030;
+}
+
+.btn-danger:hover {
+  background-color: #ffe5e5;
 }
 
 /* Partner logo */

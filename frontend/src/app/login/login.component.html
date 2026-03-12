@@ -22,6 +22,10 @@
             {{ authError }}
           </div>
 
+          <div *ngIf="dataMessage" class="data-message">
+            {{ dataMessage }}
+          </div>
+
           <div class="form-group">
             <label class="sr-only" for="username">Username</label>
             <div class="input-wrapper">
@@ -58,6 +62,11 @@
             {{ submitting ? 'Signing In...' : 'Sign In' }}
           </button>
         </form>
+
+        <div class="test-data">
+          <button type="button" class="btn-secondary" (click)="resetDemoData()">Reset demo data</button>
+          <button type="button" class="btn-danger" (click)="clearAllData()">Clear all data</button>
+        </div>
 
         <div class="footer-logo">
           <img src="assets/images/SLITS-Logo.png"

@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { ApplicationsService } from '../services/applications.service';
 
 @Component({
   selector: 'app-login',
@@ -15,10 +16,12 @@ export class LoginComponent {
   loginForm: FormGroup;
   submitting = false;
   authError: string | null = null;
+  dataMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private applicationsService: ApplicationsService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -27,12 +30,23 @@ export class LoginComponent {
     });
   }
 
+  resetDemoData(): void {
+    this.applicationsService.resetToMockData();
+    this.dataMessage = 'Demo data reset.';
+  }
+
+  clearAllData(): void {
+    this.applicationsService.clearAllApplications();
+    this.dataMessage = 'All application data cleared.';
+  }
+
   get f() {
     return this.loginForm.controls;
   }
 
   onSubmit(): void {
     this.authError = null;
+    this.dataMessage = null;
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -68,6 +82,15 @@ export class LoginComponent {
         break;
       case 'trainer':
         this.router.navigate(['/trainer']);
+        break;
+      case 'nurse':
+        this.router.navigate(['/nurse']);
+        break;
+      case 'doctor':
+        this.router.navigate(['/doctor']);
+        break;
+      case 'safety_officer':
+        this.router.navigate(['/safety-officer']);
         break;
       default:
         this.authService.logout();

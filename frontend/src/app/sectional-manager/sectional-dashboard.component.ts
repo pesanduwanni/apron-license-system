@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AuthService, User } from '../services/auth.service';
 import { Application, ApplicationsService } from '../services/applications.service';
 
@@ -16,6 +17,8 @@ export class SectionalDashboardComponent implements OnInit {
   applications: Application[] = [];
   filteredApplications: Application[] = [];
 
+  private readonly subscriptions = new Subscription();
+
   constructor(
     private authService: AuthService,
     private applicationsService: ApplicationsService,
@@ -30,7 +33,14 @@ export class SectionalDashboardComponent implements OnInit {
       return;
     }
 
+    this.subscriptions.add(
+      this.applicationsService.applications$.subscribe(() => this.loadApplications())
+    );
     this.loadApplications();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   get initials(): string {

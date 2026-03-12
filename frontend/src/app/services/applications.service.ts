@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+type StorageApplication = Application;
+
 export type ApplicationStatus =
   | 'pending_sectional'
   | 'approved_sectional'
@@ -15,7 +17,11 @@ export type ApplicationStatus =
   | 'medical_pending'
   | 'medical_completed'
   | 'doctor_approved'
+  | 'doctor_rejected'
+  | 'license_rejected'
   | 'license_issued';
+
+export type MedicalTestResult = 'passed' | 'failed';
 
 export interface Attachment {
   name: string;
@@ -101,11 +107,42 @@ export interface Application {
     status?: 'pending' | 'completed';
   };
 
+  // Medical test details (entered by Nurse)
+  medicalTest?: {
+    eyesight?: MedicalTestResult;
+    colourBlindness?: MedicalTestResult;
+    generalHealth?: MedicalTestResult;
+    remarks?: string;
+    nurseId?: string;
+    nurseName?: string;
+    submittedDate?: string;
+  };
+
+  // Doctor decision
+  doctorReview?: {
+    fit?: boolean;
+    remarks?: string;
+    doctorId?: string;
+    doctorName?: string;
+    reviewedDate?: string;
+  };
+
+  // Safety officer validation / issuance
+  safetyOfficerReview?: {
+    practicalAttachmentsValidated?: boolean;
+    remarks?: string;
+    officerId?: string;
+    officerName?: string;
+    validatedDate?: string;
+    issuedDate?: string;
+  };
+
   // Trainer review
   trainer?: {
     result?: 'pass' | 'fail';
     remarks?: string;
     reportName?: string;
+    report?: Attachment;
     reportUploadedAt?: string;
     reviewedDate?: string;
     trainerId?: string;
@@ -118,6 +155,23 @@ export interface Application {
 })
 export class ApplicationsService {
   private readonly storageKey = 'applications';
+
+  private readonly safetyPipelineStatuses: ApplicationStatus[] = [
+    'approved_sectional',
+    'pending_safety',
+    'approved_safety',
+    'rejected_safety',
+    'orientation_assigned',
+    'orientation_completed',
+    'practical_assigned',
+    'practical_completed',
+    'medical_pending',
+    'medical_completed',
+    'doctor_approved',
+    'doctor_rejected',
+    'license_rejected',
+    'license_issued'
+  ];
 
   // All vehicle categories
   readonly vehicleCategories = [
@@ -143,28 +197,12 @@ export class ApplicationsService {
     { key: 'skyLoader', label: 'Sky loader' },
     { key: 'ev', label: 'EV' }
   ];
-
-  private readonly safetyPipelineStatuses: ApplicationStatus[] = [
-    'approved_sectional',
-    'pending_safety',
-    'approved_safety',
-    'rejected_safety',
-    'orientation_assigned',
-    'orientation_completed',
-    'practical_assigned',
-    'practical_completed',
-    'medical_pending',
-    'medical_completed',
-    'doctor_approved',
-    'license_issued'
-  ];
-
-  private mockApplications: Application[] = [
-    // A mix of pending, approved and rejected applications for STF002
+  private readonly mockApplications: Application[] = [
+    // Minimal seed data (kept small so you can test with fresh submissions)
     {
-      id: '1',
-      referenceNumber: 'AL-2026-0001',
-      submittedDate: '2026-01-25',
+      id: 'seed-1',
+      referenceNumber: 'AL-2026-1001',
+      submittedDate: '2026-03-01',
       status: 'pending_sectional',
       applicantName: 'Olivia Isabella',
       staffNumber: '423231',
@@ -185,20 +223,20 @@ export class ApplicationsService {
         staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
         staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
         stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
         nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
         signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
       },
       sectionalManagerId: 'STF002'
     },
     {
-      id: '2',
-      referenceNumber: 'AL-2026-0002',
-      submittedDate: '2026-01-24',
-      status: 'pending_sectional',
+      id: 'seed-2',
+      referenceNumber: 'AL-2026-1002',
+      submittedDate: '2026-03-02',
+      status: 'approved_sectional',
       applicantName: 'Nuwan Perera',
-      staffNumber: '423456', 
+      staffNumber: '423456',
       department: 'Ground Operations',
       designation: 'Operations Officer',
       contactNumber: '077 123 4567',
@@ -210,71 +248,7 @@ export class ApplicationsService {
       stateLicenseIssueDate: '2021-08-10',
       stateLicenseExpiryDate: '2029-08-10',
       selectedCategories: ['transporter', 'paxCoach', 'buggy'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '3',
-      referenceNumber: 'AL-2026-0003',
-      submittedDate: '2026-01-23',
-      status: 'pending_sectional',
-      applicantName: 'Kasun Fernando',
-      staffNumber: '423789',
-      department: 'Cargo Services',
-      designation: 'Cargo Handler',
-      contactNumber: '076 987 6543',
-      nic: '912345678V',
-      licenseType: 'new',
-      aaslAccessNo: 'AASL-11223',
-      aaslAccessExpiry: '2027-12-31',
-      stateLicenseNo: 'B5544332',
-      stateLicenseIssueDate: '2022-01-15',
-      stateLicenseExpiryDate: '2030-01-15',
-      selectedCategories: ['forkliftPalletMover', 'jcpMdLoader', 'skyLoader'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '4',
-      referenceNumber: 'AL-2026-0004',
-      submittedDate: '2026-01-22',
-      status: 'approved_sectional',
-      applicantName: 'Chamari Silva',
-      staffNumber: '423100',
-      department: 'Engineering',
-      designation: 'Maintenance Technician',
-      contactNumber: '071 222 3333',
-      nic: '885566778V',
-      licenseType: 'extension',
-      currentAdpNo: 'ADP-2023-5678',
-      dateOfFirstIssue: '2023-06-01',
-      aaslAccessNo: 'AASL-99887',
-      aaslAccessExpiry: '2027-06-01',
-      stateLicenseNo: 'B1122334',
-      stateLicenseIssueDate: '2019-09-20',
-      stateLicenseExpiryDate: '2027-09-20',
-      selectedCategories: ['maintPlatLiftTruck', 'snorkelLift', 'donkeyLift'],
-      approvedCategories: ['maintPlatLiftTruck', 'snorkelLift', 'donkeyLift', 'hiLiftCatering'],
+      approvedCategories: ['transporter', 'paxCoach', 'buggy'],
       attachments: {
         staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
         staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
@@ -288,286 +262,85 @@ export class ApplicationsService {
       },
       sectionalManagerId: 'STF002',
       sectionalManagerName: 'Kamala Silva',
-      sectionalApprovalDate: '2026-01-19',
-      sectionalRemarks: 'Added Hi-lift catering category as per department requirements.'
-    },
-    // Additional mock applications to exercise pagination (more than one page)
-    {
-      id: '5',
-      referenceNumber: 'AL-2026-0005',
-      submittedDate: '2026-01-21',
-      status: 'pending_sectional',
-      applicantName: 'Amal Perera',
-      staffNumber: '20018',
-      department: 'Procurement',
-      designation: 'Procurement Officer',
-      contactNumber: '071 111 2222',
-      nic: '901112223V',
-      licenseType: 'extension',
-      currentAdpNo: 'ADP-2022-4567',
-      dateOfFirstIssue: '2022-04-12',
-      aaslAccessNo: 'AASL-11111',
-      aaslAccessExpiry: '2027-04-12',
-      stateLicenseNo: 'B1111222',
-      stateLicenseIssueDate: '2019-01-10',
-      stateLicenseExpiryDate: '2027-01-10',
-      selectedCategories: ['tractor', 'buggy'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '6',
-      referenceNumber: 'AL-2026-0006',
-      submittedDate: '2026-01-20',
-      status: 'pending_sectional',
-      applicantName: 'Rashmi Jayasinghe',
-      staffNumber: '20019',
-      department: 'Finance',
-      designation: 'Accountant',
-      contactNumber: '077 333 4444',
-      nic: '891234567V',
-      licenseType: 'new',
-      aaslAccessNo: 'AASL-22222',
-      aaslAccessExpiry: '2027-05-01',
-      stateLicenseNo: 'B3333444',
-      stateLicenseIssueDate: '2021-03-05',
-      stateLicenseExpiryDate: '2029-03-05',
-      selectedCategories: ['car', 'van'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '7',
-      referenceNumber: 'AL-2026-0007',
-      submittedDate: '2026-01-19',
-      status: 'pending_sectional',
-      applicantName: 'Tharindu Weerasinghe',
-      staffNumber: '20020',
-      department: 'Ground Operations',
-      designation: 'Coordinator',
-      contactNumber: '075 555 6666',
-      nic: '891112223V',
-      licenseType: 'new',
-      aaslAccessNo: 'AASL-33333',
-      aaslAccessExpiry: '2027-07-15',
-      stateLicenseNo: 'B5555666',
-      stateLicenseIssueDate: '2020-07-02',
-      stateLicenseExpiryDate: '2028-07-02',
-      selectedCategories: ['paxCoach', 'lorryAcBus'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '8',
-      referenceNumber: 'AL-2026-0008',
-      submittedDate: '2026-01-18',
-      status: 'pending_sectional',
-      applicantName: 'Imesha Gunawardena',
-      staffNumber: '20021',
-      department: 'Human Resources',
-      designation: 'HR Executive',
-      contactNumber: '078 777 8888',
-      nic: '901223344V',
-      licenseType: 'extension',
-      currentAdpNo: 'ADP-2022-7890',
-      dateOfFirstIssue: '2022-08-20',
-      aaslAccessNo: 'AASL-44444',
-      aaslAccessExpiry: '2027-08-20',
-      stateLicenseNo: 'B7777888',
-      stateLicenseIssueDate: '2018-11-25',
-      stateLicenseExpiryDate: '2026-11-25',
-      selectedCategories: ['car'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '9',
-      referenceNumber: 'AL-2026-0009',
-      submittedDate: '2026-01-17',
-      status: 'approved_sectional',
-      applicantName: 'Sajith Ranasinghe',
-      staffNumber: '20022',
-      department: 'Security',
-      designation: 'Security Officer',
-      contactNumber: '071 999 0000',
-      nic: '881112223V',
-      licenseType: 'new',
-      aaslAccessNo: 'AASL-55555',
-      aaslAccessExpiry: '2027-09-01',
-      stateLicenseNo: 'B9999000',
-      stateLicenseIssueDate: '2017-09-15',
-      stateLicenseExpiryDate: '2025-09-15',
-      selectedCategories: ['pickUp', 'van'],
-      approvedCategories: ['pickUp', 'van'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002',
-      sectionalManagerName: 'Kamala Silva',
-      sectionalApprovalDate: '2026-01-18'
-    },
-    {
-      id: '10',
-      referenceNumber: 'AL-2026-0010',
-      submittedDate: '2026-01-16',
-      status: 'pending_sectional',
-      applicantName: 'Dilani Fernando',
-      staffNumber: '20023',
-      department: 'Catering',
-      designation: 'Supervisor',
-      contactNumber: '070 222 3333',
-      nic: '901234568V',
-      licenseType: 'extension',
-      currentAdpNo: 'ADP-2021-4321',
-      dateOfFirstIssue: '2021-02-18',
-      aaslAccessNo: 'AASL-66666',
-      aaslAccessExpiry: '2027-02-18',
-      stateLicenseNo: 'B2222333',
-      stateLicenseIssueDate: '2016-02-18',
-      stateLicenseExpiryDate: '2024-02-18',
-      selectedCategories: ['hiLiftCatering', 'paxCoach'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '11',
-      referenceNumber: 'AL-2026-0011',
-      submittedDate: '2026-01-15',
-      status: 'pending_sectional',
-      applicantName: 'Harsha Abeywickrama',
-      staffNumber: '20024',
-      department: 'Cargo Services',
-      designation: 'Cargo Supervisor',
-      contactNumber: '071 444 5555',
-      nic: '891122334V',
-      licenseType: 'new',
-      aaslAccessNo: 'AASL-77777',
-      aaslAccessExpiry: '2027-10-10',
-      stateLicenseNo: 'B4444555',
-      stateLicenseIssueDate: '2020-10-10',
-      stateLicenseExpiryDate: '2028-10-10',
-      selectedCategories: ['skyLoader', 'forkliftPalletMover'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002'
-    },
-    {
-      id: '12',
-      referenceNumber: 'AL-2026-0012',
-      submittedDate: '2026-01-14',
-      status: 'rejected_sectional',
-      applicantName: 'Iresha Karunaratne',
-      staffNumber: '20025',
-      department: 'Administration',
-      designation: 'Admin Officer',
-      contactNumber: '072 666 7777',
-      nic: '881234567V',
-      licenseType: 'new',
-      aaslAccessNo: 'AASL-88888',
-      aaslAccessExpiry: '2027-11-30',
-      stateLicenseNo: 'B6666777',
-      stateLicenseIssueDate: '2018-03-03',
-      stateLicenseExpiryDate: '2026-03-03',
-      selectedCategories: ['car'],
-      attachments: {
-        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
-        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
-      },
-      sectionalManagerId: 'STF002',
-      sectionalManagerName: 'Kamala Silva',
-      sectionalApprovalDate: '2026-01-15',
-      sectionalRemarks: 'Incomplete documentation provided.'
+      sectionalApprovalDate: '2026-03-02'
     }
   ];
 
   private applicationsSubject = new BehaviorSubject<Application[]>(this.loadApplications());
   public applications$: Observable<Application[]> = this.applicationsSubject.asObservable();
 
-  constructor() {}
+  constructor() {
+    // Cross-tab / cross-window updates (helps demo “realtime” changes)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event) => {
+        if (event.key !== this.storageKey) return;
+        const next = this.readStoredApplications();
+        if (next) {
+          this.applicationsSubject.next(next);
+        }
+      });
+    }
+  }
 
   private loadApplications(): Application[] {
-    // Always use mock data
-    localStorage.setItem(this.storageKey, JSON.stringify(this.mockApplications));
-    return this.mockApplications;
+    const stored = this.readStoredApplications();
+    // If the key exists (even if empty), respect it.
+    // This allows you to clear data and test brand-new submissions.
+    if (stored !== null) {
+      return stored;
+    }
+
+    // Seed initial mock data when nothing is stored yet.
+    // This ensures every role (sectional/safety/trainer) sees items on first login.
+    const seeded = this.buildSeedApplications();
+    localStorage.setItem(this.storageKey, JSON.stringify(seeded));
+    return seeded;
+  }
+
+  // Intentionally no auto-injection of extra mock data into existing localStorage.
+  // Use reset/clear methods to control your test data.
+
+  private readStoredApplications(): Application[] | null {
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as StorageApplication[];
+      if (!Array.isArray(parsed)) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+
+  private buildSeedApplications(): Application[] {
+    // Minimal seed: 2 applications only.
+    return [...this.mockApplications];
+  }
+
+  clearAllApplications(): void {
+    localStorage.setItem(this.storageKey, JSON.stringify([]));
+    this.applicationsSubject.next([]);
   }
 
   private saveApplications(apps: Application[]): void {
     localStorage.setItem(this.storageKey, JSON.stringify(apps));
     this.applicationsSubject.next(apps);
+  }
+
+  createApplication(payload: Omit<Application, 'id'> & { id?: string }): Application {
+    const apps = this.getApplications();
+    const id = payload.id ?? this.generateId();
+    const app: Application = { ...payload, id };
+    this.saveApplications([app, ...apps]);
+    return app;
+  }
+
+  getApplicationsForApplicant(staffNumber: string): Application[] {
+    return this.applicationsSubject.value.filter(a => a.staffNumber === staffNumber);
+  }
+
+  private generateId(): string {
+    return String(Date.now()) + '-' + Math.floor(Math.random() * 1000000);
   }
 
   getApplications(): Application[] {
@@ -602,9 +375,10 @@ export class ApplicationsService {
 
   // Get applications visible to a trainer
   getApplicationsForTrainer(trainerName: string): Application[] {
-    return this.applicationsSubject.value.filter(app =>
-      app.status === 'approved_safety' ||
-      (app.practical?.trainer === trainerName && !!app.practical?.status)
+    // Trainers should only see applicants that have been assigned to them
+    // for practical training (and its downstream stages).
+    return this.applicationsSubject.value.filter(
+      app => app.practical?.trainer === trainerName && !!app.practical?.status
     );
   }
 
@@ -818,13 +592,142 @@ export class ApplicationsService {
     return true;
   }
 
-  updateTrainerReport(appId: string, reportName: string): boolean {
+  // Nurse submits medical test details
+  submitMedicalTest(
+    appId: string,
+    nurseId: string,
+    nurseName: string,
+    payload: {
+      eyesight: MedicalTestResult;
+      colourBlindness: MedicalTestResult;
+      generalHealth: MedicalTestResult;
+      remarks?: string;
+    }
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].medicalTest = {
+      eyesight: payload.eyesight,
+      colourBlindness: payload.colourBlindness,
+      generalHealth: payload.generalHealth,
+      remarks: payload.remarks,
+      nurseId,
+      nurseName,
+      submittedDate: new Date().toISOString()
+    };
+
+    const medical = apps[idx].medical || {};
+    medical.status = 'completed';
+    apps[idx].medical = medical;
+    apps[idx].status = 'medical_completed';
+
+    this.saveApplications(apps);
+    return true;
+  }
+
+  // Doctor submits fit/not-fit decision
+  submitDoctorDecision(
+    appId: string,
+    doctorId: string,
+    doctorName: string,
+    fit: boolean,
+    remarks?: string
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].doctorReview = {
+      fit,
+      remarks,
+      doctorId,
+      doctorName,
+      reviewedDate: new Date().toISOString()
+    };
+
+    apps[idx].status = fit ? 'doctor_approved' : 'doctor_rejected';
+    this.saveApplications(apps);
+    return true;
+  }
+
+  // Safety officer validates attachments after practical + doctor approval
+  validatePracticalAttachments(
+    appId: string,
+    officerId: string,
+    officerName: string,
+    accepted: boolean,
+    remarks?: string
+  ): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].safetyOfficerReview = {
+      practicalAttachmentsValidated: accepted,
+      remarks,
+      officerId,
+      officerName,
+      validatedDate: new Date().toISOString(),
+      issuedDate: apps[idx].safetyOfficerReview?.issuedDate
+    };
+
+    if (!accepted) {
+      apps[idx].status = 'license_rejected';
+    }
+
+    this.saveApplications(apps);
+    return true;
+  }
+
+  // Safety officer issues digital license
+  issueDigitalLicense(appId: string, officerId: string, officerName: string): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx === -1) return false;
+
+    const review = apps[idx].safetyOfficerReview;
+    if (!review?.practicalAttachmentsValidated) return false;
+
+    apps[idx].safetyOfficerReview = {
+      ...review,
+      officerId,
+      officerName,
+      issuedDate: new Date().toISOString()
+    };
+    apps[idx].status = 'license_issued';
+    this.saveApplications(apps);
+    return true;
+  }
+
+  // Nurse list: applicants forwarded for medical
+  getApplicationsForNurse(): Application[] {
+    return this.applicationsSubject.value.filter(app => app.status === 'medical_pending');
+  }
+
+  // Doctor list: applicants with completed medical test
+  getApplicationsForDoctor(): Application[] {
+    return this.applicationsSubject.value.filter(app => app.status === 'medical_completed');
+  }
+
+  // Safety officer list: applicants approved by doctor and not yet issued/rejected
+  getApplicationsForSafetyOfficer(): Application[] {
+    return this.applicationsSubject.value.filter(app => app.status === 'doctor_approved');
+  }
+
+  updateTrainerReport(appId: string, report: string | Attachment): boolean {
     const apps = this.getApplications();
     const idx = apps.findIndex(a => a.id === appId);
     if (idx === -1) return false;
 
     const trainer = apps[idx].trainer || {};
-    trainer.reportName = reportName;
+    if (typeof report === 'string') {
+      trainer.reportName = report;
+    } else {
+      trainer.report = report;
+      trainer.reportName = report.name;
+    }
     trainer.reportUploadedAt = new Date().toISOString();
     apps[idx].trainer = trainer;
     this.saveApplications(apps);
@@ -861,7 +764,8 @@ export class ApplicationsService {
 
   // Reset to mock data (for testing)
   resetToMockData(): void {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.mockApplications));
-    this.applicationsSubject.next([...this.mockApplications]);
+    const seeded = this.buildSeedApplications();
+    localStorage.setItem(this.storageKey, JSON.stringify(seeded));
+    this.applicationsSubject.next([...seeded]);
   }
 }

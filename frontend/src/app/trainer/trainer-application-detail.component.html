@@ -352,6 +352,7 @@
                       *ngIf="application.attachments.signature?.url && !failedAttachments['signature']"
                       [src]="application.attachments.signature?.url"
                       alt="Signature"
+                      class="signature-image"
                       (click)="previewAttachment(application.attachments.signature?.url || '', 'Signature')"
                       (error)="imageError('signature')"
                       (load)="imageLoaded('signature')"
@@ -423,26 +424,6 @@
 
             <div class="trainer-grid">
               <div class="trainer-block">
-                <label class="trainer-label">Training Result</label>
-                <div class="toggle-group">
-                  <button
-                    class="toggle-btn pass"
-                    [class.active]="trainingResult === 'pass'"
-                    (click)="setTrainingResult('pass')"
-                  >
-                    Pass
-                  </button>
-                  <button
-                    class="toggle-btn fail"
-                    [class.active]="trainingResult === 'fail'"
-                    (click)="setTrainingResult('fail')"
-                  >
-                    Fail
-                  </button>
-                </div>
-              </div>
-
-              <div class="trainer-block">
                 <label class="trainer-label">Upload Report</label>
                 <div class="upload-row">
                   <label class="file-input">
@@ -455,17 +436,8 @@
               </div>
             </div>
 
-            <div class="trainer-remarks">
-              <label for="trainerRemarks">Remarks</label>
-              <textarea id="trainerRemarks" [(ngModel)]="trainingRemarks" rows="3"></textarea>
-            </div>
-
             <div class="trainer-actions">
               <button class="btn btn-secondary" (click)="goBack()">Back</button>
-              <div class="trainer-actions-right">
-                <button class="btn btn-reject" (click)="submitTrainerDecision('fail')">Rejected</button>
-                <button class="btn btn-approve" (click)="submitTrainerDecision('pass')">Accepted</button>
-              </div>
             </div>
           </section>
         </div>

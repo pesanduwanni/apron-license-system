@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
+import { ApplicationsService, Application, Attachment } from '../services/applications.service';
 
 type SectionKey = 'basic' | 'personal' | 'license' | 'attachments';
 
@@ -134,24 +135,12 @@ export class ApplicantDashboardComponent implements OnInit {
   ];
 
   attachmentNames: Record<string, string> = {};
-  historyEntries: RequestHistory[] = [
-    {
-      id: 'AL-2025-0001',
-      submittedOn: '2025-01-05',
-      status: 'Approved',
-      licenseType: 'Extension License'
-    },
-    {
-      id: 'AL-2024-0321',
-      submittedOn: '2024-07-18',
-      status: 'Rejected',
-      licenseType: 'New License'
-    }
-  ];
+  historyEntries: RequestHistory[] = [];
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private applicationsService: ApplicationsService,
     private router: Router
   ) {
     this.applicantForm = this.fb.group({
@@ -191,6 +180,37 @@ export class ApplicantDashboardComponent implements OnInit {
     }
 
     this.prefillFormValues();
+
+    if (this.user) {
+      this.historyEntries = this.applicationsService
+        .getApplicationsForApplicant(this.user.staffNumber)
+        .map((app): RequestHistory => {
+          const status: RequestHistory['status'] =
+            app.status.includes('rejected') ? 'Rejected' : app.status.includes('approved') ? 'Approved' : 'Pending';
+          const licenseType = app.licenseType === 'extension' ? 'Extension License' : 'New License';
+          return { id: app.referenceNumber, submittedOn: app.submittedDate, status, licenseType };
+        });
+    }
+  }
+
+  private fileToAttachment(file: File): Promise<Attachment> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.onload = () => {
+        const url = String(reader.result || '');
+        const mime = (file.type || '').toLowerCase();
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+
+        let type: Attachment['type'] = 'jpg';
+        if (mime.includes('pdf') || ext === 'pdf') type = 'pdf';
+        else if (mime.includes('png') || ext === 'png') type = 'png';
+        else if (mime.includes('jpg') || mime.includes('jpeg') || ext === 'jpg' || ext === 'jpeg') type = 'jpg';
+
+        resolve({ name: file.name, type, url });
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   get initials(): string {
@@ -235,7 +255,7 @@ export class ApplicantDashboardComponent implements OnInit {
     this.formStatus = 'idle';
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.applicantForm.invalid) {
       this.applicantForm.markAllAsTouched();
       return;
@@ -243,27 +263,70 @@ export class ApplicantDashboardComponent implements OnInit {
 
     this.formStatus = 'saving';
 
-    setTimeout(() => {
-      const submission = this.applicantForm.getRawValue();
-      const selectedDepartment = submission.personalInfo.department;
-      const referenceNumber = `AL-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000 + 1000)}`;
+    const submission = this.applicantForm.getRawValue();
+    const selectedDepartment = submission.personalInfo.department;
+    const referenceNumber = `AL-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000 + 1000)}`;
 
-      // Simulate sending to sectional manager
-      console.log(`Application submitted to sectional manager for department: ${selectedDepartment}`);
-      console.log(`Email sent to sectional manager: New application ${referenceNumber} submitted`);
-      console.log(`Email sent to applicant: Your application ${referenceNumber} has been submitted`);
+    const selectedCategories = this.getSelectedCategories(submission.equipment);
+    const submittedDate = new Date().toISOString().split('T')[0];
 
-      const newEntry: RequestHistory = {
-        id: referenceNumber,
-        submittedOn: new Date().toISOString(),
-        status: 'Pending',
-        licenseType: submission.basicInfo.licenseType === 'extension' ? 'Extension License' : 'New License'
+    const attachmentFiles = (submission.attachments || {}) as Record<string, File | null>;
+    const attachmentEntries = Object.entries(attachmentFiles).filter(([, file]) => file instanceof File) as Array<[
+      string,
+      File
+    ]>;
+    const resolved = await Promise.all(
+      attachmentEntries.map(async ([key, file]) => {
+        const attachment = await this.fileToAttachment(file);
+        return [key, attachment] as const;
+      })
+    );
+    const attachments = Object.fromEntries(resolved) as Application['attachments'];
+
+    if (this.user) {
+      const appPayload: Omit<Application, 'id'> = {
+        referenceNumber,
+        submittedDate,
+        status: 'pending_sectional',
+        applicantName: submission.personalInfo.name,
+        staffNumber: submission.personalInfo.staffNumber,
+        department: selectedDepartment,
+        designation: submission.personalInfo.designation,
+        contactNumber: submission.personalInfo.contactNo,
+        nic: submission.personalInfo.nic,
+        licenseType: submission.basicInfo.licenseType,
+        currentAdpNo: submission.basicInfo.currentAdpNo || undefined,
+        dateOfFirstIssue: submission.basicInfo.dateOfFirstIssue || undefined,
+        aaslAccessNo: submission.basicInfo.aaslAccessNo,
+        aaslAccessExpiry: submission.basicInfo.aaslAccessExpiry,
+        stateLicenseNo: submission.licenseInfo.stateLicenseNo,
+        stateLicenseIssueDate: submission.licenseInfo.issueDate,
+        stateLicenseExpiryDate: submission.licenseInfo.expiryDate,
+        selectedCategories,
+        attachments,
+        sectionalManagerId: 'STF002'
       };
 
-      this.historyEntries = [newEntry, ...this.historyEntries];
-      this.showHistory = true;
-      this.formStatus = 'submitted';
-    }, 2000);
+      this.applicationsService.createApplication(appPayload);
+    }
+
+    const newEntry: RequestHistory = {
+      id: referenceNumber,
+      submittedOn: submittedDate,
+      status: 'Pending',
+      licenseType: submission.basicInfo.licenseType === 'extension' ? 'Extension License' : 'New License'
+    };
+
+    this.historyEntries = [newEntry, ...this.historyEntries];
+    this.showHistory = true;
+    this.formStatus = 'submitted';
+  }
+
+  private getSelectedCategories(equipmentGroup: Record<string, boolean>): string[] {
+    if (!equipmentGroup) return [];
+    return Object.entries(equipmentGroup)
+      .filter(([, selected]) => !!selected)
+      .map(([key]) => key);
   }
 
   private buildEquipmentGroup(): FormGroup {
@@ -278,10 +341,23 @@ export class ApplicantDashboardComponent implements OnInit {
     const controls: Record<string, any> = {};
     this.attachmentGroups.forEach((group) => {
       group.controls.forEach((control) => {
-        controls[control.key] = this.fb.control<File | null>(null);
+        const isRequired =
+          control.key === 'staffIdFront' ||
+          control.key === 'staffIdBack' ||
+          control.key === 'stateLicenseFront' ||
+          control.key === 'stateLicenseBack' ||
+          control.key === 'nicFront' ||
+          control.key === 'nicBack';
+        controls[control.key] = isRequired
+          ? this.fb.control<File | null>(null, Validators.required)
+          : this.fb.control<File | null>(null);
         this.attachmentNames[control.key] = '';
       });
     });
+
+    controls[this.signatureControl.key] = this.fb.control<File | null>(null);
+    this.attachmentNames[this.signatureControl.key] = '';
+
     return this.fb.group(controls);
   }
 

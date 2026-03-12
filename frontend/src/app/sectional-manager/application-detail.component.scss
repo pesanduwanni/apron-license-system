@@ -545,6 +545,38 @@
 
 .attachment-box {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-download {
+  width: fit-content;
+  align-self: flex-end;
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #0d63d6;
+  color: #0d63d6;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-download:active {
+  transform: translateY(1px);
+}
+
+.btn-download:hover {
+  background: rgba(13, 99, 214, 0.08);
+}
+
+.btn-download:disabled {
+  border-color: #cbd5f5;
+  color: #94a3b8;
+  cursor: not-allowed;
+  background: transparent;
 }
 
 .attachment-image-box {
@@ -575,27 +607,41 @@
   padding: 0.5rem;
 }
 .signature-placeholder {
-  height: 40px;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-  background: #f9fafb;
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
 }
 
 .signature-image-box {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 40px;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.signature-image-box img {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
 }
 
 .signature-image {
-  max-width: 120px;
-  max-height: 40px;
   display: block;
+  width: 100%;
+  height: 120px;
   object-fit: contain;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-  background: #f9fafb;
 }
 
 /* Signature row layout: single column like applicant view */

@@ -2,6 +2,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AuthService, User } from '../services/auth.service';
 import { Application, ApplicationsService } from '../services/applications.service';
 
@@ -23,6 +24,8 @@ export class TrainerRequestsComponent implements OnInit {
   user: User | null = null;
   applications: Application[] = [];
   filteredApplications: Application[] = [];
+
+  private readonly subscriptions = new Subscription();
 
   activeTab: RequestsTab = 'all';
   mode: Mode = 'requests';
@@ -48,7 +51,15 @@ export class TrainerRequestsComponent implements OnInit {
     }
 
     this.mode = (this.route.snapshot.data['mode'] as Mode) || 'requests';
+
+    this.subscriptions.add(
+      this.appsService.applications$.subscribe(() => this.loadApplications())
+    );
     this.loadApplications();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   loadApplications(): void {
