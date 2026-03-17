@@ -201,13 +201,22 @@
                     />
                     <div *ngIf="!application.attachments.staffIdFront?.url || failedAttachments['staffIdFront']" class="attachment-placeholder">Staff ID - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.staffIdFront?.url"
-                    (click)="downloadAttachment(application.attachments.staffIdFront?.url || '', application.attachments.staffIdFront?.name || 'staff-id-front')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.staffIdFront?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.staffIdFront?.url || '', 'Staff ID - Front')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.staffIdFront?.url || '', application.attachments.staffIdFront?.name || 'staff-id-front')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -221,13 +230,22 @@
                     />
                     <div *ngIf="!application.attachments.staffIdBack?.url || failedAttachments['staffIdBack']" class="attachment-placeholder">Staff ID - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.staffIdBack?.url"
-                    (click)="downloadAttachment(application.attachments.staffIdBack?.url || '', application.attachments.staffIdBack?.name || 'staff-id-back')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.staffIdBack?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.staffIdBack?.url || '', 'Staff ID - Back')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.staffIdBack?.url || '', application.attachments.staffIdBack?.name || 'staff-id-back')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -247,13 +265,22 @@
                     />
                     <div *ngIf="!application.attachments.stateLicenseFront?.url || failedAttachments['stateLicenseFront']" class="attachment-placeholder">State License - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.stateLicenseFront?.url"
-                    (click)="downloadAttachment(application.attachments.stateLicenseFront?.url || '', application.attachments.stateLicenseFront?.name || 'state-license-front')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.stateLicenseFront?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.stateLicenseFront?.url || '', 'State License - Front')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.stateLicenseFront?.url || '', application.attachments.stateLicenseFront?.name || 'state-license-front')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -267,13 +294,22 @@
                     />
                     <div *ngIf="!application.attachments.stateLicenseBack?.url || failedAttachments['stateLicenseBack']" class="attachment-placeholder">State License - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.stateLicenseBack?.url"
-                    (click)="downloadAttachment(application.attachments.stateLicenseBack?.url || '', application.attachments.stateLicenseBack?.name || 'state-license-back')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.stateLicenseBack?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.stateLicenseBack?.url || '', 'State License - Back')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.stateLicenseBack?.url || '', application.attachments.stateLicenseBack?.name || 'state-license-back')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -295,13 +331,22 @@
                     />
                     <div *ngIf="!application.attachments.aviationPassFront?.url || failedAttachments['aviationPassFront']" class="attachment-placeholder">Aviation Pass - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.aviationPassFront?.url"
-                    (click)="downloadAttachment(application.attachments.aviationPassFront?.url || '', application.attachments.aviationPassFront?.name || 'aviation-pass-front')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.aviationPassFront?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.aviationPassFront?.url || '', 'Aviation Pass - Front')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.aviationPassFront?.url || '', application.attachments.aviationPassFront?.name || 'aviation-pass-front')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -315,13 +360,22 @@
                     />
                     <div *ngIf="!application.attachments.aviationPassBack?.url || failedAttachments['aviationPassBack']" class="attachment-placeholder">Aviation Pass - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.aviationPassBack?.url"
-                    (click)="downloadAttachment(application.attachments.aviationPassBack?.url || '', application.attachments.aviationPassBack?.name || 'aviation-pass-back')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.aviationPassBack?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.aviationPassBack?.url || '', 'Aviation Pass - Back')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.aviationPassBack?.url || '', application.attachments.aviationPassBack?.name || 'aviation-pass-back')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -341,13 +395,22 @@
                     />
                     <div *ngIf="!application.attachments.nicFront?.url || failedAttachments['nicFront']" class="attachment-placeholder">NIC - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.nicFront?.url"
-                    (click)="downloadAttachment(application.attachments.nicFront?.url || '', application.attachments.nicFront?.name || 'nic-front')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.nicFront?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.nicFront?.url || '', 'NIC - Front')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.nicFront?.url || '', application.attachments.nicFront?.name || 'nic-front')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -361,22 +424,31 @@
                     />
                     <div *ngIf="!application.attachments.nicBack?.url || failedAttachments['nicBack']" class="attachment-placeholder">NIC - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.nicBack?.url"
-                    (click)="downloadAttachment(application.attachments.nicBack?.url || '', application.attachments.nicBack?.name || 'nic-back')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.nicBack?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.nicBack?.url || '', 'NIC - Back')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      (click)="downloadAttachment(application.attachments.nicBack?.url || '', application.attachments.nicBack?.name || 'nic-back')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="section-body">
           <div class="attachment-row signature-row">
             <div class="attachment-group signature-group">
+              <p class="attachment-title signature-title">Signature</p>
+
               <div class="attachment-boxes">
                 <div class="attachment-box">
                   <div class="signature-image-box">
@@ -391,20 +463,55 @@
                     />
                     <div *ngIf="!application.attachments.signature?.url || failedAttachments['signature']" class="signature-placeholder"></div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.signature?.url"
-                    (click)="downloadAttachment(application.attachments.signature?.url || '', application.attachments.signature?.name || 'signature')"
-                  >
-                    Download
-                  </button>
+                  <div class="attachment-actions" *ngIf="application.attachments.signature?.url">
+                    <button
+                      class="btn-attach btn-attach--view"
+                      type="button"
+                      (click)="previewAttachment(application.attachments.signature?.url || '', 'Signature')"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="btn-attach btn-attach--download"
+                      type="button"
+                      title="Download signature"
+                      aria-label="Download signature"
+                      (click)="downloadAttachment(application.attachments.signature?.url || '', application.attachments.signature?.name || 'signature')"
+                    >
+                      Download
+                    </button>
+                  </div>
                 </div>
               </div>
-              <p class="attachment-title signature-title">Signature</p>
+
+              <div class="attachment-decision" *ngIf="isSafetyPending">
+                <div class="attachment-decision-title">Attachment Validation</div>
+                <div class="attachment-decision-hint">Accept if all uploaded documents and the signature are correct. Reject to request a re-upload with a remark.</div>
+                <div class="attachment-decision-actions">
+                  <button class="btn btn-reject" type="button" (click)="startReject()">Reject Attachments</button>
+                  <button class="btn btn-approve" type="button" (click)="acceptApplication()">Accept Attachments</button>
+                </div>
+
+                <div class="attachment-reject" *ngIf="showRejectBox">
+                  <label for="attachmentRejectReason">Remark</label>
+                  <textarea
+                    id="attachmentRejectReason"
+                    [(ngModel)]="rejectReason"
+                    placeholder="Enter rejection reason..."
+                    rows="3"
+                    class="reject-textarea"
+                  ></textarea>
+                  <div class="attachment-reject-actions">
+                    <button class="btn btn-secondary" type="button" (click)="cancelReject()">Cancel</button>
+                    <button class="btn btn-reject" type="button" [disabled]="!rejectReason.trim()" (click)="confirmReject()">Confirm Reject</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class="field full" *ngIf="application.sectionalManagerName">
+        </div>
+        <div class="section-body">
+          <div class="field full sectional-manager-block" *ngIf="application.sectionalManagerName">
             <div class="equipment-header">
               <label>Sectional Manager</label>
             </div>
@@ -434,31 +541,53 @@
 
             <div class="safety-grid">
               <div class="safety-block">
-                <h4>Assign for Class Room test</h4>
+                <h4>Assign for Orientation</h4>
                 <div class="inline-grid">
                   <label>
-                    <span>Select Class Date</span>
+                    <span>Select Class</span>
+                    <select [(ngModel)]="orientationForm.className" [disabled]="!canAssignOrientation">
+                      <option value="" disabled>Select class</option>
+                      <option *ngFor="let c of availableClasses" [value]="c">{{ c }}</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Date</span>
                     <input type="date" [(ngModel)]="orientationForm.classDate" [disabled]="!canAssignOrientation" [min]="today" />
                   </label>
                   <label>
-                    <span>Class Room No</span>
-                    <select [(ngModel)]="orientationForm.classRoom" [disabled]="!canAssignOrientation">
-                      <option value="" disabled>Select room</option>
-                      <option *ngFor="let room of availableClassRooms" [value]="room">{{ room }}</option>
+                    <span>Select Instructor</span>
+                    <select [(ngModel)]="orientationForm.instructor" [disabled]="!canAssignOrientation">
+                      <option value="" disabled>Select instructor</option>
+                      <option *ngFor="let instructor of instructorOptions" [value]="instructor">{{ instructor }}</option>
                     </select>
                   </label>
                 </div>
-                <label>
-                  <span>Select Trainer</span>
-                  <select [(ngModel)]="orientationForm.trainer" [disabled]="!canAssignOrientation">
-                    <option value="" disabled>Select trainer</option>
-                    <option *ngFor="let trainer of trainerOptions" [value]="trainer">{{ trainer }}</option>
-                  </select>
-                </label>
                 <div class="safety-actions">
-                  <button class="btn btn-secondary" (click)="assignOrientation()" [disabled]="!canAssignOrientation">Assign Classroom</button>
+                  <button class="btn btn-secondary" (click)="assignOrientation()" [disabled]="!canAssignOrientation">Proceed</button>
                   <button class="btn btn-outline" (click)="markOrientation('completed')" [disabled]="!application!.orientation">Mark Complete</button>
-                  <button class="btn btn-outline" (click)="markOrientation('not_completed')" [disabled]="!application!.orientation">Not Completed</button>
+                  <button class="btn btn-outline" (click)="startOrientationNotCompleted()" [disabled]="!application!.orientation">Not Completed</button>
+                </div>
+
+                <div class="orientation-not-completed" *ngIf="showOrientationNotCompletedBox">
+                  <label for="orientationNotCompletedRemark">Remark</label>
+                  <textarea
+                    id="orientationNotCompletedRemark"
+                    [(ngModel)]="orientationNotCompletedReason"
+                    placeholder="Enter reason for not completing orientation..."
+                    rows="3"
+                    class="reject-textarea"
+                  ></textarea>
+                  <div class="orientation-not-completed-actions">
+                    <button class="btn btn-secondary" type="button" (click)="cancelOrientationNotCompleted()">Cancel</button>
+                    <button
+                      class="btn btn-reject"
+                      type="button"
+                      [disabled]="!orientationNotCompletedReason.trim()"
+                      (click)="confirmOrientationNotCompleted()"
+                    >
+                      Confirm Not Completed
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -466,7 +595,7 @@
                 <h4>Assign for Practical Test</h4>
                 <div class="inline-grid">
                   <label>
-                    <span>Select Date</span>
+                    <span>Date</span>
                     <input type="date" [(ngModel)]="practicalForm.date" [disabled]="!canAssignPractical" [min]="today" />
                   </label>
                   <label>
@@ -481,12 +610,29 @@
                 <div class="field full" *ngIf="application.trainer?.reportName">
                   <label>Trainer Report</label>
                   <div class="field-value">
-                    {{ trainerReportName }}
-                    <ng-container *ngIf="application.trainer?.report?.url">
-                      &nbsp;•&nbsp;
-                      <button class="btn btn-outline" type="button" (click)="previewAttachment(application.trainer?.report?.url || '', 'Trainer Report')">View</button>
-                      <button class="btn btn-outline" type="button" (click)="downloadAttachment(application.trainer?.report?.url || '', trainerReportName)">Download</button>
-                    </ng-container>
+                    <div class="trainer-report-line">
+                      <span class="trainer-report-name" [title]="trainerReportName">{{ trainerReportName }}</span>
+                      <div class="trainer-report-actions" *ngIf="application.trainer?.report?.url">
+                        <button
+                          class="btn btn-outline trainer-report-action trainer-report-action--view"
+                          type="button"
+                          title="View trainer report"
+                          aria-label="View trainer report"
+                          (click)="previewAttachment(application.trainer?.report?.url || '', 'Trainer Report')"
+                        >
+                          View
+                        </button>
+                        <button
+                          class="btn btn-outline trainer-report-action trainer-report-action--download"
+                          type="button"
+                          title="Download trainer report"
+                          aria-label="Download trainer report"
+                          (click)="downloadAttachment(application.trainer?.report?.url || '', trainerReportName)"
+                        >
+                          Download
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="field full" *ngIf="!application.trainer?.reportName">
@@ -495,7 +641,7 @@
                 </div>
 
                 <div class="safety-actions">
-                  <button class="btn btn-secondary" (click)="assignPractical()" [disabled]="!canAssignPractical">Assign Practical</button>
+                  <button class="btn btn-secondary" (click)="assignPractical()" [disabled]="!canAssignPractical">Proceed</button>
                   <button class="btn btn-outline" (click)="markPractical('completed')" [disabled]="!canMarkPracticalCompleted">Mark Complete</button>
                   <button class="btn btn-outline" (click)="markPractical('not_completed')" [disabled]="!application!.practical">Not Completed</button>
                 </div>
@@ -515,10 +661,6 @@
           <div class="action-buttons">
             <div class="action-left">
               <button class="btn btn-secondary" (click)="goBack()">Back</button>
-            </div>
-            <div class="action-right" *ngIf="isSafetyPending">
-              <button class="btn btn-reject" (click)="openRejectModal()">Rejected</button>
-              <button class="btn btn-approve" (click)="acceptApplication()">Accepted</button>
             </div>
           </div>
         </div>
@@ -565,18 +707,6 @@
       <div class="footer-copy">Ⓒ  2025 SriLankan IT Systems. All rights reserved</div>
     </div>
   </footer>
-
-  <div class="modal-overlay" *ngIf="showRejectModal" (click)="closeRejectModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>Reject Application</h3>
-      <p>Please provide a reason for rejecting this application:</p>
-      <textarea [(ngModel)]="rejectReason" placeholder="Enter rejection reason..." rows="4" class="reject-textarea"></textarea>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" (click)="closeRejectModal()">Cancel</button>
-        <button class="btn btn-reject" [disabled]="!rejectReason.trim()" (click)="confirmReject()">Reject Application</button>
-      </div>
-    </div>
-  </div>
 
   <div class="modal-overlay preview-overlay" *ngIf="showPreviewModal" (click)="closePreview()">
     <div class="preview-modal" (click)="$event.stopPropagation()">

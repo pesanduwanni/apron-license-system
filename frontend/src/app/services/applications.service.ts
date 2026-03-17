@@ -87,6 +87,9 @@ export interface Application {
   // Orientation assignment
   orientation?: {
     classDate?: string;
+    className?: string;
+    instructor?: string;
+    // Backward compatibility with earlier UI/seed data
     classRoom?: string;
     trainer?: string;
     status?: 'pending' | 'assigned' | 'completed' | 'not_completed';
@@ -500,7 +503,7 @@ export class ApplicationsService {
   assignOrientation(
     appId: string,
     managerId: string,
-    payload: { classDate: string; classRoom: string; trainer: string; remarks?: string }
+    payload: { classDate: string; className: string; instructor: string; remarks?: string }
   ): boolean {
     const apps = this.getApplications();
     const idx = apps.findIndex(a => a.id === appId);
@@ -508,8 +511,8 @@ export class ApplicationsService {
 
     apps[idx].orientation = {
       classDate: payload.classDate,
-      classRoom: payload.classRoom,
-      trainer: payload.trainer,
+      className: payload.className,
+      instructor: payload.instructor,
       status: 'assigned',
       remarks: payload.remarks
     };

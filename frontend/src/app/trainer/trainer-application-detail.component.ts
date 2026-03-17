@@ -59,11 +59,6 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
     const appId = this.route.snapshot.paramMap.get('id');
     if (appId) {
       this.application = this.applicationsService.getApplicationById(appId) || null;
-      if (this.application?.trainer) {
-        this.reportStatusMessage = this.application.trainer.reportName
-          ? `Uploaded report successfully. ${this.application.trainer.reportName}`
-          : '';
-      }
     }
 
     // Trainers must only access applications assigned to them for practical training.
@@ -198,6 +193,7 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
     if (!file) {
       this.selectedReportFile = null;
       this.selectedReportName = '';
+      this.reportStatusMessage = '';
       return;
     }
 
@@ -215,6 +211,7 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
 
     this.selectedReportFile = file;
     this.selectedReportName = file.name;
+    this.reportStatusMessage = '';
   }
 
   uploadTrainingReport(): void {
@@ -224,6 +221,8 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
     }
     if (!this.application) return;
 
+    this.reportStatusMessage = 'Uploading…';
+
     const file = this.selectedReportFile;
     const name = this.selectedReportName;
     const ext = name.split('.').pop()?.toLowerCase();
@@ -231,11 +230,13 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
 
     const reader = new FileReader();
     reader.onerror = () => {
+      this.reportStatusMessage = '';
       this.showToastMessage('Unable to read the selected file.', 'error');
     };
     reader.onload = () => {
       const url = String(reader.result || '');
       if (!url) {
+        this.reportStatusMessage = '';
         this.showToastMessage('Unable to read the selected file.', 'error');
         return;
       }
@@ -247,15 +248,20 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
       });
 
       if (!success) {
+        this.reportStatusMessage = '';
         this.showToastMessage('Unable to upload training report.', 'error');
         return;
       }
 
       this.application = this.applicationsService.getApplicationById(this.application!.id) || null;
-      this.reportStatusMessage = `Uploaded report successfully. ${name}`;
+      this.reportStatusMessage = 'Uploaded successfully.';
       this.showToastMessage('Training report uploaded successfully.');
       this.selectedReportFile = null;
       this.selectedReportName = '';
+
+      setTimeout(() => {
+        this.reportStatusMessage = '';
+      }, 4000);
     };
 
     reader.readAsDataURL(file);

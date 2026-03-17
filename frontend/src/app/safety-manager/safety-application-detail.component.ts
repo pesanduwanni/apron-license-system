@@ -21,8 +21,10 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
 
   remarks = '';
 
-  showRejectModal = false;
+  showRejectBox = false;
   rejectReason = '';
+  showOrientationNotCompletedBox = false;
+  orientationNotCompletedReason = '';
 
   successMessage = '';
   errorMessage = '';
@@ -40,8 +42,8 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
 
   orientationForm = {
     classDate: '',
-    classRoom: '',
-    trainer: ''
+    className: '',
+    instructor: ''
   };
 
   practicalForm = {
@@ -49,7 +51,8 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     trainer: ''
   };
 
-  availableClassRooms = ['Room 01', 'Room 02', 'Training Hall'];
+  availableClasses = ['Orientation Class A', 'Orientation Class B', 'Orientation Class C'];
+  instructorOptions = ['Officer Jayasinghe', 'Officer Seneviratne', 'Trainer Perera', 'Sunil Jayawardena'];
   trainerOptions = ['Officer Jayasinghe', 'Officer Seneviratne', 'Trainer Perera', 'Sunil Jayawardena'];
 
   private timeUpdateInterval: any;
@@ -82,8 +85,8 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
         if (this.application.orientation) {
           this.orientationForm = {
             classDate: this.application.orientation.classDate || '',
-            classRoom: this.application.orientation.classRoom || '',
-            trainer: this.application.orientation.trainer || ''
+            className: this.application.orientation.className || this.application.orientation.classRoom || '',
+            instructor: this.application.orientation.instructor || this.application.orientation.trainer || ''
           };
         }
         if (this.application.practical) {
@@ -160,7 +163,13 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   }
 
   get canAssignOrientation(): boolean {
-    return !!this.application && ['approved_sectional', 'pending_safety', 'approved_safety', 'orientation_assigned', 'orientation_completed', 'practical_assigned', 'practical_completed'].includes(this.application.status);
+    // Only after attachments are accepted by Safety Manager
+    return (
+      !!this.application &&
+      ['approved_safety', 'orientation_assigned', 'orientation_completed', 'practical_assigned', 'practical_completed'].includes(
+        this.application.status
+      )
+    );
   }
 
   get canAssignPractical(): boolean {
@@ -213,18 +222,20 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
       console.log('Email: Attachments accepted - notifying applicant for', this.application.applicantName, this.application.referenceNumber);
       this.successMessage = 'Application validated successfully. Email sent to applicant.';
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
+      this.showRejectBox = false;
+      this.rejectReason = '';
     } else {
       this.errorMessage = 'Failed to update application.';
     }
   }
 
-  openRejectModal(): void {
-    this.rejectReason = '';
-    this.showRejectModal = true;
+  startReject(): void {
+    this.showRejectBox = true;
   }
 
-  closeRejectModal(): void {
-    this.showRejectModal = false;
+  cancelReject(): void {
+    this.showRejectBox = false;
+    this.rejectReason = '';
   }
 
   confirmReject(): void {
@@ -237,12 +248,13 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
       this.rejectReason.trim()
     );
 
-    this.showRejectModal = false;
+    this.showRejectBox = false;
 
     if (success) {
       console.log('Email: Attachments rejected - notifying applicant for', this.application.applicantName, this.application.referenceNumber);
       this.successMessage = 'Application rejected. Email sent to applicant.';
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
+      this.rejectReason = '';
     } else {
       this.errorMessage = 'Failed to reject application.';
     }
@@ -250,20 +262,26 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
 
   assignOrientation(): void {
     if (!this.application || !this.user) return;
-    const { classDate, classRoom, trainer } = this.orientationForm;
-    if (!classDate || !classRoom || !trainer) {
-      this.showToastMessage('Fill all classroom fields before assigning.', 'error');
+    const { classDate, className, instructor } = this.orientationForm;
+    if (!className || !classDate || !instructor) {
+      this.showToastMessage('Select class, date, and instructor before proceeding.', 'error');
       return;
     }
 
     const success = this.applicationsService.assignOrientation(
       this.application.id,
       this.user.staffNumber,
-      { classDate, classRoom, trainer, remarks: this.remarks }
+      { classDate, className, instructor, remarks: this.remarks }
     );
 
     if (success) {
-      console.log('Email: Orientation assigned to applicant', this.application.applicantName, this.application.referenceNumber, 'trainer:', this.orientationForm.trainer);
+      console.log(
+        'Email: Orientation assigned to applicant',
+        this.application.applicantName,
+        this.application.referenceNumber,
+        'instructor:',
+        this.orientationForm.instructor
+      );
       this.showToastMessage('Classroom assignment saved. Email sent to applicant and instructor.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -273,6 +291,12 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
 
   markOrientation(status: 'completed' | 'not_completed'): void {
     if (!this.application) return;
+
+    if (status === 'completed') {
+      this.showOrientationNotCompletedBox = false;
+      this.orientationNotCompletedReason = '';
+    }
+
     const success = this.applicationsService.updateOrientationStatus(
       this.application.id,
       status,
@@ -286,6 +310,27 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     } else {
       this.showToastMessage('Unable to update orientation status', 'error');
     }
+  }
+
+  startOrientationNotCompleted(): void {
+    this.showOrientationNotCompletedBox = true;
+  }
+
+  cancelOrientationNotCompleted(): void {
+    this.showOrientationNotCompletedBox = false;
+    this.orientationNotCompletedReason = '';
+  }
+
+  confirmOrientationNotCompleted(): void {
+    if (!this.orientationNotCompletedReason.trim()) {
+      this.showToastMessage('Enter a remark before marking orientation as not completed.', 'error');
+      return;
+    }
+
+    this.remarks = this.orientationNotCompletedReason.trim();
+    this.markOrientation('not_completed');
+    this.showOrientationNotCompletedBox = false;
+    this.orientationNotCompletedReason = '';
   }
 
   assignPractical(): void {

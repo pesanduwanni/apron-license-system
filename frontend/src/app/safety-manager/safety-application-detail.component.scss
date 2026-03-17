@@ -75,6 +75,26 @@
   margin-top: 0.75rem;
 }
 
+.orientation-not-completed {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.orientation-not-completed label {
+  display: block;
+  font-size: 0.85rem;
+  color: #475569;
+  margin-bottom: 0.35rem;
+}
+
+.orientation-not-completed-actions {
+  margin-top: 0.55rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .btn.btn-outline {
   background: transparent;
   border: 1px solid #0d63d6;
@@ -94,6 +114,129 @@
   min-width: 180px;
 }
 
+/* Trainer report row (responsive + cleaner) */
+.trainer-report-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.trainer-report-name {
+  flex: 1;
+  min-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trainer-report-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.trainer-report-action {
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.trainer-report-action--view::before {
+  content: '↗';
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.trainer-report-action--download::before {
+  content: '⤓';
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Attachment action buttons (View / Download) */
+.attachment-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.btn-attach {
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 1px solid #0d63d6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.btn-attach--view {
+  background: #ffffff;
+  color: #0d63d6;
+}
+
+.btn-attach--view::before {
+  content: '↗';
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.btn-attach--download {
+  background: #0d63d6;
+  color: #ffffff;
+  width: 2.35rem;
+  padding: 0;
+  font-size: 0;
+}
+
+.btn-attach--download::before {
+  content: '⤓';
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Safety page needs signature area full width so decision panel can align horizontally */
+.signature-row .signature-group {
+  max-width: 100%;
+}
+
+.btn-attach:hover {
+  filter: brightness(0.97);
+}
+
+.btn-attach:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 560px) {
+  .trainer-report-name {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .trainer-report-actions {
+    width: 100%;
+  }
+
+  .trainer-report-action {
+    flex: 1;
+  }
+}
+
 /* Equipment header styling */
 .equipment-header {
   display: flex;
@@ -106,4 +249,94 @@
 
 .equipment-header label {
   margin: 0;
+}
+
+/* Attachment decision (Accept/Reject) under Signature */
+.attachment-decision {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem 1rem;
+  align-items: center;
+  margin-top: 0.9rem;
+  padding: 0.85rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.attachment-decision-title {
+  grid-column: 1;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0;
+}
+
+.attachment-decision-hint {
+  grid-column: 1;
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.4;
+  margin-bottom: 0;
+}
+
+.attachment-decision-actions {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.attachment-decision-actions .btn {
+  min-width: 170px;
+}
+
+.attachment-reject {
+  grid-column: 1 / -1;
+  margin-top: 0.75rem;
+}
+
+.attachment-reject label {
+  display: block;
+  font-size: 0.85rem;
+  color: #475569;
+  margin-bottom: 0.35rem;
+}
+
+.attachment-reject-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sectional-manager-block {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 560px) {
+  .attachment-actions {
+    grid-template-columns: 1fr auto;
+  }
+
+  .attachment-decision {
+    grid-template-columns: 1fr;
+  }
+
+  .attachment-decision-actions {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .attachment-decision-actions .btn,
+  .attachment-reject-actions .btn,
+  .orientation-not-completed-actions .btn {
+    width: 100%;
+    min-width: 0;
+  }
 }

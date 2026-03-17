@@ -169,13 +169,6 @@
                     />
                     <div *ngIf="!application.attachments.staffIdFront?.url || failedAttachments['staffIdFront']" class="attachment-placeholder">Staff ID - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.staffIdFront?.url"
-                    (click)="downloadAttachment(application.attachments.staffIdFront?.url || '', application.attachments.staffIdFront?.name || 'staff-id-front')"
-                  >
-                    Download
-                  </button>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -189,13 +182,6 @@
                     />
                     <div *ngIf="!application.attachments.staffIdBack?.url || failedAttachments['staffIdBack']" class="attachment-placeholder">Staff ID - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.staffIdBack?.url"
-                    (click)="downloadAttachment(application.attachments.staffIdBack?.url || '', application.attachments.staffIdBack?.name || 'staff-id-back')"
-                  >
-                    Download
-                  </button>
                 </div>
               </div>
             </div>
@@ -215,13 +201,6 @@
                     />
                     <div *ngIf="!application.attachments.stateLicenseFront?.url || failedAttachments['stateLicenseFront']" class="attachment-placeholder">State License - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.stateLicenseFront?.url"
-                    (click)="downloadAttachment(application.attachments.stateLicenseFront?.url || '', application.attachments.stateLicenseFront?.name || 'state-license-front')"
-                  >
-                    Download
-                  </button>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -235,13 +214,6 @@
                     />
                     <div *ngIf="!application.attachments.stateLicenseBack?.url || failedAttachments['stateLicenseBack']" class="attachment-placeholder">State License - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.stateLicenseBack?.url"
-                    (click)="downloadAttachment(application.attachments.stateLicenseBack?.url || '', application.attachments.stateLicenseBack?.name || 'state-license-back')"
-                  >
-                    Download
-                  </button>
                 </div>
               </div>
             </div>
@@ -263,13 +235,6 @@
                     />
                     <div *ngIf="!application.attachments.aviationPassFront?.url || failedAttachments['aviationPassFront']" class="attachment-placeholder">Aviation Pass - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.aviationPassFront?.url"
-                    (click)="downloadAttachment(application.attachments.aviationPassFront?.url || '', application.attachments.aviationPassFront?.name || 'aviation-pass-front')"
-                  >
-                    Download
-                  </button>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -283,13 +248,6 @@
                     />
                     <div *ngIf="!application.attachments.aviationPassBack?.url || failedAttachments['aviationPassBack']" class="attachment-placeholder">Aviation Pass - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.aviationPassBack?.url"
-                    (click)="downloadAttachment(application.attachments.aviationPassBack?.url || '', application.attachments.aviationPassBack?.name || 'aviation-pass-back')"
-                  >
-                    Download
-                  </button>
                 </div>
               </div>
             </div>
@@ -309,13 +267,6 @@
                     />
                     <div *ngIf="!application.attachments.nicFront?.url || failedAttachments['nicFront']" class="attachment-placeholder">NIC - Front</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.nicFront?.url"
-                    (click)="downloadAttachment(application.attachments.nicFront?.url || '', application.attachments.nicFront?.name || 'nic-front')"
-                  >
-                    Download
-                  </button>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
@@ -329,13 +280,6 @@
                     />
                     <div *ngIf="!application.attachments.nicBack?.url || failedAttachments['nicBack']" class="attachment-placeholder">NIC - Back</div>
                   </div>
-                  <button
-                    class="btn-download"
-                    *ngIf="application.attachments.nicBack?.url"
-                    (click)="downloadAttachment(application.attachments.nicBack?.url || '', application.attachments.nicBack?.name || 'nic-back')"
-                  >
-                    Download
-                  </button>
                 </div>
               </div>
             </div>
@@ -426,12 +370,35 @@
               <div class="trainer-block">
                 <label class="trainer-label">Upload Report</label>
                 <div class="upload-row">
-                  <label class="file-input">
-                    <span class="file-label">Choose File</span>
-                    <input type="file" accept=".pdf,.png,.jpg,.jpeg" (change)="onTrainingReportSelected($event)" />
-                  </label>
-                  <button class="btn btn-approve" (click)="uploadTrainingReport()">Upload</button>
-                  <div class="upload-note" *ngIf="reportStatusMessage">{{ reportStatusMessage }}</div>
+                  <div class="upload-controls">
+                    <label class="file-input">
+                      <span class="file-label">Choose File</span>
+                      <input type="file" accept=".pdf,.png,.jpg,.jpeg" (change)="onTrainingReportSelected($event)" />
+                    </label>
+
+                    <div class="file-meta" aria-live="polite">
+                      <div class="file-name" [class.placeholder]="!selectedReportName">
+                        {{ selectedReportName || 'No file selected' }}
+                      </div>
+                      <div class="file-help">Allowed: PDF, PNG, JPG</div>
+                    </div>
+
+                    <button class="btn btn-approve" (click)="uploadTrainingReport()" [disabled]="!selectedReportFile">
+                      Upload
+                    </button>
+                  </div>
+
+                  <div class="upload-status" aria-live="polite">
+                    <div class="status-line" *ngIf="application?.trainer?.reportName; else noReport">
+                      <span class="status-label">Uploaded report:</span>
+                      <span class="status-value">{{ application?.trainer?.reportName }}</span>
+                    </div>
+                    <ng-template #noReport>
+                      <div class="status-muted">No report uploaded yet.</div>
+                    </ng-template>
+
+                    <div class="status-line status-success" *ngIf="reportStatusMessage">{{ reportStatusMessage }}</div>
+                  </div>
                 </div>
               </div>
             </div>
