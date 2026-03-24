@@ -233,11 +233,10 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
     this.closeModals();
 
     if (success) {
-      // Simulate email to applicant and notify safety manager
-      console.log('Email: Form Approved for', this.application.applicantName, this.application.referenceNumber);
+      // Frontend-only: simulate email/notification
       // Move to safety pipeline (assign to safety manager) so it's visible to safety
       this.applicationsService.acceptApplicationSafety(this.application.id, 'STF003', 'Nimal Fernando');
-      this.successMessage = 'Form Approved. Email sent to applicant.';
+      this.successMessage = 'Form Approved. Notification sent to applicant and safety manager.';
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -259,8 +258,7 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
     this.closeModals();
 
     if (success) {
-      console.log('Email: Form Rejected for', this.application.applicantName, this.application.referenceNumber);
-      this.successMessage = 'Form Rejected. Email sent to applicant.';
+      this.successMessage = 'Form Rejected. Notification sent to applicant.';
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {

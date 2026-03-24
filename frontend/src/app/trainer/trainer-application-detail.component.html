@@ -389,9 +389,9 @@
                   </div>
 
                   <div class="upload-status" aria-live="polite">
-                    <div class="status-line" *ngIf="application?.trainer?.reportName; else noReport">
+                    <div class="status-line" *ngIf="application.trainer?.reportName; else noReport">
                       <span class="status-label">Uploaded report:</span>
-                      <span class="status-value">{{ application?.trainer?.reportName }}</span>
+                      <span class="status-value">{{ application.trainer?.reportName }}</span>
                     </div>
                     <ng-template #noReport>
                       <div class="status-muted">No report uploaded yet.</div>

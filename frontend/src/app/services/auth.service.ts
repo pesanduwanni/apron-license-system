@@ -103,6 +103,11 @@ export class AuthService {
   login(username: string, password: string): boolean {
     const normalizedUsername = username.trim().toLowerCase();
 
+    // Frontend-only validation: UL email format
+    if (!normalizedUsername.endsWith('@ul.com')) {
+      return false;
+    }
+
     const user = this.mockAccounts.find(
       (account) =>
         account.username.toLowerCase() === normalizedUsername &&

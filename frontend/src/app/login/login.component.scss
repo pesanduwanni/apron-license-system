@@ -22,10 +22,11 @@ body,
 .login-page {
   width: 100%;
   height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
   display: flex;
   overflow: hidden;
-  position: fixed;
-  inset: 0;
+  position: relative;
 }
 
 .login-left {
@@ -36,17 +37,20 @@ body,
   justify-content: center;
   align-items: center;
   border-right: 1px solid var(--divider-color, #000000);
-  padding: 32px 0;
+  padding: clamp(16px, 3vh, 32px) 16px;
   overflow: hidden;
 }
 
 .login-left-inner {
-  width: 320px;
+  width: min(360px, 100%);
+  height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 24px;
+  justify-content: space-between;
+  gap: clamp(12px, 2vh, 24px);
 }
 
 /* Brand header - stacked vertically */
@@ -72,7 +76,7 @@ body,
 }
 
 .brand-divider {
-  width: 130%;
+  width: 100%;
   border: none;
   border-top: 3px solid var(--divider-color, #000000);
   margin: 0;
@@ -81,12 +85,17 @@ body,
 /* Form section */
 .login-form-section {
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .login-title {
   font-size: 18px;
   font-weight: 500;
-  margin-bottom: 24px;
+  margin-bottom: clamp(12px, 2vh, 24px);
 }
 
 .login-form {
@@ -189,7 +198,7 @@ body,
 }
 
 .test-data {
-  margin-top: 12px;
+  margin-top: clamp(8px, 1.5vh, 12px);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -227,7 +236,7 @@ body,
 
 /* Partner logo */
 .footer-logo {
-  margin-top: 24px;
+  margin-top: clamp(8px, 2vh, 24px);
   text-align: center;
 }
 
@@ -238,7 +247,7 @@ body,
 
 /* Footer */
 .login-footer {
-  margin-top: 32px;
+  margin-top: 0;
   text-align: center;
 }
 
@@ -299,6 +308,8 @@ body,
   .login-left {
     flex: 0 0 auto;
     width: 100%;
+    height: auto;
+    border-right: none;
   }
 
   .login-right {
@@ -308,5 +319,37 @@ body,
   .login-left-inner {
     padding: 24px;
     margin: 16px auto;
+  }
+}
+
+@media (max-height: 760px) {
+  .login-left {
+    padding: 12px 16px;
+  }
+
+  .login-left-inner {
+    gap: 12px;
+  }
+
+  .brand-logo-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-text {
+    font-size: 20px;
+  }
+
+  .login-title {
+    font-size: 16px;
+  }
+
+  .btn-primary {
+    padding: 10px 20px;
+  }
+
+  .btn-secondary,
+  .btn-danger {
+    padding: 9px 20px;
   }
 }

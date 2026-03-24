@@ -44,13 +44,22 @@ export class ApplicantDashboardComponent implements OnInit {
   formStatus: 'idle' | 'saving' | 'submitted' = 'idle';
   user: User | null = null;
 
+  readonly todayIso = this.toIsoDate(new Date());
+  readonly tomorrowIso = this.toIsoDate(this.addDays(new Date(), 1));
+
   get isAaslValid(): boolean {
+    const hasPermit = !!this.applicantForm.get('basicInfo.hasAaslPermit')?.value;
+    if (!hasPermit) return false;
     const aaslExpiry = this.applicantForm.get('basicInfo.aaslAccessExpiry')?.value;
     if (!aaslExpiry) return false;
     const expiryDate = new Date(aaslExpiry);
     const now = new Date();
     return expiryDate > now;
   }
+
+  readonly sectionalManagerOptions = [
+    { id: 'STF002', name: 'Kamala Silva' }
+  ];
 
   readonly departmentOptions = [
     'Information Technology',
@@ -146,9 +155,11 @@ export class ApplicantDashboardComponent implements OnInit {
     this.applicantForm = this.fb.group({
       basicInfo: this.fb.group({
         licenseType: ['extension', Validators.required],
+        sectionalManagerId: ['STF002', Validators.required],
         currentAdpNo: [''],
         dateOfFirstIssue: [''],
         safetyOrientationDate: [''],
+        hasAaslPermit: [false, Validators.required],
         aaslAccessNo: [''],
         aaslAccessExpiry: ['']
       }),
@@ -158,7 +169,7 @@ export class ApplicantDashboardComponent implements OnInit {
         designation: [{value: '', disabled: true}, Validators.required],
         department: ['', Validators.required],
         contactNo: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-        nic: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{12}$/)]],
+        nic: ['', [Validators.required, Validators.maxLength(12), Validators.pattern(/^[A-Za-z0-9]{1,12}$/)]],
         currentDate: [{value: '', disabled: true}, Validators.required]
       }),
       licenseInfo: this.fb.group({
@@ -169,6 +180,8 @@ export class ApplicantDashboardComponent implements OnInit {
       equipment: this.buildEquipmentGroup(),
       attachments: this.buildAttachmentsGroup()
     });
+
+    this.setupConditionalValidation();
   }
 
   ngOnInit(): void {
@@ -243,6 +256,28 @@ export class ApplicantDashboardComponent implements OnInit {
   handleFileChange(controlKey: string, event: Event): void {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files?.[0] ?? null;
+
+    if (file) {
+      const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const allowedExt = ['pdf', 'png', 'jpg', 'jpeg'];
+
+      const isSignature = controlKey === this.signatureControl.key;
+      const signatureAllowedTypes = ['image/png', 'image/jpeg'];
+      const signatureAllowedExt = ['png', 'jpg', 'jpeg'];
+
+      const ok = isSignature
+        ? (signatureAllowedTypes.includes(file.type) || signatureAllowedExt.includes(ext))
+        : (allowedTypes.includes(file.type) || allowedExt.includes(ext));
+
+      if (!ok) {
+        this.applicantForm.get(['attachments', controlKey])?.setValue(null);
+        this.attachmentNames[controlKey] = '';
+        fileInput.value = '';
+        return;
+      }
+    }
+
     this.applicantForm.get(['attachments', controlKey])?.setValue(file);
     this.attachmentNames[controlKey] = file ? file.name : '';
     fileInput.value = '';
@@ -297,14 +332,14 @@ export class ApplicantDashboardComponent implements OnInit {
         licenseType: submission.basicInfo.licenseType,
         currentAdpNo: submission.basicInfo.currentAdpNo || undefined,
         dateOfFirstIssue: submission.basicInfo.dateOfFirstIssue || undefined,
-        aaslAccessNo: submission.basicInfo.aaslAccessNo,
-        aaslAccessExpiry: submission.basicInfo.aaslAccessExpiry,
+        aaslAccessNo: submission.basicInfo.hasAaslPermit ? submission.basicInfo.aaslAccessNo : '',
+        aaslAccessExpiry: submission.basicInfo.hasAaslPermit ? submission.basicInfo.aaslAccessExpiry : '',
         stateLicenseNo: submission.licenseInfo.stateLicenseNo,
         stateLicenseIssueDate: submission.licenseInfo.issueDate,
         stateLicenseExpiryDate: submission.licenseInfo.expiryDate,
         selectedCategories,
         attachments,
-        sectionalManagerId: 'STF002'
+        sectionalManagerId: submission.basicInfo.sectionalManagerId
       };
 
       this.applicationsService.createApplication(appPayload);
@@ -375,12 +410,16 @@ export class ApplicantDashboardComponent implements OnInit {
 
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
+    const normalizedContact = String(this.user.contactNumber || '').replace(/\D/g, '');
+
     this.applicantForm.patchValue({
       basicInfo: {
         licenseType: 'extension',
+        sectionalManagerId: 'STF002',
         currentAdpNo: '',
         dateOfFirstIssue: '',
         safetyOrientationDate: '',
+        hasAaslPermit: false,
         aaslAccessNo: '',
         aaslAccessExpiry: ''
       },
@@ -389,7 +428,7 @@ export class ApplicantDashboardComponent implements OnInit {
         staffNumber: this.user.staffNumber,
         designation: this.user.designation || '',
         department: this.user.department,
-        contactNo: this.user.contactNumber || '',
+        contactNo: normalizedContact,
         nic: this.user.nic || '',
         currentDate: currentDate
       },
@@ -399,5 +438,71 @@ export class ApplicantDashboardComponent implements OnInit {
         expiryDate: ''
       }
     });
+  }
+
+  private setupConditionalValidation(): void {
+    const licenseTypeCtrl = this.applicantForm.get('basicInfo.licenseType');
+    const currentAdpCtrl = this.applicantForm.get('basicInfo.currentAdpNo');
+    const firstIssueCtrl = this.applicantForm.get('basicInfo.dateOfFirstIssue');
+
+    const hasPermitCtrl = this.applicantForm.get('basicInfo.hasAaslPermit');
+    const aaslNoCtrl = this.applicantForm.get('basicInfo.aaslAccessNo');
+    const aaslExpiryCtrl = this.applicantForm.get('basicInfo.aaslAccessExpiry');
+
+    const aviationPassFrontCtrl = this.applicantForm.get(['attachments', 'aviationPassFront']);
+    const aviationPassBackCtrl = this.applicantForm.get(['attachments', 'aviationPassBack']);
+
+    const applyLicenseTypeRules = (type: unknown) => {
+      const isExtension = type === 'extension';
+      if (isExtension) {
+        currentAdpCtrl?.setValidators([Validators.required]);
+        firstIssueCtrl?.setValidators([Validators.required]);
+      } else {
+        currentAdpCtrl?.clearValidators();
+        firstIssueCtrl?.clearValidators();
+        currentAdpCtrl?.setValue('');
+        firstIssueCtrl?.setValue('');
+      }
+      currentAdpCtrl?.updateValueAndValidity();
+      firstIssueCtrl?.updateValueAndValidity();
+    };
+
+    const applyPermitRules = (hasPermit: unknown) => {
+      const permit = !!hasPermit;
+      if (permit) {
+        aaslNoCtrl?.setValidators([Validators.required]);
+        aaslExpiryCtrl?.setValidators([Validators.required]);
+      } else {
+        aaslNoCtrl?.clearValidators();
+        aaslExpiryCtrl?.clearValidators();
+        aaslNoCtrl?.setValue('');
+        aaslExpiryCtrl?.setValue('');
+
+        aviationPassFrontCtrl?.setValue(null);
+        aviationPassBackCtrl?.setValue(null);
+        this.attachmentNames['aviationPassFront'] = '';
+        this.attachmentNames['aviationPassBack'] = '';
+      }
+
+      aaslNoCtrl?.updateValueAndValidity();
+      aaslExpiryCtrl?.updateValueAndValidity();
+    };
+
+    licenseTypeCtrl?.valueChanges.subscribe((type) => applyLicenseTypeRules(type));
+    hasPermitCtrl?.valueChanges.subscribe((hasPermit) => applyPermitRules(hasPermit));
+
+    // Apply rules immediately on first render
+    applyLicenseTypeRules(licenseTypeCtrl?.value);
+    applyPermitRules(hasPermitCtrl?.value);
+  }
+
+  private toIsoDate(d: Date): string {
+    return d.toISOString().split('T')[0];
+  }
+
+  private addDays(d: Date, days: number): Date {
+    const copy = new Date(d);
+    copy.setDate(copy.getDate() + days);
+    return copy;
   }
 }

@@ -219,7 +219,6 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     );
 
     if (success) {
-      console.log('Email: Attachments accepted - notifying applicant for', this.application.applicantName, this.application.referenceNumber);
       this.successMessage = 'Application validated successfully. Email sent to applicant.';
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
       this.showRejectBox = false;
@@ -251,7 +250,6 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     this.showRejectBox = false;
 
     if (success) {
-      console.log('Email: Attachments rejected - notifying applicant for', this.application.applicantName, this.application.referenceNumber);
       this.successMessage = 'Application rejected. Email sent to applicant.';
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
       this.rejectReason = '';
@@ -304,7 +302,6 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     );
 
     if (success) {
-      console.log('Email: Orientation', status, 'notification for', this.application.applicantName, this.application.referenceNumber);
       this.showToastMessage('Orientation status updated. Email sent to applicant.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -352,7 +349,6 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     });
 
     if (success) {
-      console.log('Email: Practical assigned to applicant', this.application.applicantName, this.application.referenceNumber, 'trainer:', this.practicalForm.trainer);
       this.showToastMessage('Practical assignment saved. Email sent to applicant and trainer.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -369,7 +365,6 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     );
 
     if (success) {
-      console.log('Email: Practical', status, 'notification for', this.application.applicantName, this.application.referenceNumber);
       this.showToastMessage('Practical status updated. Email sent to applicant.');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {

@@ -56,7 +56,7 @@
         <div class="history-card" *ngFor="let entry of historyEntries">
           <div>
             <p class="history-id">{{ entry.id }}</p>
-            <p class="history-date">{{ entry.submittedOn | date: 'longDate' }}</p>
+            <p class="history-date">{{ entry.submittedOn | date: 'dd-MM-yyyy' }}</p>
           </div>
           <div class="history-meta">
             <span class="history-type">{{ entry.licenseType }}</span>
@@ -92,6 +92,33 @@
           </header>
 
           <div class="section-body" *ngIf="!collapsedSections.basic" formGroupName="basicInfo">
+            <div class="field-grid-2">
+              <div class="field">
+                <label for="sectionalManagerId">Sectional Manager</label>
+                <select id="sectionalManagerId" formControlName="sectionalManagerId">
+                  <option *ngFor="let sm of sectionalManagerOptions" [value]="sm.id">
+                    {{ sm.name }} ({{ sm.id }})
+                  </option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Do you have a valid AASL Permit?</label>
+                <div class="license-type-group">
+                  <label class="license-checkbox">
+                    <input type="radio" formControlName="hasAaslPermit" [value]="true" />
+                    <span class="checkbox-custom"></span>
+                    Yes
+                  </label>
+                  <label class="license-checkbox">
+                    <input type="radio" formControlName="hasAaslPermit" [value]="false" />
+                    <span class="checkbox-custom"></span>
+                    No
+                  </label>
+                </div>
+              </div>
+            </div>
+
             <div class="field-grid-3">
               <div class="field">
                 <label>License Type</label>
@@ -119,7 +146,7 @@
 
               <div class="field">
                 <label for="dateOfFirstIssue">Date of First Issue</label>
-                <input id="dateOfFirstIssue" type="date" formControlName="dateOfFirstIssue" />
+                <input id="dateOfFirstIssue" type="date" formControlName="dateOfFirstIssue" [max]="todayIso" />
               </div>
             </div>
 
@@ -134,12 +161,13 @@
                 <input id="aaslAccessNo"
                        type="text"
                        formControlName="aaslAccessNo"
+                       [disabled]="!applicantForm.get('basicInfo.hasAaslPermit')?.value"
                        placeholder="AASL Access P/No" />
               </div>
 
               <div class="field">
                 <label for="aaslAccessExpiry">AASL Access Permit Expiry Date</label>
-                <input id="aaslAccessExpiry" type="date" formControlName="aaslAccessExpiry" />
+                <input id="aaslAccessExpiry" type="date" formControlName="aaslAccessExpiry" [min]="tomorrowIso" [disabled]="!applicantForm.get('basicInfo.hasAaslPermit')?.value" />
               </div>
             </div>
           </div>
@@ -208,9 +236,10 @@
                 <input id="nic"
                        type="text"
                        formControlName="nic"
+                       maxlength="12"
                        placeholder="NIC Number" />
                 <div class="field-error" *ngIf="applicantForm.get('personalInfo.nic')?.touched && applicantForm.get('personalInfo.nic')?.hasError('pattern')">
-                  NIC must be 12 alphanumeric characters.
+                  NIC must be up to 12 alphanumeric characters.
                 </div>
               </div>
 
@@ -246,12 +275,12 @@
 
               <div class="field">
                 <label for="issueDate">Date of issuance of the State License</label>
-                <input id="issueDate" type="date" formControlName="issueDate" />
+                <input id="issueDate" type="date" formControlName="issueDate" [max]="todayIso" />
               </div>
 
               <div class="field">
                 <label for="expiryDate">Date of Expiry of the State License</label>
-                <input id="expiryDate" type="date" formControlName="expiryDate" />
+                <input id="expiryDate" type="date" formControlName="expiryDate" [min]="tomorrowIso" />
               </div>
             </div>
 
