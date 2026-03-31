@@ -1,10 +1,15 @@
 import { Routes } from '@angular/router';
 import { ApplicantDashboardComponent } from './applicant/applicant-dashboard.component';
 import { applicantGuard } from './guards/applicant.guard';
+import { nurseGuard } from './guards/nurse.guard';
 import { sectionalManagerGuard } from './guards/sectional-manager.guard';
 import { safetyManagerGuard } from './guards/safety-manager.guard';
 import { trainerGuard } from './guards/trainer.guard';
 import { LoginComponent } from './login/login.component';
+import { NurseApplicationDetailComponent } from './nurse/nurse-application-detail.component';
+import { NurseDashboardComponent } from './nurse/nurse-dashboard.component';
+import { NurseLayoutComponent } from './nurse/nurse-layout.component';
+import { NurseRequestsComponent } from './nurse/nurse-requests.component';
 import { SectionalLayoutComponent } from './sectional-manager/sectional-layout.component';
 import { SectionalDashboardComponent } from './sectional-manager/sectional-dashboard.component';
 import { SectionalRequestsComponent } from './sectional-manager/sectional-requests.component';
@@ -26,6 +31,20 @@ export const routes: Routes = [
     path: 'applicant',
     component: ApplicantDashboardComponent,
     canActivate: [applicantGuard]
+  },
+
+  // Nurse routes
+  {
+    path: 'nurse',
+    canActivate: [nurseGuard],
+    component: NurseLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: NurseDashboardComponent },
+      { path: 'requests', component: NurseRequestsComponent },
+      { path: 'rejected', component: NurseRequestsComponent, data: { mode: 'rejected' } },
+      { path: 'application/:id', component: NurseApplicationDetailComponent }
+    ]
   },
 
   // Sectional Manager routes

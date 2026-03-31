@@ -103,7 +103,7 @@
             <div class="field">
               <label>License Type</label>
               <div class="field-value">
-                {{ application.licenseType === 'extension' ? 'Extension License' : 'New License' }}
+         4 {{ application.licenseType === 'extension' ? 'Extension License' : 'New License' }}
               </div>
             </div>
             <div class="field">
@@ -208,26 +208,36 @@
               <div class="attachment-boxes">
                 <div class="attachment-box">
                   <div class="attachment-image-box">
-                    <!-- <img
+                    <img
                       *ngIf="application.attachments.staffIdFront?.url && !failedAttachments['staffIdFront']"
                       [src]="application.attachments.staffIdFront!.url"
                       alt="Staff ID - Front"
+                      (click)="previewAttachment(application.attachments.staffIdFront?.url || '', 'Staff ID - Front')"
                       (error)="imageError('staffIdFront')"
                       (load)="imageLoaded('staffIdFront')"
-                    /> -->
+                    />
                     <div *ngIf="!application.attachments.staffIdFront?.url || failedAttachments['staffIdFront']" class="attachment-placeholder">Staff ID - Front</div>
+                  </div>
+                  <div class="attachment-actions" *ngIf="application.attachments.staffIdFront?.url">
+                    <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.staffIdFront?.url || '', 'Staff ID - Front')">View</button>
+                    <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.staffIdFront?.url || '', application.attachments.staffIdFront?.name || 'staff-id-front')">Download</button>
                   </div>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
-                    <!-- <img
+                    <img
                       *ngIf="application.attachments.staffIdBack?.url && !failedAttachments['staffIdBack']"
                       [src]="application.attachments.staffIdBack!.url"
                       alt="Staff ID - Back"
+                      (click)="previewAttachment(application.attachments.staffIdBack?.url || '', 'Staff ID - Back')"
                       (error)="imageError('staffIdBack')"
                       (load)="imageLoaded('staffIdBack')"
-                    /> -->
+                    />
                     <div *ngIf="!application.attachments.staffIdBack?.url || failedAttachments['staffIdBack']" class="attachment-placeholder">Staff ID - Back</div>
+                  </div>
+                  <div class="attachment-actions" *ngIf="application.attachments.staffIdBack?.url">
+                    <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.staffIdBack?.url || '', 'Staff ID - Back')">View</button>
+                    <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.staffIdBack?.url || '', application.attachments.staffIdBack?.name || 'staff-id-back')">Download</button>
                   </div>
                 </div>
               </div>
@@ -238,26 +248,36 @@
               <div class="attachment-boxes">
                 <div class="attachment-box">
                   <div class="attachment-image-box">
-                    <!-- <img
+                    <img
                       *ngIf="application.attachments.stateLicenseFront?.url && !failedAttachments['stateLicenseFront']"
                       [src]="application.attachments.stateLicenseFront!.url"
                       alt="State License - Front"
+                      (click)="previewAttachment(application.attachments.stateLicenseFront?.url || '', 'State License - Front')"
                       (error)="imageError('stateLicenseFront')"
                       (load)="imageLoaded('stateLicenseFront')"
-                    /> -->
+                    />
                     <div *ngIf="!application.attachments.stateLicenseFront?.url || failedAttachments['stateLicenseFront']" class="attachment-placeholder">State License - Front</div>
+                  </div>
+                  <div class="attachment-actions" *ngIf="application.attachments.stateLicenseFront?.url">
+                    <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.stateLicenseFront?.url || '', 'State License - Front')">View</button>
+                    <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.stateLicenseFront?.url || '', application.attachments.stateLicenseFront?.name || 'state-license-front')">Download</button>
                   </div>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
-                    <!-- <img
+                    <img
                       *ngIf="application.attachments.stateLicenseBack?.url && !failedAttachments['stateLicenseBack']"
                       [src]="application.attachments.stateLicenseBack!.url"
                       alt="State License - Back"
+                      (click)="previewAttachment(application.attachments.stateLicenseBack?.url || '', 'State License - Back')"
                       (error)="imageError('stateLicenseBack')"
                       (load)="imageLoaded('stateLicenseBack')"
-                    /> -->
+                    />
                     <div *ngIf="!application.attachments.stateLicenseBack?.url || failedAttachments['stateLicenseBack']" class="attachment-placeholder">State License - Back</div>
+                  </div>
+                  <div class="attachment-actions" *ngIf="application.attachments.stateLicenseBack?.url">
+                    <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.stateLicenseBack?.url || '', 'State License - Back')">View</button>
+                    <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.stateLicenseBack?.url || '', application.attachments.stateLicenseBack?.name || 'state-license-back')">Download</button>
                   </div>
                 </div>
               </div>
@@ -271,26 +291,36 @@
               <div class="attachment-boxes">
                 <div class="attachment-box">
                     <div class="attachment-image-box">
-                      <!-- <img
+                      <img
                         *ngIf="application.attachments.aviationPassFront?.url && !failedAttachments['aviationPassFront']"
                         [src]="application.attachments.aviationPassFront!.url"
                         alt="Aviation Pass - Front"
+                        (click)="previewAttachment(application.attachments.aviationPassFront?.url || '', 'Aviation Pass - Front')"
                         (error)="imageError('aviationPassFront')"
                         (load)="imageLoaded('aviationPassFront')"
-                      /> -->
+                      />
                       <div *ngIf="!application.attachments.aviationPassFront?.url || failedAttachments['aviationPassFront']" class="attachment-placeholder">Aviation Pass - Front</div>
+                    </div>
+                    <div class="attachment-actions" *ngIf="application.attachments.aviationPassFront?.url">
+                      <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.aviationPassFront?.url || '', 'Aviation Pass - Front')">View</button>
+                      <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.aviationPassFront?.url || '', application.attachments.aviationPassFront?.name || 'aviation-pass-front')">Download</button>
                     </div>
                 </div>
                 <div class="attachment-box">
                     <div class="attachment-image-box">
-                      <!-- <img
+                      <img
                         *ngIf="application.attachments.aviationPassBack?.url && !failedAttachments['aviationPassBack']"
                         [src]="application.attachments.aviationPassBack!.url"
                         alt="Aviation Pass - Back"
+                        (click)="previewAttachment(application.attachments.aviationPassBack?.url || '', 'Aviation Pass - Back')"
                         (error)="imageError('aviationPassBack')"
                         (load)="imageLoaded('aviationPassBack')"
-                      /> -->
+                      />
                       <div *ngIf="!application.attachments.aviationPassBack?.url || failedAttachments['aviationPassBack']" class="attachment-placeholder">Aviation Pass - Back</div>
+                    </div>
+                    <div class="attachment-actions" *ngIf="application.attachments.aviationPassBack?.url">
+                      <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.aviationPassBack?.url || '', 'Aviation Pass - Back')">View</button>
+                      <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.aviationPassBack?.url || '', application.attachments.aviationPassBack?.name || 'aviation-pass-back')">Download</button>
                     </div>
                 </div>
               </div>
@@ -301,26 +331,36 @@
               <div class="attachment-boxes">
                 <div class="attachment-box">
                   <div class="attachment-image-box">
-                            <!-- <img
+                            <img
                               *ngIf="application.attachments.nicFront?.url && !failedAttachments['nicFront']"
                               [src]="application.attachments.nicFront!.url"
                               alt="NIC - Front"
+                              (click)="previewAttachment(application.attachments.nicFront?.url || '', 'NIC - Front')"
                               (error)="imageError('nicFront')"
                               (load)="imageLoaded('nicFront')"
-                            /> -->
+                            />
                             <div *ngIf="!application.attachments.nicFront?.url || failedAttachments['nicFront']" class="attachment-placeholder">NIC - Front</div>
+                  </div>
+                  <div class="attachment-actions" *ngIf="application.attachments.nicFront?.url">
+                    <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.nicFront?.url || '', 'NIC - Front')">View</button>
+                    <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.nicFront?.url || '', application.attachments.nicFront?.name || 'nic-front')">Download</button>
                   </div>
                 </div>
                 <div class="attachment-box">
                   <div class="attachment-image-box">
-                            <!-- <img
+                            <img
                               *ngIf="application.attachments.nicBack?.url && !failedAttachments['nicBack']"
                               [src]="application.attachments.nicBack!.url"
                               alt="NIC - Back"
+                              (click)="previewAttachment(application.attachments.nicBack?.url || '', 'NIC - Back')"
                               (error)="imageError('nicBack')"
                               (load)="imageLoaded('nicBack')"
-                            /> -->
+                            />
                             <div *ngIf="!application.attachments.nicBack?.url || failedAttachments['nicBack']" class="attachment-placeholder">NIC - Back</div>
+                  </div>
+                  <div class="attachment-actions" *ngIf="application.attachments.nicBack?.url">
+                    <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.nicBack?.url || '', 'NIC - Back')">View</button>
+                    <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.nicBack?.url || '', application.attachments.nicBack?.name || 'nic-back')">Download</button>
                   </div>
                 </div>
               </div>
@@ -331,29 +371,36 @@
           </div>
         </div>
 
-        <!-- Signature section (always visible) -->
-        <div class="section-body">
+        <!-- Signature (hidden until attachments expanded) -->
+        <div class="section-body" *ngIf="attachmentsExpanded">
           <div class="attachment-row signature-row">
             <div class="attachment-group signature-group">
               <div class="attachment-boxes">
                 <div class="attachment-box">
                   <div class="signature-image-box">
-                    <!-- <img
+                    <img
                       *ngIf="application.attachments.signature?.url && !failedAttachments['signature']"
                       [src]="application.attachments.signature?.url || ''"
                       alt="Signature"
                       class="signature-image"
+                      (click)="previewAttachment(application.attachments.signature?.url || '', 'Signature')"
                       (error)="imageError('signature')"
                       (load)="imageLoaded('signature')"
-                    /> -->
+                    />
                     <div *ngIf="!application.attachments.signature?.url || failedAttachments['signature']" class="signature-placeholder"></div>
+                  </div>
+                  <div class="attachment-actions" *ngIf="application.attachments.signature?.url">
+                    <button class="btn-attach btn-attach--view" type="button" (click)="previewAttachment(application.attachments.signature?.url || '', 'Signature')">View</button>
+                    <button class="btn-attach btn-attach--download" type="button" (click)="downloadAttachment(application.attachments.signature?.url || '', application.attachments.signature?.name || 'signature')">Download</button>
                   </div>
                 </div>
               </div>
               <p class="attachment-title signature-title">Signature</p>
             </div>
           </div>
+        </div>
 
+        <div class="section-body">
           <div class="remarks-section">
             <label for="remarks">Add your comment here</label>
             <textarea

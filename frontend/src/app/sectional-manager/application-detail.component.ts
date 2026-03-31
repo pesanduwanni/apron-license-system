@@ -49,7 +49,7 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
   failedAttachments: { [key: string]: boolean } = {};
 
   // Attachments section expand/collapse
-  attachmentsExpanded = true;
+  attachmentsExpanded = false;
 
   private timeUpdateInterval: any;
   timeUpdateTrigger = 0;

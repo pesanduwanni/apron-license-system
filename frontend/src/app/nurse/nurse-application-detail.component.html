@@ -6,19 +6,18 @@
           <div class="toast-title">{{ toastType === 'success' ? 'Success' : 'Error' }}</div>
           <div class="toast-message">{{ toastMessage }}</div>
         </div>
-        <button class="toast-close" (click)="closeToast()">x</button>
+        <button class="toast-close" (click)="closeToast()">✕</button>
       </div>
     </div>
 
     <div class="form-card">
       <div class="page-header">
-        <button class="btn-back" (click)="goBack()"><- Back to List</button>
+        <button class="btn-back" (click)="goBack()">← Back to List</button>
         <div class="header-right">
           <span class="header-ref">{{ application.referenceNumber }}</span>
-          <ng-container>
-            <button class="badge badge-new" *ngIf="application.licenseType === 'new'">New</button>
-            <button class="badge badge-ongoing" *ngIf="application.licenseType === 'extension'">Extension</button>
-          </ng-container>
+          <button class="badge" [ngClass]="isRejected ? 'badge-rejected' : 'badge-ongoing'">
+            {{ isReadOnly ? (isRejected ? 'Rejected' : 'Completed') : 'Medical Pending' }}
+          </button>
         </div>
       </div>
 
@@ -81,8 +80,8 @@
 
           <div class="field-grid-3">
             <div class="field">
-              <label>Date Participation of Safety Orientation</label>
-              <div class="field-value">{{ application.orientation?.classDate ? formatDate(application.orientation?.classDate) : 'N/A' }}</div>
+              <label>Medical Assigned Date</label>
+              <div class="field-value">{{ application.medical?.assignedDate ? formatDate(application.medical?.assignedDate) : 'N/A' }}</div>
             </div>
             <div class="field">
               <label>AASL Access Permit Expiry Date</label>
@@ -92,14 +91,6 @@
               <label>Requested Date</label>
               <div class="field-value">{{ formatDate(application.submittedDate) }}</div>
             </div>
-          </div>
-          <div class="field-grid-3">
-            <div class="field">
-              <label>Current Date</label>
-              <div class="field-value">{{ formatDate(today) }}</div>
-            </div>
-            <div class="field"></div>
-            <div class="field"></div>
           </div>
         </div>
       </section>
@@ -150,7 +141,7 @@
       <section class="form-section">
         <header class="section-header expandable-header" (click)="toggleAttachments()">
           <h2>Attachments</h2>
-          <span class="expand-arrow" [class.expanded]="attachmentsExpanded">></span>
+          <span class="expand-arrow" [class.expanded]="attachmentsExpanded">▶</span>
         </header>
         <div class="section-body" *ngIf="attachmentsExpanded">
           <div class="attachment-row">
@@ -343,156 +334,222 @@
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="section-body">
-          <div class="field full" *ngIf="application.sectionalManagerName">
-            <div class="equipment-header">
-              <label>Sectional Manager</label>
-            </div>
-            <div class="section-body">
-              <div class="field-grid-3">
-                <div class="field">
-                  <label>Processed By</label>
-                  <div class="field-value">{{ application.sectionalManagerName || 'N/A' }}</div>
-                </div>
-                <div class="field">
-                  <label>Processing Date</label>
-                  <div class="field-value">{{ formatDate(application.sectionalApprovalDate) }}</div>
-                </div>
-                <div class="field">
-                  <label>Approval Status</label>
-                  <div class="field-value">{{ sectionalApprovalStatus }}</div>
-                </div>
-                <div class="field full" *ngIf="application.sectionalRemarks">
-                  <label>Remarks</label>
-                  <div class="field-value">{{ application.sectionalRemarks }}</div>
-                </div>
+      <section class="after-signature">
+        <div class="after-title">Sectional Manager</div>
+        <div class="after-comment">{{ application.sectionalRemarks || 'No comment added.' }}</div>
+
+        <div class="after-assignments">
+          <div class="assignment-block">
+            <div class="assignment-title">Assign for Class Room test</div>
+            <div class="field-grid-2">
+              <div class="field">
+                <label>Select Class Date</label>
+                <div class="field-value">{{ formatWorkflowDate(application.orientation?.classDate) }}</div>
+              </div>
+              <div class="field">
+                <label>Class Room</label>
+                <div class="field-value">{{ application.orientation?.className || application.orientation?.classRoom || '—' }}</div>
               </div>
             </div>
           </div>
 
-          <div class="field full" *ngIf="application.safetyManagerName">
-            <div class="equipment-header">
-              <label>Safety Manager</label>
-            </div>
-            <div class="section-body">
-              <div class="field-grid-3">
-                <div class="field">
-                  <label>Processed By</label>
-                  <div class="field-value">{{ application.safetyManagerName || 'N/A' }}</div>
-                </div>
-                <div class="field">
-                  <label>Processing Date</label>
-                  <div class="field-value">{{ formatDate(application.safetyApprovalDate) }}</div>
-                </div>
-                <div class="field">
-                  <label>Approval Status</label>
-                  <div class="field-value">{{ safetyApprovalStatus }}</div>
-                </div>
-                <div class="field full" *ngIf="application.safetyRemarks">
-                  <label>Remarks</label>
-                  <div class="field-value">{{ application.safetyRemarks }}</div>
-                </div>
+          <div class="assignment-block">
+            <div class="assignment-title">Assign for Practical Test</div>
+            <div class="field-grid-2">
+              <div class="field">
+                <label>Select Class Date</label>
+                <div class="field-value">{{ formatWorkflowDate(application.practical?.date) }}</div>
+              </div>
+              <div class="field">
+                <label>Select Trainer</label>
+                <div class="field-value">{{ application.practical?.trainer || '—' }}</div>
               </div>
             </div>
           </div>
+        </div>
 
-          <section class="trainer-section">
-            <header class="trainer-header">
-              <h3>Trainer</h3>
-            </header>
+        <div class="after-divider"></div>
 
-            <div class="trainer-grid">
-              <div class="trainer-block">
-                <label class="trainer-label">Upload Report</label>
-                <div class="upload-row">
-                  <div class="upload-controls">
-                    <label class="file-input">
-                      <span class="file-label">Choose File</span>
-                      <input type="file" accept=".pdf,.png,.jpg,.jpeg" (change)="onTrainingReportSelected($event)" />
-                    </label>
+        <div class="after-title">Safety Manager</div>
+        <div class="after-comment">{{ application.safetyRemarks || 'No comment added.' }}</div>
 
-                    <div class="file-meta" aria-live="polite">
-                      <div class="file-name" [class.placeholder]="!selectedReportName">
-                        {{ selectedReportName || 'No file selected' }}
-                      </div>
-                      <div class="file-help">Allowed: PDF, PNG, JPG</div>
-                    </div>
+        <div class="after-grid">
+          <div class="after-block">
+            <div class="after-block-title">Training Result</div>
+            <div class="toggle-group" aria-label="Training result">
+              <span class="toggle-btn pass" [class.active]="trainerOutcome === 'pass'">Pass</span>
+              <span class="toggle-btn fail" [class.active]="trainerOutcome === 'fail'">Fail</span>
+            </div>
+          </div>
 
-                    <button class="btn btn-approve" (click)="uploadTrainingReport()" [disabled]="!selectedReportFile">
-                      Upload
-                    </button>
-                  </div>
+          <div class="after-block">
+            <div class="after-block-title">Upload Report</div>
+            <ng-container *ngIf="application.trainer?.reportName; else noTrainerReport">
+              <div class="upload-success">Uploaded report successfully.</div>
+              <div class="upload-filename">{{ application.trainer?.reportName }}</div>
+            </ng-container>
+            <ng-template #noTrainerReport>
+              <div class="upload-muted">No report uploaded yet.</div>
+            </ng-template>
+          </div>
+        </div>
 
-                  <div class="upload-status" aria-live="polite">
-                    <div class="status-line" *ngIf="application.trainer?.reportName; else noReport">
-                      <span class="status-label">Uploaded report:</span>
-                      <span class="status-value">{{ application.trainer?.reportName }}</span>
-                    </div>
-                    <ng-template #noReport>
-                      <div class="status-muted">No report uploaded yet.</div>
-                    </ng-template>
+        <div class="after-divider"></div>
 
-                    <div class="status-line status-success" *ngIf="reportStatusMessage">{{ reportStatusMessage }}</div>
-                  </div>
-                </div>
+        <div class="after-title">Trainer</div>
+        <div class="after-comment">{{ application.trainer?.remarks || 'No comment added.' }}</div>
+      </section>
+
+      <section class="nurse-section">
+        <header class="nurse-header">
+          <h3>Medical Nurse</h3>
+        </header>
+
+        <div class="medical-tests">
+          <div class="medical-test">
+            <div class="medical-test-title">Eyesight Test</div>
+            <div class="medical-test-row">
+              <div class="segmented" role="group" aria-label="Eyesight Test">
+                <button
+                  type="button"
+                  class="seg-btn"
+                  [class.active]="medicalForm.eyesight === 'passed'"
+                  (click)="setMedicalResult('eyesight', 'passed')"
+                  [disabled]="isReadOnly"
+                >
+                  Pass
+                </button>
+                <button
+                  type="button"
+                  class="seg-btn"
+                  [class.active]="medicalForm.eyesight === 'failed'"
+                  (click)="setMedicalResult('eyesight', 'failed')"
+                  [disabled]="isReadOnly"
+                >
+                  Fail
+                </button>
               </div>
-            </div>
 
-            <div class="trainer-actions">
-              <button class="btn btn-secondary" (click)="goBack()">Back</button>
+              <input
+                class="remark-input"
+                type="text"
+                placeholder="Remark"
+                [(ngModel)]="medicalForm.eyesightRemark"
+                [disabled]="isReadOnly"
+              />
             </div>
-          </section>
+          </div>
+
+          <div class="medical-test">
+            <div class="medical-test-title">Color Blindness Test</div>
+            <div class="medical-test-row">
+              <div class="segmented" role="group" aria-label="Color Blindness Test">
+                <button
+                  type="button"
+                  class="seg-btn"
+                  [class.active]="medicalForm.colourBlindness === 'passed'"
+                  (click)="setMedicalResult('colourBlindness', 'passed')"
+                  [disabled]="isReadOnly"
+                >
+                  Pass
+                </button>
+                <button
+                  type="button"
+                  class="seg-btn"
+                  [class.active]="medicalForm.colourBlindness === 'failed'"
+                  (click)="setMedicalResult('colourBlindness', 'failed')"
+                  [disabled]="isReadOnly"
+                >
+                  Fail
+                </button>
+              </div>
+
+              <input
+                class="remark-input"
+                type="text"
+                placeholder="Remark"
+                [(ngModel)]="medicalForm.colourBlindnessRemark"
+                [disabled]="isReadOnly"
+              />
+            </div>
+          </div>
+
+          <div class="medical-test">
+            <div class="medical-test-title">General Health Test</div>
+            <div class="medical-test-row">
+              <div class="segmented" role="group" aria-label="General Health Test">
+                <button
+                  type="button"
+                  class="seg-btn"
+                  [class.active]="medicalForm.generalHealth === 'passed'"
+                  (click)="setMedicalResult('generalHealth', 'passed')"
+                  [disabled]="isReadOnly"
+                >
+                  Pass
+                </button>
+                <button
+                  type="button"
+                  class="seg-btn"
+                  [class.active]="medicalForm.generalHealth === 'failed'"
+                  (click)="setMedicalResult('generalHealth', 'failed')"
+                  [disabled]="isReadOnly"
+                >
+                  Fail
+                </button>
+              </div>
+
+              <input
+                class="remark-input"
+                type="text"
+                placeholder="Remark"
+                [(ngModel)]="medicalForm.generalHealthRemark"
+                [disabled]="isReadOnly"
+              />
+            </div>
+          </div>
+
+          <textarea
+            class="medical-comment"
+            rows="4"
+            placeholder="Add your comment here"
+            [(ngModel)]="medicalForm.comment"
+            [disabled]="isReadOnly"
+          ></textarea>
+        </div>
+
+        <div class="medical-actions">
+          <button type="button" class="medical-back" (click)="goBack()">Back</button>
+
+          <div class="medical-decision">
+            <button
+              type="button"
+              class="decision-btn decision-btn--rejected"
+              (click)="submitMedical()"
+              [disabled]="isReadOnly || !isMedicalComplete || medicalOutcome !== 'rejected'"
+            >
+              Rejected
+            </button>
+            <button
+              type="button"
+              class="decision-btn decision-btn--accepted"
+              (click)="submitMedical()"
+              [disabled]="isReadOnly || !isMedicalComplete || medicalOutcome !== 'accepted'"
+            >
+              Accepted
+            </button>
+          </div>
         </div>
       </section>
     </div>
-
-    <div class="right-column">
-      <div class="summary-card">
-        <h4>Summary</h4>
-        <div class="summary-divider"></div>
-        <div class="timeline">
-          <div *ngFor="let item of historyItems" class="timeline-item">
-            <div class="avatar-col">
-              <div class="avatar-ring">
-                <div class="avatar-icon"></div>
-              </div>
-            </div>
-            <div class="item-col">
-              <div class="item-header">
-                <div class="title-block">
-                  <div class="name-row">
-                    <span class="actor">{{ item.actor }}</span>
-                    <span class="staff-id" *ngIf="item.staffId">({{ item.staffId }})</span>
-                  </div>
-                  <div class="role">{{ item.role }}</div>
-                </div>
-              </div>
-              <div class="item-body">
-                <div class="message-block">
-                  <div class="message">{{ item.message }}</div>
-                  <div class="date">{{ formatDate(item.date) }}</div>
-                </div>
-                <div class="time-ago">{{ getTimeAgo(item.date, timeUpdateTrigger) }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
-
-  <footer class="page-footer">
-    <div class="footer-inner">
-      <div class="footer-copy">(c) 2025 SriLankan IT Systems. All rights reserved</div>
-    </div>
-  </footer>
 
   <div class="modal-overlay preview-overlay" *ngIf="showPreviewModal" (click)="closePreview()">
     <div class="preview-modal" (click)="$event.stopPropagation()">
       <div class="preview-header">
         <h3>{{ previewTitle }}</h3>
-        <button class="btn-close" (click)="closePreview()">x</button>
+        <button class="btn-close" (click)="closePreview()">✕</button>
       </div>
       <div class="preview-body">
         <img [src]="previewUrl" [alt]="previewTitle" />

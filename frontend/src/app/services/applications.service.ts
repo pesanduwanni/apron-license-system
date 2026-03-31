@@ -115,6 +115,9 @@ export interface Application {
     eyesight?: MedicalTestResult;
     colourBlindness?: MedicalTestResult;
     generalHealth?: MedicalTestResult;
+    eyesightRemarks?: string;
+    colourBlindnessRemarks?: string;
+    generalHealthRemarks?: string;
     remarks?: string;
     nurseId?: string;
     nurseName?: string;
@@ -266,6 +269,58 @@ export class ApplicationsService {
       sectionalManagerId: 'STF002',
       sectionalManagerName: 'Kamala Silva',
       sectionalApprovalDate: '2026-03-02'
+    },
+    {
+      id: 'seed-3',
+      referenceNumber: 'AL-2026-1003',
+      submittedDate: '2026-03-03',
+      status: 'medical_pending',
+      applicantName: 'Kavindu Jayasinghe',
+      staffNumber: '423789',
+      department: 'Ramp Operations',
+      designation: 'Ramp Agent',
+      contactNumber: '071 222 3344',
+      nic: '940112233V',
+      licenseType: 'new',
+      aaslAccessNo: 'AASL-11223',
+      aaslAccessExpiry: '2027-10-15',
+      stateLicenseNo: 'B5557788',
+      stateLicenseIssueDate: '2022-02-14',
+      stateLicenseExpiryDate: '2030-02-14',
+      selectedCategories: ['tractor', 'van', 'car'],
+      approvedCategories: ['tractor', 'van', 'car'],
+      attachments: {
+        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
+      },
+      sectionalManagerId: 'STF002',
+      sectionalManagerName: 'Kamala Silva',
+      sectionalApprovalDate: '2026-03-03',
+      safetyManagerId: 'STF003',
+      safetyManagerName: 'Nimal Fernando',
+      safetyApprovalDate: '2026-03-03',
+      orientation: {
+        classDate: '2026-03-04',
+        className: 'Orientation Class A',
+        instructor: 'Officer Jayasinghe',
+        status: 'completed'
+      },
+      practical: {
+        date: '2026-03-05',
+        trainer: 'Sunil Jayawardena',
+        status: 'completed'
+      },
+      medical: {
+        assignedDate: '2026-03-06',
+        status: 'pending'
+      }
     }
   ];
 
@@ -604,6 +659,9 @@ export class ApplicationsService {
       eyesight: MedicalTestResult;
       colourBlindness: MedicalTestResult;
       generalHealth: MedicalTestResult;
+      eyesightRemarks?: string;
+      colourBlindnessRemarks?: string;
+      generalHealthRemarks?: string;
       remarks?: string;
     }
   ): boolean {
@@ -615,6 +673,9 @@ export class ApplicationsService {
       eyesight: payload.eyesight,
       colourBlindness: payload.colourBlindness,
       generalHealth: payload.generalHealth,
+      eyesightRemarks: payload.eyesightRemarks,
+      colourBlindnessRemarks: payload.colourBlindnessRemarks,
+      generalHealthRemarks: payload.generalHealthRemarks,
       remarks: payload.remarks,
       nurseId,
       nurseName,

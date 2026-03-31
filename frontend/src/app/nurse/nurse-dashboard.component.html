@@ -1,0 +1,44 @@
+<section class="dashboard-page" *ngIf="user as activeUser">
+  <header class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Medical test requests forwarded to you.</p>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat-card pending" (click)="goToRequests()">
+      <div class="stat-icon">🩺</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ pendingCount }}</div>
+        <div class="stat-label">Pending Medical Tests</div>
+      </div>
+    </div>
+
+    <div class="stat-card total" (click)="goToRequests()">
+      <div class="stat-icon">📁</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ applications.length }}</div>
+        <div class="stat-label">Total Requests</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="recent-card" *ngIf="filteredApplications.length">
+    <header class="recent-header">
+      <h2>Recent Requests</h2>
+      <button class="link-btn" (click)="goToRequests()">View all requests →</button>
+    </header>
+
+    <ul class="recent-list">
+      <li class="recent-row" *ngFor="let app of filteredApplications | slice:0:5" (click)="viewApplication(app)" role="button" tabindex="0">
+        <div class="recent-main">
+          <div class="ref">{{ app.referenceNumber }} <span>(Ref No)</span></div>
+          <div class="name">{{ app.applicantName }} ({{ app.staffNumber }})</div>
+        </div>
+        <div class="recent-meta">
+          <span class="recent-date">{{ formatDate(app.medical?.assignedDate || app.submittedDate) }}</span>
+          <span class="status-chip pending">Pending</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+</section>

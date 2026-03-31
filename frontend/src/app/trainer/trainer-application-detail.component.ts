@@ -28,7 +28,7 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
   previewTitle = '';
 
   failedAttachments: { [key: string]: boolean } = {};
-  attachmentsExpanded = true;
+  attachmentsExpanded = false;
 
   selectedReportName = '';
   selectedReportFile: File | null = null;

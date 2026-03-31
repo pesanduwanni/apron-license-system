@@ -132,12 +132,13 @@
 }
 
 .trainer-report-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
 }
 
 .trainer-report-action {
+  width: 100%;
   padding: 0.5rem 0.8rem;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -149,28 +150,17 @@
   white-space: nowrap;
 }
 
-.trainer-report-action--view::before {
-  content: '↗';
-  font-size: 1rem;
-  line-height: 1;
-}
-
-.trainer-report-action--download::before {
-  content: '⤓';
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* Attachment action buttons (View / Download) */
 .attachment-actions {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: 0.45rem;
   margin-top: 0.5rem;
 }
 
 .btn-attach {
   min-width: 0;
+  width: 100%;
   padding: 0.55rem 0.75rem;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -189,24 +179,9 @@
   color: #0d63d6;
 }
 
-.btn-attach--view::before {
-  content: '↗';
-  font-size: 1rem;
-  line-height: 1;
-}
-
 .btn-attach--download {
   background: #0d63d6;
   color: #ffffff;
-  width: 2.35rem;
-  padding: 0;
-  font-size: 0;
-}
-
-.btn-attach--download::before {
-  content: '⤓';
-  font-size: 1rem;
-  line-height: 1;
 }
 
 /* Safety page needs signature area full width so decision panel can align horizontally */
@@ -230,10 +205,6 @@
 
   .trainer-report-actions {
     width: 100%;
-  }
-
-  .trainer-report-action {
-    flex: 1;
   }
 }
 
@@ -319,7 +290,7 @@
 
 @media (max-width: 560px) {
   .attachment-actions {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 1fr;
   }
 
   .attachment-decision {

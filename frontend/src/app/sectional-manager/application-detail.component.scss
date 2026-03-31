@@ -527,6 +527,41 @@
 
 .attachment-group {
   display: flex;
+
+.attachment-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-attach {
+  width: 100%;
+  padding: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #0d6efd;
+  background: transparent;
+  color: #0d6efd;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-attach:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+.btn-attach--download {
+  background: #0d6efd;
+  color: #fff;
+}
+
+.btn-attach--download:hover {
+  background: #0b5ed7;
+}
   flex-direction: column;
   gap: 0.5rem;
 }

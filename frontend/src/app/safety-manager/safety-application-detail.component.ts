@@ -38,7 +38,7 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   previewTitle = '';
 
   failedAttachments: { [key: string]: boolean } = {};
-  attachmentsExpanded = true;
+  attachmentsExpanded = false;
 
   orientationForm = {
     classDate: '',
