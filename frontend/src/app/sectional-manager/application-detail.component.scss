@@ -202,85 +202,6 @@
 }
 
 /* Notification modal (success / error) matching provided UI */
-.notify-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-
-.notify-modal {
-  width: 420px;
-  max-width: calc(100% - 40px);
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-  text-align: center;
-}
-
-.notify-top {
-  height: 86px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.notify-icon {
-  width: 92px;
-  height: 92px;
-  border-radius: 8px;
-  font-size: 48px;
-  line-height: 92px;
-  color: #fff;
-  display: inline-block;
-  transform: translateY(-22px);
-}
-
-.notify-modal.success .notify-top {
-  background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.06));
-}
-.notify-modal.error .notify-top {
-  background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06));
-}
-
-.success-icon {
-  background: #16a34a;
-}
-
-.error-icon {
-  background: #ef4444;
-}
-
-.notify-body {
-  padding: 0 28px 28px;
-}
-
-.notify-body h3 {
-  margin: 12px 0 6px;
-  font-size: 1.1rem;
-  color: #111827;
-}
-
-.notify-body p {
-  margin: 0 0 16px;
-  color: #6b7280;
-}
-
-.notify-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.notify-actions .btn-secondary {
-  padding: 0.6rem 1.25rem;
-  border-radius: 6px;
-}
-
 /* Top-right toast styles */
 .toast-container {
   position: fixed;
@@ -379,6 +300,7 @@
 
 .expandable-header {
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -1165,6 +1087,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
 }
 
 .title-block {
@@ -1197,9 +1120,21 @@
 .chevron {
   font-size: 0.9rem;
   color: #6b7280;
+  display: inline-flex;
+  transition: transform 0.15s ease;
 }
 
-.item-body {
+.chevron.collapsed {
+  transform: rotate(180deg);
+}
+
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.event-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;

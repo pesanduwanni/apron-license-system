@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
-import { Application, ApplicationsService } from '../services/applications.service';
+import { Application, ApplicationsService, SummaryGroup } from '../services/applications.service';
 
 @Component({
   selector: 'app-application-detail',
@@ -53,6 +53,8 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
 
   private timeUpdateInterval: any;
   timeUpdateTrigger = 0;
+
+  private collapsedSummaryGroupKeys = new Set<string>();
 
   constructor(
     private route: ActivatedRoute,
@@ -236,7 +238,7 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
       // Frontend-only: simulate email/notification
       // Move to safety pipeline (assign to safety manager) so it's visible to safety
       this.applicationsService.acceptApplicationSafety(this.application.id, 'STF003', 'Nimal Fernando');
-      this.successMessage = 'Form Approved. Notification sent to applicant and safety manager.';
+      this.successMessage = 'Task Updated and Sent to next level Successfully';
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
@@ -340,87 +342,27 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
     return `${diffSeconds}s`;
   }
 
-  // Build a simple history/timeline from available application fields
-  get historyItems() {
+  get summaryGroups(): SummaryGroup[] {
     if (!this.application) return [];
-    const items: Array<{ actor: string; role: string; staffId?: string; date?: string; message?: string }>
-      = [];
+    return this.applicationsService.buildSummaryGroups(this.application);
+  }
 
-    // Applicant submission
-    items.push({
-      actor: this.application.applicantName,
-      role: 'User',
-      staffId: this.application.staffNumber,
-      date: this.application.submittedDate,
-      message: 'Request sent'
-    });
+  private summaryGroupKey(group: SummaryGroup): string {
+    const staffPart = (group.staffId || '').trim() ? group.staffId : group.actor;
+    return `${group.role}|${staffPart}`;
+  }
 
-    // Sectional manager action (if present)
-    if (this.application.sectionalManagerName && this.application.sectionalApprovalDate) {
-      const approved = this.application.approvedCategories || [];
-      const original = this.application.selectedCategories || [];
-      const changed =
-        approved.length !== original.length ||
-        approved.some((k) => !original.includes(k));
+  isSummaryGroupExpanded(group: SummaryGroup): boolean {
+    return !this.collapsedSummaryGroupKeys.has(this.summaryGroupKey(group));
+  }
 
-      let message = '';
-
-      if (this.application.status === 'approved_sectional') {
-        message = 'Accepted request';
-      } else if (this.application.status === 'rejected_sectional') {
-        message = 'Rejected request';
-      } else if (changed) {
-        message = 'Updated equipment recommendation';
-      } else {
-        message = 'Reviewed request';
-      }
-
-      if (this.application.sectionalRemarks) {
-        message += ` – ${this.application.sectionalRemarks}`;
-      }
-
-      items.push({
-        actor: this.application.sectionalManagerName,
-        role: 'Sectional Manager',
-        staffId: this.application.sectionalManagerId,
-        date: this.application.sectionalApprovalDate,
-        message
-      });
+  toggleSummaryGroup(group: SummaryGroup): void {
+    const key = this.summaryGroupKey(group);
+    if (this.collapsedSummaryGroupKeys.has(key)) {
+      this.collapsedSummaryGroupKeys.delete(key);
+    } else {
+      this.collapsedSummaryGroupKeys.add(key);
     }
-
-    // Safety manager action (if present)
-    if (this.application.safetyManagerName && this.application.safetyApprovalDate) {
-      let message = '';
-
-      if (this.application.status === 'approved_safety') {
-        message = 'Accepted request';
-      } else if (this.application.status === 'rejected_safety') {
-        message = 'Rejected request';
-      } else {
-        message = 'Reviewed request';
-      }
-
-      if (this.application.safetyRemarks) {
-        message += ` – ${this.application.safetyRemarks}`;
-      }
-
-      items.push({
-        actor: this.application.safetyManagerName,
-        role: 'Safety Manager',
-        staffId: this.application.safetyManagerId,
-        date: this.application.safetyApprovalDate,
-        message
-      });
-    }
-
-    // Sort newest first by date if available
-    items.sort((a, b) => {
-      const da = a.date ? new Date(a.date).getTime() : 0;
-      const db = b.date ? new Date(b.date).getTime() : 0;
-      return db - da;
-    });
-
-    return items;
   }
 
   toggleAttachments() {

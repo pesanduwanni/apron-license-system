@@ -1,5 +1,37 @@
 <ng-container *ngIf="user && application">
   <div class="page-body">
+    <div class="notify-overlay" *ngIf="errorMessage" (click)="closeAlert()">
+      <div class="notify-modal error" (click)="$event.stopPropagation()">
+        <div class="notify-top">
+          <button type="button" class="notify-close" aria-label="Close" (click)="closeAlert()">✕</button>
+          <div class="notify-icon error-icon">✕</div>
+        </div>
+        <div class="notify-body">
+          <h3>Error</h3>
+          <p>{{ errorMessage }}</p>
+          <div class="notify-actions">
+            <button class="btn btn-secondary" (click)="closeAlert()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notify-overlay" *ngIf="successMessage" (click)="closeAlert()">
+      <div class="notify-modal success" (click)="$event.stopPropagation()">
+        <div class="notify-top">
+          <button type="button" class="notify-close" aria-label="Close" (click)="closeAlert()">✕</button>
+          <div class="notify-icon success-icon">✓</div>
+        </div>
+        <div class="notify-body">
+          <h3>Success</h3>
+          <p>{{ successMessage }}</p>
+          <div class="notify-actions">
+            <button class="btn btn-secondary" (click)="closeAlert()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="toast-container" *ngIf="showToast">
       <div class="toast" [class.success]="toastType === 'success'" [class.error]="toastType === 'error'">
         <div class="toast-body">
@@ -543,6 +575,50 @@
         </div>
       </section>
     </div>
+
+    <div class="right-column">
+      <div class="summary-card">
+        <h4>Summery</h4>
+        <div class="summary-divider"></div>
+        <div class="timeline">
+          <div *ngFor="let group of summaryGroups" class="timeline-item">
+            <div class="avatar-col">
+              <div class="avatar-ring">
+                <div class="avatar-icon"></div>
+              </div>
+            </div>
+            <div class="item-col">
+              <div
+                class="item-header"
+                role="button"
+                tabindex="0"
+                [attr.aria-expanded]="isSummaryGroupExpanded(group)"
+                (click)="toggleSummaryGroup(group)"
+                (keydown.enter)="toggleSummaryGroup(group)"
+              >
+                <div class="title-block">
+                  <div class="name-row">
+                    <span class="actor">{{ group.actor }}</span>
+                    <span class="staff-id" *ngIf="group.staffId">({{ group.staffId }})</span>
+                  </div>
+                  <div class="role">{{ group.role }}</div>
+                </div>
+                <span class="chevron" [class.collapsed]="!isSummaryGroupExpanded(group)">⌄</span>
+              </div>
+              <div class="events" *ngIf="isSummaryGroupExpanded(group)">
+                <div *ngFor="let ev of group.events" class="event-row">
+                  <div class="message-block">
+                    <div class="message">{{ ev.message }}</div>
+                    <div class="date">{{ formatDate(ev.date) }}</div>
+                  </div>
+                  <div class="time-ago">{{ getTimeAgo(ev.date, timeUpdateTrigger) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="modal-overlay preview-overlay" *ngIf="showPreviewModal" (click)="closePreview()">
@@ -552,7 +628,7 @@
         <button class="btn-close" (click)="closePreview()">✕</button>
       </div>
       <div class="preview-body">
-        <img [src]="previewUrl" [alt]="previewTitle" />
+        <img [src]="previewUrl" alt="{{ previewTitle || 'Preview image' }}" title="{{ previewTitle || 'Preview image' }}" />
       </div>
     </div>
   </div>

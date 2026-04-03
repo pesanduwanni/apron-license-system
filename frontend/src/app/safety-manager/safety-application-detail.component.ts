@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
-import { Application, ApplicationsService } from '../services/applications.service';
+import { Application, ApplicationsService, SummaryGroup } from '../services/applications.service';
 
 @Component({
   selector: 'app-safety-application-detail',
@@ -58,6 +58,8 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   private timeUpdateInterval: any;
   timeUpdateTrigger = 0;
 
+  private collapsedSummaryGroupKeys = new Set<string>();
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -67,6 +69,29 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
 
   get vehicleCategories() {
     return this.applicationsService.vehicleCategories;
+  }
+
+  get summaryGroups(): SummaryGroup[] {
+    if (!this.application) return [];
+    return this.applicationsService.buildSummaryGroups(this.application);
+  }
+
+  private summaryGroupKey(group: SummaryGroup): string {
+    const staffPart = (group.staffId || '').trim() ? group.staffId : group.actor;
+    return `${group.role}|${staffPart}`;
+  }
+
+  isSummaryGroupExpanded(group: SummaryGroup): boolean {
+    return !this.collapsedSummaryGroupKeys.has(this.summaryGroupKey(group));
+  }
+
+  toggleSummaryGroup(group: SummaryGroup): void {
+    const key = this.summaryGroupKey(group);
+    if (this.collapsedSummaryGroupKeys.has(key)) {
+      this.collapsedSummaryGroupKeys.delete(key);
+    } else {
+      this.collapsedSummaryGroupKeys.add(key);
+    }
   }
 
   ngOnInit(): void {
@@ -219,7 +244,7 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     );
 
     if (success) {
-      this.successMessage = 'Application validated successfully. Email sent to applicant.';
+      this.successMessage = 'Task Updated and Sent to next level Successfully';
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
       this.showRejectBox = false;
       this.rejectReason = '';

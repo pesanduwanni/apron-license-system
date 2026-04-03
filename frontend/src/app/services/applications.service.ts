@@ -29,6 +29,18 @@ export interface Attachment {
   url: string;
 }
 
+export interface SummaryEvent {
+  message: string;
+  date?: string;
+}
+
+export interface SummaryGroup {
+  actor: string;
+  role: string;
+  staffId?: string;
+  events: SummaryEvent[];
+}
+
 export interface Application {
   id: string;
   referenceNumber: string;
@@ -75,6 +87,7 @@ export interface Application {
   // Sectional Manager fields
   sectionalManagerId?: string;
   sectionalManagerName?: string;
+  sectionalUpdatedDate?: string;
   sectionalApprovalDate?: string;
   sectionalRemarks?: string;
 
@@ -463,11 +476,255 @@ export class ApplicationsService {
     apps[idx].sectionalRemarks = remarks;
     apps[idx].sectionalManagerId = managerId;
     apps[idx].sectionalManagerName = managerName;
-    apps[idx].sectionalApprovalDate = new Date().toISOString();
+    // Track category update separately from the approve/reject decision date.
+    apps[idx].sectionalUpdatedDate = new Date().toISOString();
     this.saveApplications(apps);
     return true;
   }
 
+  // Summary timeline helpers (sidebar)
+  // Ordered groups as per UI mock: User -> Sectional -> Safety -> Trainer -> Medical -> Doctor -> Officer
+  buildSummaryGroups(app: Application): SummaryGroup[] {
+    const groups: SummaryGroup[] = [];
+
+    const sortEvents = (events: SummaryEvent[]): SummaryEvent[] => {
+      return [...events].sort((a, b) => {
+        const aTime = a.date ? new Date(a.date).getTime() : 0;
+        const bTime = b.date ? new Date(b.date).getTime() : 0;
+        return aTime - bTime;
+      });
+    };
+
+    const pushGroup = (group: SummaryGroup) => {
+      const events = sortEvents(group.events);
+      if (!events.length) return;
+      groups.push({ ...group, events });
+    };
+
+    const pushEvent = (events: SummaryEvent[], message: string, date?: string) => {
+      if (!date) return;
+      events.push({ message, date });
+    };
+
+    // User
+    pushGroup({
+      actor: app.applicantName,
+      staffId: app.staffNumber,
+      role: 'User',
+      events: [
+        {
+          message: 'Request sent',
+          date: app.submittedDate
+        }
+      ]
+    });
+
+    // Sectional Manager
+    {
+      const events: SummaryEvent[] = [];
+
+      const approved = app.approvedCategories || [];
+      const original = app.selectedCategories || [];
+      const changed =
+        approved.length !== 0 &&
+        (approved.length !== original.length || approved.some((k) => !original.includes(k)));
+
+      if (changed) {
+        pushEvent(events, 'Update equipment...', app.sectionalUpdatedDate || app.sectionalApprovalDate);
+      }
+
+      if (app.sectionalRemarks) {
+        pushEvent(events, 'Comment added', app.sectionalUpdatedDate || app.sectionalApprovalDate);
+      }
+
+      if (app.sectionalApprovalDate) {
+        const message =
+          app.status === 'rejected_sectional'
+            ? 'Request Rejected'
+            : app.status === 'pending_sectional'
+              ? 'Reviewed request'
+              : 'Request Accepted';
+
+        pushEvent(events, message, app.sectionalApprovalDate);
+      }
+
+      if ((app.sectionalManagerName || app.sectionalManagerId) && events.length) {
+        pushGroup({
+          actor: app.sectionalManagerName || 'Sectional Manager',
+          staffId: app.sectionalManagerId,
+          role: 'Sectional Manager',
+          events
+        });
+      }
+    }
+
+    // Safety Manager
+    {
+      const events: SummaryEvent[] = [];
+
+      if (app.trainer?.reportUploadedAt) {
+        pushEvent(events, 'Upload reports', app.trainer.reportUploadedAt);
+      }
+
+      if (app.safetyApprovalDate) {
+        const message = app.status === 'rejected_safety' ? 'Request Rejected' : 'Request Accepted';
+        pushEvent(events, message, app.safetyApprovalDate);
+      }
+
+      if (app.safetyRemarks) {
+        pushEvent(events, 'Comment added', app.safetyApprovalDate);
+      }
+
+      // Orientation
+      if (app.orientation?.classDate && (app.orientation.status === 'assigned' || app.status === 'orientation_assigned')) {
+        pushEvent(events, 'Orientation assigned', app.orientation.classDate);
+      }
+      if (app.orientation?.classDate && app.orientation.status === 'completed') {
+        pushEvent(events, 'Orientation completed', app.orientation.classDate);
+      }
+      if (app.orientation?.classDate && app.orientation.status === 'not_completed') {
+        pushEvent(events, 'Orientation not completed', app.orientation.classDate);
+      }
+
+      // Practical
+      if (app.practical?.date && (app.practical.status === 'assigned' || app.status === 'practical_assigned')) {
+        pushEvent(events, 'Practical assigned', app.practical.date);
+      }
+      if (app.practical?.date && app.practical.status === 'completed') {
+        pushEvent(events, 'Practical completed', app.practical.date);
+      }
+      if (app.practical?.date && app.practical.status === 'not_completed') {
+        pushEvent(events, 'Practical not completed', app.practical.date);
+      }
+
+      // Medical assignment
+      if (app.medical?.assignedDate) {
+        pushEvent(events, 'Sent to Medical', app.medical.assignedDate);
+      }
+
+      if ((app.safetyManagerName || app.safetyManagerId) && events.length) {
+        pushGroup({
+          actor: app.safetyManagerName || 'Safety Manager',
+          staffId: app.safetyManagerId,
+          role: 'Safety Manager',
+          events
+        });
+      }
+    }
+
+    // Trainer
+    {
+      const events: SummaryEvent[] = [];
+      const trainer = app.trainer;
+
+      if (app.practical?.date) {
+        pushEvent(events, 'Practical scheduled', app.practical.date);
+      }
+
+      if (trainer?.reportUploadedAt) {
+        pushEvent(events, 'Upload reports', trainer.reportUploadedAt);
+      }
+
+      if (trainer?.reviewedDate) {
+        const message = trainer.result === 'fail' ? 'Request Rejected' : 'Request Accepted';
+        pushEvent(events, message, trainer.reviewedDate);
+      }
+
+      if ((trainer?.trainerName || trainer?.trainerId || app.practical?.trainer) && events.length) {
+        pushGroup({
+          actor: trainer?.trainerName || app.practical?.trainer || 'Trainer',
+          staffId: trainer?.trainerId,
+          role: 'Trainer',
+          events
+        });
+      }
+    }
+
+    // Medical Nurse
+    {
+      const events: SummaryEvent[] = [];
+      const test = app.medicalTest;
+
+      if (test?.eyesight) {
+        pushEvent(events, `Eyesight: ${test.eyesight === 'passed' ? 'Passed' : 'Failed'}`, test.submittedDate);
+      }
+      if (test?.colourBlindness) {
+        pushEvent(
+          events,
+          `Colour blindness: ${test.colourBlindness === 'passed' ? 'Passed' : 'Failed'}`,
+          test.submittedDate
+        );
+      }
+      if (test?.generalHealth) {
+        pushEvent(events, `General health: ${test.generalHealth === 'passed' ? 'Passed' : 'Failed'}`, test.submittedDate);
+      }
+      if (test?.remarks) {
+        pushEvent(events, 'Comment added', test.submittedDate);
+      }
+      if (test?.submittedDate) {
+        pushEvent(events, 'Complete tests', test.submittedDate);
+      }
+
+      if ((test?.nurseName || test?.nurseId) && events.length) {
+        pushGroup({
+          actor: test?.nurseName || 'Medical Nurse',
+          staffId: test?.nurseId,
+          role: 'Medical Nurse',
+          events
+        });
+      }
+    }
+
+    // Doctor
+    {
+      const events: SummaryEvent[] = [];
+      const review = app.doctorReview;
+
+      if (review?.reviewedDate) {
+        pushEvent(events, review.fit ? 'Request Accepted' : 'Request Rejected', review.reviewedDate);
+      }
+      if (review?.remarks) {
+        pushEvent(events, 'Comment added', review.reviewedDate);
+      }
+
+      if ((review?.doctorName || review?.doctorId) && events.length) {
+        pushGroup({
+          actor: review?.doctorName || 'Doctor',
+          staffId: review?.doctorId,
+          role: 'Doctor',
+          events
+        });
+      }
+    }
+
+    // Safety Officer (validation / issuance)
+    {
+      const events: SummaryEvent[] = [];
+      const officer = app.safetyOfficerReview;
+
+      if (officer?.validatedDate) {
+        pushEvent(events, 'Validate attachments', officer.validatedDate);
+      }
+      if (officer?.issuedDate) {
+        pushEvent(events, 'License issued', officer.issuedDate);
+      }
+
+      if (officer?.remarks) {
+        pushEvent(events, 'Comment added', officer.issuedDate || officer.validatedDate);
+      }
+
+      if ((officer?.officerName || officer?.officerId) && events.length) {
+        pushGroup({
+          actor: officer?.officerName || 'Safety Officer',
+          staffId: officer?.officerId,
+          role: 'Safety Officer',
+          events
+        });
+      }
+    }
+
+    return groups;
+  }
   // Approve application (sectional manager)
   approveApplication(
     appId: string,

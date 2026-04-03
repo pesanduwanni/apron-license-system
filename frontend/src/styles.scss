@@ -24,3 +24,104 @@ body {
 * {
   font-family: inherit;
 }
+
+/* Global notification modal (success / error) */
+.notify-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.notify-modal {
+  width: 420px;
+  max-width: calc(100% - 40px);
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.notify-top {
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.notify-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+  color: #111827;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.notify-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.notify-icon {
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  font-size: 48px;
+  line-height: 92px;
+  color: #ffffff;
+  display: inline-block;
+  transform: translateY(-22px);
+}
+
+.notify-modal.success .notify-top {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.06));
+}
+
+.notify-modal.error .notify-top {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.06));
+}
+
+.success-icon {
+  background: #16a34a;
+}
+
+.error-icon {
+  background: #ef4444;
+}
+
+.notify-body {
+  padding: 0 28px 28px;
+}
+
+.notify-body h3 {
+  margin: 12px 0 6px;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.notify-body p {
+  margin: 0 0 16px;
+  color: #6b7280;
+  white-space: pre-line;
+}
+
+.notify-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.notify-actions .btn-secondary {
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+}

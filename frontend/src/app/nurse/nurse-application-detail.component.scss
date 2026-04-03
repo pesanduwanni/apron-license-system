@@ -1,5 +1,187 @@
 .page-body {
-  grid-template-columns: 1fr;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 270px);
+  gap: 1rem;
+}
+
+.right-column {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1rem 1.1rem 1.2rem;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  position: sticky;
+  top: calc(var(--topbar-height, 72px) + var(--page-top-gap, 24px));
+  width: 100%;
+  max-width: 260px;
+  margin-right: 0;
+}
+
+.summary-card h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.summary-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin-bottom: 0.9rem;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  padding-top: 0.25rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.avatar-col {
+  position: relative;
+  padding-top: 0.15rem;
+}
+
+.avatar-ring {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 2px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+}
+
+.avatar-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.item-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.actor {
+  font-weight: 700;
+  color: #111827;
+}
+
+.staff-id {
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.role {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.chevron {
+  font-size: 0.9rem;
+  color: #6b7280;
+  display: inline-flex;
+  transition: transform 0.15s ease;
+}
+
+.chevron.collapsed {
+  transform: rotate(180deg);
+}
+
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.event-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.message-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.message {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.date {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.time-ago {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1024px) {
+  .page-body {
+    grid-template-columns: 1fr;
+  }
+
+  .right-column {
+    justify-content: flex-start;
+  }
+
+  .summary-card {
+    position: static;
+    top: auto;
+    max-width: none;
+    box-shadow: none;
+  }
 }
 
 .nurse-section {
@@ -279,6 +461,7 @@ textarea {
   background: #ffffff;
   color: #111827;
   font-weight: 600;
+  -webkit-user-select: none;
   user-select: none;
 }
 

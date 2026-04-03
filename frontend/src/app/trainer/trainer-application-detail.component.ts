@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
-import { Application, ApplicationsService } from '../services/applications.service';
+import { Application, ApplicationsService, SummaryGroup } from '../services/applications.service';
 
 @Component({
   selector: 'app-trainer-application-detail',
@@ -30,12 +30,14 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
   failedAttachments: { [key: string]: boolean } = {};
   attachmentsExpanded = false;
 
-  selectedReportName = '';
   selectedReportFile: File | null = null;
+  selectedReportName = '';
   reportStatusMessage = '';
 
   private timeUpdateInterval: any;
   timeUpdateTrigger = 0;
+
+  private collapsedSummaryGroupKeys = new Set<string>();
 
   constructor(
     private route: ActivatedRoute,
@@ -48,9 +50,31 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
     return this.applicationsService.vehicleCategories;
   }
 
+  get summaryGroups(): SummaryGroup[] {
+    if (!this.application) return [];
+    return this.applicationsService.buildSummaryGroups(this.application);
+  }
+
+  private summaryGroupKey(group: SummaryGroup): string {
+    const staffPart = (group.staffId || '').trim() ? group.staffId : group.actor;
+    return `${group.role}|${staffPart}`;
+  }
+
+  isSummaryGroupExpanded(group: SummaryGroup): boolean {
+    return !this.collapsedSummaryGroupKeys.has(this.summaryGroupKey(group));
+  }
+
+  toggleSummaryGroup(group: SummaryGroup): void {
+    const key = this.summaryGroupKey(group);
+    if (this.collapsedSummaryGroupKeys.has(key)) {
+      this.collapsedSummaryGroupKeys.delete(key);
+    } else {
+      this.collapsedSummaryGroupKeys.add(key);
+    }
+  }
+
   ngOnInit(): void {
     this.user = this.authService.currentUser;
-
     if (!this.user) {
       this.router.navigate(['/login']);
       return;
@@ -61,19 +85,12 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
       this.application = this.applicationsService.getApplicationById(appId) || null;
     }
 
-    // Trainers must only access applications assigned to them for practical training.
-    if (this.application && this.user) {
-      const assignedTrainer = this.application.practical?.trainer;
-      if (!assignedTrainer || assignedTrainer !== this.user.name) {
-        this.router.navigate(['/trainer/requests']);
-        return;
-      }
-    }
-
     if (!this.application) {
       this.router.navigate(['/trainer/requests']);
+      return;
     }
 
+    // Update time-ago values every minute for real-time display.
     this.timeUpdateInterval = setInterval(() => {
       this.timeUpdateTrigger++;
     }, 60000);
@@ -93,7 +110,7 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
   }
 
   get today(): string {
-    return new Date().toISOString();
+    return new Date().toISOString().split('T')[0];
   }
 
   get safetyApprovalStatus(): string {

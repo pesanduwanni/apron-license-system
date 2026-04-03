@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -7,7 +7,8 @@ import { AuthService, User } from '../services/auth.service';
 import {
   Application,
   ApplicationsService,
-  MedicalTestResult
+  MedicalTestResult,
+  SummaryGroup
 } from '../services/applications.service';
 
 @Component({
@@ -17,7 +18,7 @@ import {
   templateUrl: './nurse-application-detail.component.html',
   styleUrls: ['../sectional-manager/application-detail.component.scss', './nurse-application-detail.component.scss']
 })
-export class NurseApplicationDetailComponent implements OnInit {
+export class NurseApplicationDetailComponent implements OnInit, OnDestroy {
   user: User | null = null;
   application: Application | null = null;
 
@@ -25,12 +26,21 @@ export class NurseApplicationDetailComponent implements OnInit {
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
 
+  successMessage = '';
+  errorMessage = '';
+  private successRedirectUrl: string | null = null;
+
   showPreviewModal = false;
   previewUrl = '';
   previewTitle = '';
 
   failedAttachments: { [key: string]: boolean } = {};
   attachmentsExpanded = false;
+
+  private timeUpdateInterval: any;
+  timeUpdateTrigger = 0;
+
+  private collapsedSummaryGroupKeys = new Set<string>();
 
   medicalForm: {
     eyesight: MedicalTestResult | '';
@@ -91,6 +101,29 @@ export class NurseApplicationDetailComponent implements OnInit {
     return this.applicationsService.vehicleCategories;
   }
 
+  get summaryGroups(): SummaryGroup[] {
+    if (!this.application) return [];
+    return this.applicationsService.buildSummaryGroups(this.application);
+  }
+
+  private summaryGroupKey(group: SummaryGroup): string {
+    const staffPart = (group.staffId || '').trim() ? group.staffId : group.actor;
+    return `${group.role}|${staffPart}`;
+  }
+
+  isSummaryGroupExpanded(group: SummaryGroup): boolean {
+    return !this.collapsedSummaryGroupKeys.has(this.summaryGroupKey(group));
+  }
+
+  toggleSummaryGroup(group: SummaryGroup): void {
+    const key = this.summaryGroupKey(group);
+    if (this.collapsedSummaryGroupKeys.has(key)) {
+      this.collapsedSummaryGroupKeys.delete(key);
+    } else {
+      this.collapsedSummaryGroupKeys.add(key);
+    }
+  }
+
   get trainerOutcome(): 'pass' | 'fail' | null {
     if (!this.application) return null;
     if (this.application.trainer?.result) return this.application.trainer.result;
@@ -149,9 +182,17 @@ export class NurseApplicationDetailComponent implements OnInit {
           this.applicationsService.getApplicationById(this.application.id) || null;
       })
     );
+
+    // Update time-ago values every minute for real-time display.
+    this.timeUpdateInterval = setInterval(() => {
+      this.timeUpdateTrigger++;
+    }, 60000);
   }
 
   ngOnDestroy(): void {
+    if (this.timeUpdateInterval) {
+      clearInterval(this.timeUpdateInterval);
+    }
     this.subscriptions.unsubscribe();
   }
 
@@ -169,6 +210,17 @@ export class NurseApplicationDetailComponent implements OnInit {
   closeToast(): void {
     this.showToast = false;
     this.toastMessage = '';
+  }
+
+  closeAlert(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
+
+    if (this.successRedirectUrl) {
+      const url = this.successRedirectUrl;
+      this.successRedirectUrl = null;
+      this.router.navigate([url]);
+    }
   }
 
   previewAttachment(url: string, title: string): void {
@@ -236,6 +288,26 @@ export class NurseApplicationDetailComponent implements OnInit {
     return `${yyyy}-${mm}-${dd}`;
   }
 
+  getTimeAgo(dateStr?: string, trigger?: number): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    if (diffMs <= 0) return '0s';
+
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays >= 1) return `${diffDays}d`;
+
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    if (diffHours >= 1) return `${diffHours}h`;
+
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    if (diffMinutes >= 1) return `${diffMinutes}m`;
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    return `${diffSeconds}s`;
+  }
+
   setMedicalResult(
     key: 'eyesight' | 'colourBlindness' | 'generalHealth',
     value: MedicalTestResult
@@ -280,7 +352,8 @@ export class NurseApplicationDetailComponent implements OnInit {
       return;
     }
 
-    this.showToastMessage('Medical test submitted successfully.');
-    setTimeout(() => this.router.navigate(['/nurse/requests']), 700);
+    this.closeToast();
+    this.successMessage = 'Task Updated and Sent to next level Successfully';
+    this.successRedirectUrl = '/nurse/requests';
   }
 }
