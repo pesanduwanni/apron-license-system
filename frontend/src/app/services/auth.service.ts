@@ -41,6 +41,17 @@ export class AuthService {
       nic: '923836657V'
     },
     {
+      username: 'approved.applicant@ul.com',
+      password: 'approved123',
+      role: 'applicant',
+      name: 'Nadeesha Wijeratne',
+      staffNumber: '424999',
+      department: 'Ground Operations',
+      designation: 'Operations Assistant',
+      contactNumber: '071 999 8877',
+      nic: '955551234V'
+    },
+    {
       username: 'sectional@ul.com',
       password: 'sectional123',
       role: 'sectional_manager',

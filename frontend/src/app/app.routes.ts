@@ -1,11 +1,16 @@
 import { Routes } from '@angular/router';
 import { ApplicantDashboardComponent } from './applicant/applicant-dashboard.component';
 import { applicantGuard } from './guards/applicant.guard';
+import { doctorGuard } from './guards/doctor.guard';
 import { nurseGuard } from './guards/nurse.guard';
 import { sectionalManagerGuard } from './guards/sectional-manager.guard';
 import { safetyManagerGuard } from './guards/safety-manager.guard';
 import { trainerGuard } from './guards/trainer.guard';
 import { LoginComponent } from './login/login.component';
+import { DoctorApplicationDetailComponent } from './doctor/doctor-application-detail.component';
+import { DoctorDashboardComponent } from './doctor/doctor-dashboard.component';
+import { DoctorLayoutComponent } from './doctor/doctor-layout.component';
+import { DoctorRequestsComponent } from './doctor/doctor-requests.component';
 import { NurseApplicationDetailComponent } from './nurse/nurse-application-detail.component';
 import { NurseDashboardComponent } from './nurse/nurse-dashboard.component';
 import { NurseLayoutComponent } from './nurse/nurse-layout.component';
@@ -86,6 +91,20 @@ export const routes: Routes = [
       { path: 'requests', component: TrainerRequestsComponent, data: { mode: 'requests' } },
       { path: 'rejected', component: TrainerRequestsComponent, data: { mode: 'rejected' } },
       { path: 'application/:id', component: TrainerApplicationDetailComponent }
+    ]
+  },
+
+  // Doctor routes
+  {
+    path: 'doctor',
+    canActivate: [doctorGuard],
+    component: DoctorLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DoctorDashboardComponent },
+      { path: 'requests', component: DoctorRequestsComponent },
+      { path: 'rejected', component: DoctorRequestsComponent, data: { mode: 'rejected' } },
+      { path: 'application/:id', component: DoctorApplicationDetailComponent }
     ]
   },
 

@@ -40,6 +40,27 @@
 
   <!-- Page content area (centered) -->
   <div class="page-body">
+    <!-- License Approved Banner -->
+    <div class="license-approved-banner" *ngIf="showLicenseApprovedBanner">
+      <div class="banner-left">
+        <span class="banner-icon" aria-hidden="true">🎉</span>
+        <div class="banner-text">
+          <p class="banner-title">License Approved</p>
+          <p class="banner-message">
+            Your license is now ready for collection. Kindly collect it from the Safety Office.
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="banner-close"
+        aria-label="Dismiss license approved message"
+        (click)="dismissLicenseApprovedBanner()">
+        ×
+      </button>
+    </div>
+
     <!-- Previously Submitted Requests Box -->
     <div class="history-box">
       <div class="history-box-header">
@@ -86,7 +107,13 @@
         <section class="form-section" [class.collapsed]="collapsedSections.basic">
           <header class="section-header">
             <h2>Basic Information</h2>
-            <button type="button" class="collapse-btn" (click)="toggleSection('basic')">
+            <button
+              type="button"
+              class="collapse-btn"
+              (click)="toggleSection('basic')"
+              aria-label="Toggle Basic Information section"
+              title="Toggle Basic Information section"
+              [attr.aria-expanded]="!collapsedSections.basic">
               <span class="chevron" [class.open]="!collapsedSections.basic"></span>
             </button>
           </header>
@@ -177,7 +204,13 @@
         <section class="form-section" [class.collapsed]="collapsedSections.personal">
           <header class="section-header">
             <h2>Personal Information</h2>
-            <button type="button" class="collapse-btn" (click)="toggleSection('personal')">
+            <button
+              type="button"
+              class="collapse-btn"
+              (click)="toggleSection('personal')"
+              aria-label="Toggle Personal Information section"
+              title="Toggle Personal Information section"
+              [attr.aria-expanded]="!collapsedSections.personal">
               <span class="chevron" [class.open]="!collapsedSections.personal"></span>
             </button>
           </header>
@@ -258,7 +291,13 @@
         <section class="form-section" [class.collapsed]="collapsedSections.license">
           <header class="section-header">
             <h2>License Information</h2>
-            <button type="button" class="collapse-btn" (click)="toggleSection('license')">
+            <button
+              type="button"
+              class="collapse-btn"
+              (click)="toggleSection('license')"
+              aria-label="Toggle License Information section"
+              title="Toggle License Information section"
+              [attr.aria-expanded]="!collapsedSections.license">
               <span class="chevron" [class.open]="!collapsedSections.license"></span>
             </button>
           </header>
@@ -303,7 +342,13 @@
         <section class="form-section" [class.collapsed]="collapsedSections.attachments">
           <header class="section-header">
             <h2>Attachments</h2>
-            <button type="button" class="collapse-btn" (click)="toggleSection('attachments')">
+            <button
+              type="button"
+              class="collapse-btn"
+              (click)="toggleSection('attachments')"
+              aria-label="Toggle Attachments section"
+              title="Toggle Attachments section"
+              [attr.aria-expanded]="!collapsedSections.attachments">
               <span class="chevron" [class.open]="!collapsedSections.attachments"></span>
             </button>
           </header>

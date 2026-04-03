@@ -334,6 +334,241 @@ export class ApplicationsService {
         assignedDate: '2026-03-06',
         status: 'pending'
       }
+    },
+    {
+      // Doctor demo request: already completed by Nurse, awaiting Doctor evaluation
+      id: 'seed-4',
+      referenceNumber: 'AL-2026-1004',
+      submittedDate: '2026-03-07',
+      status: 'medical_completed',
+      applicantName: 'Sachini Fernando',
+      staffNumber: '424001',
+      department: 'Ramp Operations',
+      designation: 'Ramp Agent',
+      contactNumber: '071 333 4455',
+      nic: '945667889V',
+      licenseType: 'new',
+      aaslAccessNo: 'AASL-33445',
+      aaslAccessExpiry: '2027-11-30',
+      stateLicenseNo: 'B7744112',
+      stateLicenseIssueDate: '2021-09-25',
+      stateLicenseExpiryDate: '2029-09-25',
+      selectedCategories: ['tractor', 'van', 'car'],
+      approvedCategories: ['tractor', 'van', 'car'],
+      attachments: {
+        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
+      },
+      sectionalManagerId: 'STF002',
+      sectionalManagerName: 'Kamala Silva',
+      sectionalApprovalDate: '2026-03-08',
+      safetyManagerId: 'STF003',
+      safetyManagerName: 'Nimal Fernando',
+      safetyApprovalDate: '2026-03-09',
+      orientation: {
+        classDate: '2026-03-10',
+        className: 'Orientation Class B',
+        instructor: 'Officer Jayasinghe',
+        status: 'completed'
+      },
+      practical: {
+        date: '2026-03-11',
+        trainer: 'Sunil Jayawardena',
+        status: 'completed'
+      },
+      medical: {
+        assignedDate: '2026-03-12',
+        status: 'completed'
+      },
+      medicalTest: {
+        eyesight: 'passed',
+        colourBlindness: 'passed',
+        generalHealth: 'passed',
+        eyesightRemarks: 'Within normal limits',
+        colourBlindnessRemarks: 'No findings',
+        generalHealthRemarks: 'Fit for duty',
+        remarks: 'Cleared for evaluation by doctor.',
+        nurseId: 'STF005',
+        nurseName: 'Malini Rathnayake',
+        submittedDate: '2026-03-12'
+      }
+    },
+    {
+      // Safety manager demo request: doctor approved, awaiting practical attachment validation + license issuance
+      id: 'seed-5',
+      referenceNumber: 'AL-2026-1005',
+      submittedDate: '2026-03-13',
+      status: 'doctor_approved',
+      applicantName: 'Dinuka Abeysekara',
+      staffNumber: '424550',
+      department: 'Ground Operations',
+      designation: 'Operations Officer',
+      contactNumber: '077 555 6677',
+      nic: '933221100V',
+      licenseType: 'extension',
+      currentAdpNo: 'ADP-2025-7788',
+      dateOfFirstIssue: '2025-01-15',
+      aaslAccessNo: 'AASL-77889',
+      aaslAccessExpiry: '2027-12-31',
+      stateLicenseNo: 'B6622001',
+      stateLicenseIssueDate: '2019-04-20',
+      stateLicenseExpiryDate: '2027-04-20',
+      selectedCategories: ['transporter', 'paxCoach', 'buggy'],
+      approvedCategories: ['transporter', 'paxCoach', 'buggy'],
+      attachments: {
+        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
+      },
+      sectionalManagerId: 'STF002',
+      sectionalManagerName: 'Kamala Silva',
+      sectionalApprovalDate: '2026-03-13',
+      safetyManagerId: 'STF003',
+      safetyManagerName: 'Nimal Fernando',
+      safetyApprovalDate: '2026-03-14',
+      safetyRemarks: 'No comment added.',
+      orientation: {
+        classDate: '2026-03-15',
+        className: 'Class Room 15',
+        instructor: 'Officer Jayasinghe',
+        status: 'completed'
+      },
+      practical: {
+        date: '2026-03-16',
+        trainer: 'Amila Kanchana (21322)',
+        status: 'completed'
+      },
+      trainer: {
+        result: 'pass',
+        remarks: 'User passed all the trainings',
+        reportName: 'userTraining.png',
+        report: { name: 'userTraining.png', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        reportUploadedAt: '2026-03-16'
+      },
+      medical: {
+        assignedDate: '2026-03-17',
+        status: 'completed'
+      },
+      medicalTest: {
+        eyesight: 'passed',
+        colourBlindness: 'passed',
+        generalHealth: 'passed',
+        eyesightRemarks: 'Remark',
+        colourBlindnessRemarks: 'Remark',
+        generalHealthRemarks: 'Remark',
+        remarks: 'Cleared for evaluation by doctor.',
+        nurseId: 'STF005',
+        nurseName: 'Malini Rathnayake',
+        submittedDate: '2026-03-17'
+      },
+      doctorReview: {
+        fit: true,
+        remarks: 'This user is eligible for the license',
+        doctorId: 'STF006',
+        doctorName: 'Dr. Ranjan Wijesinghe',
+        reviewedDate: '2026-03-18'
+      }
+    },
+    {
+      // Applicant demo: license issued (shows "License Approved" banner in applicant portal)
+      id: 'seed-6',
+      referenceNumber: 'AL-2026-1006',
+      submittedDate: '2026-03-20',
+      status: 'license_issued',
+      applicantName: 'Nadeesha Wijeratne',
+      staffNumber: '424999',
+      department: 'Ground Operations',
+      designation: 'Operations Assistant',
+      contactNumber: '071 999 8877',
+      nic: '955551234V',
+      licenseType: 'new',
+      aaslAccessNo: 'AASL-99001',
+      aaslAccessExpiry: '2027-10-31',
+      stateLicenseNo: 'B9900112',
+      stateLicenseIssueDate: '2021-01-05',
+      stateLicenseExpiryDate: '2029-01-05',
+      selectedCategories: ['tractor', 'van', 'car'],
+      approvedCategories: ['tractor', 'van', 'car'],
+      attachments: {
+        staffIdFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        staffIdBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        stateLicenseBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        aviationPassBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicFront: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        nicBack: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' },
+        signature: { name: 'login-airport.jpg', type: 'jpg', url: '/assets/images/login-airport.jpg' }
+      },
+      sectionalManagerId: 'STF002',
+      sectionalManagerName: 'Kamala Silva',
+      sectionalApprovalDate: '2026-03-20',
+      safetyManagerId: 'STF003',
+      safetyManagerName: 'Nimal Fernando',
+      safetyApprovalDate: '2026-03-20',
+      safetyRemarks: 'No comment added.',
+      orientation: {
+        classDate: '2026-03-21',
+        className: 'Class Room 15',
+        instructor: 'Officer Jayasinghe',
+        status: 'completed'
+      },
+      practical: {
+        date: '2026-03-22',
+        trainer: 'Amila Kanchana (21322)',
+        status: 'completed'
+      },
+      trainer: {
+        result: 'pass',
+        remarks: 'User passed all the trainings',
+        reportName: 'userTraining.pdf',
+        report: { name: 'userTraining.pdf', type: 'pdf', url: '/assets/images/login-airport.jpg' },
+        reportUploadedAt: '2026-03-22'
+      },
+      medical: {
+        assignedDate: '2026-03-23',
+        status: 'completed'
+      },
+      medicalTest: {
+        eyesight: 'passed',
+        colourBlindness: 'passed',
+        generalHealth: 'passed',
+        eyesightRemarks: 'Remark',
+        colourBlindnessRemarks: 'Remark',
+        generalHealthRemarks: 'Remark',
+        remarks: 'Cleared for evaluation by doctor.',
+        nurseId: 'STF005',
+        nurseName: 'Malini Rathnayake',
+        submittedDate: '2026-03-23'
+      },
+      doctorReview: {
+        fit: true,
+        remarks: 'This user is eligible for the license',
+        doctorId: 'STF006',
+        doctorName: 'Dr. Ranjan Wijesinghe',
+        reviewedDate: '2026-03-24'
+      },
+      safetyOfficerReview: {
+        practicalAttachmentsValidated: true,
+        remarks: 'Attachments accepted',
+        officerId: 'STF007',
+        officerName: 'Shanika Perera',
+        validatedDate: '2026-03-25',
+        issuedDate: '2026-03-25'
+      }
     }
   ];
 
@@ -384,7 +619,7 @@ export class ApplicationsService {
   }
 
   private buildSeedApplications(): Application[] {
-    // Minimal seed: 2 applications only.
+    // Minimal seed: a few demo applications so each role can test their queue.
     return [...this.mockApplications];
   }
 
@@ -680,6 +915,10 @@ export class ApplicationsService {
       const events: SummaryEvent[] = [];
       const review = app.doctorReview;
 
+      if (!review && app.status === 'medical_completed') {
+        pushEvent(events, 'Awaiting evaluation', app.medicalTest?.submittedDate);
+      }
+
       if (review?.reviewedDate) {
         pushEvent(events, review.fit ? 'Request Accepted' : 'Request Rejected', review.reviewedDate);
       }
@@ -691,6 +930,12 @@ export class ApplicationsService {
         pushGroup({
           actor: review?.doctorName || 'Doctor',
           staffId: review?.doctorId,
+          role: 'Doctor',
+          events
+        });
+      } else if (!review && events.length) {
+        pushGroup({
+          actor: 'Doctor',
           role: 'Doctor',
           events
         });

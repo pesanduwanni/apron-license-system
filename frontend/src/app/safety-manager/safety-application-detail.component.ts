@@ -26,6 +26,9 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   showOrientationNotCompletedBox = false;
   orientationNotCompletedReason = '';
 
+  showLicenseRejectBox = false;
+  licenseRejectReason = '';
+
   successMessage = '';
   errorMessage = '';
 
@@ -183,6 +186,26 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
     return !!this.application && this.application.status === 'license_issued';
   }
 
+  get isLicenseRejected(): boolean {
+    return !!this.application && this.application.status === 'license_rejected';
+  }
+
+  get isSafetyOfficerStage(): boolean {
+    return !!this.application && ['doctor_approved', 'license_rejected', 'license_issued'].includes(this.application.status);
+  }
+
+  get practicalAttachmentsValidated(): boolean {
+    return !!this.application?.safetyOfficerReview?.practicalAttachmentsValidated;
+  }
+
+  get canValidatePracticalAttachments(): boolean {
+    return !!this.application && this.application.status === 'doctor_approved' && !this.isLicenseIssued;
+  }
+
+  get canIssueLicense(): boolean {
+    return !!this.application && this.application.status === 'doctor_approved' && this.practicalAttachmentsValidated && !this.isLicenseIssued;
+  }
+
   get isSafetyRejected(): boolean {
     return this.application?.status === 'rejected_safety';
   }
@@ -207,6 +230,15 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
 
   get trainerReportName(): string {
     return this.application?.trainer?.report?.name || this.application?.trainer?.reportName || '';
+  }
+
+  get trainerOutcome(): 'pass' | 'fail' | null {
+    if (!this.application) return null;
+    if (this.application.trainer?.result) return this.application.trainer.result;
+    const practicalStatus = this.application.practical?.status;
+    if (practicalStatus === 'completed') return 'pass';
+    if (practicalStatus === 'not_completed') return 'fail';
+    return null;
   }
 
   get hasTrainerReport(): boolean {
@@ -280,6 +312,117 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
       this.rejectReason = '';
     } else {
       this.errorMessage = 'Failed to reject application.';
+    }
+  }
+
+  acceptPracticalAttachments(): void {
+    if (!this.application || !this.user) return;
+    if (!this.canValidatePracticalAttachments) return;
+
+    const success = this.applicationsService.validatePracticalAttachments(
+      this.application.id,
+      this.user.staffNumber,
+      this.user.name,
+      true
+    );
+
+    if (success) {
+      console.log('Email: Practical attachments accepted for applicant', this.application.applicantName, this.application.referenceNumber);
+      this.successMessage = 'Attachments accepted. Email sent to applicant.';
+      this.application = this.applicationsService.getApplicationById(this.application.id) || null;
+      this.showLicenseRejectBox = false;
+      this.licenseRejectReason = '';
+    } else {
+      this.errorMessage = 'Failed to accept attachments.';
+    }
+  }
+
+  startLicenseReject(): void {
+    this.showLicenseRejectBox = true;
+  }
+
+  cancelLicenseReject(): void {
+    this.showLicenseRejectBox = false;
+    this.licenseRejectReason = '';
+  }
+
+  confirmLicenseReject(): void {
+    if (!this.application || !this.user || !this.licenseRejectReason.trim()) return;
+    if (!this.canValidatePracticalAttachments) return;
+
+    const reason = this.licenseRejectReason.trim();
+    const success = this.applicationsService.validatePracticalAttachments(
+      this.application.id,
+      this.user.staffNumber,
+      this.user.name,
+      false,
+      reason
+    );
+
+    this.showLicenseRejectBox = false;
+
+    if (success) {
+      console.log('Email: Applicant rejected after attachment validation', this.application.applicantName, this.application.referenceNumber, reason);
+      this.successMessage = 'Applicant rejected. Email sent to applicant.';
+      this.application = this.applicationsService.getApplicationById(this.application.id) || null;
+      this.licenseRejectReason = '';
+    } else {
+      this.errorMessage = 'Failed to reject applicant.';
+    }
+  }
+
+  issueLicense(): void {
+    if (!this.application || !this.user) return;
+    if (!this.canIssueLicense) return;
+
+    const success = this.applicationsService.issueDigitalLicense(
+      this.application.id,
+      this.user.staffNumber,
+      this.user.name
+    );
+
+    if (success) {
+      console.log('Email: Digital license issued to applicant', this.application.applicantName, this.application.referenceNumber);
+      this.successMessage = 'Digital license issued. Email notification sent to applicant.';
+      this.application = this.applicationsService.getApplicationById(this.application.id) || null;
+    } else {
+      this.errorMessage = 'Failed to issue digital license.';
+    }
+  }
+
+  approveLicense(): void {
+    if (!this.application || !this.user) return;
+    if (this.application.status !== 'doctor_approved') return;
+    if (this.isLicenseIssued) return;
+
+    // Final-stage approval: validate the practical attachments (if not already done)
+    // and issue the digital license.
+    if (!this.practicalAttachmentsValidated) {
+      const validated = this.applicationsService.validatePracticalAttachments(
+        this.application.id,
+        this.user.staffNumber,
+        this.user.name,
+        true
+      );
+
+      if (!validated) {
+        this.errorMessage = 'Failed to approve license.';
+        return;
+      }
+    }
+
+    const issued = this.applicationsService.issueDigitalLicense(
+      this.application.id,
+      this.user.staffNumber,
+      this.user.name
+    );
+
+    if (issued) {
+      console.log('Email: Digital license issued to applicant', this.application.applicantName, this.application.referenceNumber);
+      this.successMessage = 'Digital license issued. Email notification sent to applicant.';
+      this.application = this.applicationsService.getApplicationById(this.application.id) || null;
+    } else {
+      this.errorMessage = 'Failed to approve license.';
     }
   }
 

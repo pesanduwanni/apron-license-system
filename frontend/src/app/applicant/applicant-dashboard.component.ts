@@ -44,6 +44,10 @@ export class ApplicantDashboardComponent implements OnInit {
   formStatus: 'idle' | 'saving' | 'submitted' = 'idle';
   user: User | null = null;
 
+  showLicenseApprovedBanner = false;
+  licenseIssuedApplication: Application | null = null;
+  private readonly licenseBannerDismissKeyPrefix = 'licenseApprovedBannerDismissed';
+
   readonly todayIso = this.toIsoDate(new Date());
   readonly tomorrowIso = this.toIsoDate(this.addDays(new Date(), 1));
 
@@ -195,15 +199,36 @@ export class ApplicantDashboardComponent implements OnInit {
     this.prefillFormValues();
 
     if (this.user) {
-      this.historyEntries = this.applicationsService
-        .getApplicationsForApplicant(this.user.staffNumber)
-        .map((app): RequestHistory => {
+      const applications = this.applicationsService.getApplicationsForApplicant(this.user.staffNumber);
+
+      this.licenseIssuedApplication = applications
+        .filter((app) => app.status === 'license_issued')
+        .sort((a, b) => new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime())[0] ?? null;
+
+      if (this.licenseIssuedApplication) {
+        const dismissKey = `${this.licenseBannerDismissKeyPrefix}:${this.licenseIssuedApplication.referenceNumber}`;
+        this.showLicenseApprovedBanner = localStorage.getItem(dismissKey) !== '1';
+      }
+
+      this.historyEntries = applications.map((app): RequestHistory => {
           const status: RequestHistory['status'] =
-            app.status.includes('rejected') ? 'Rejected' : app.status.includes('approved') ? 'Approved' : 'Pending';
+            app.status.includes('rejected')
+              ? 'Rejected'
+              : app.status.includes('approved') || app.status === 'license_issued'
+                ? 'Approved'
+                : 'Pending';
           const licenseType = app.licenseType === 'extension' ? 'Extension License' : 'New License';
           return { id: app.referenceNumber, submittedOn: app.submittedDate, status, licenseType };
         });
     }
+  }
+
+  dismissLicenseApprovedBanner(): void {
+    if (this.licenseIssuedApplication) {
+      const dismissKey = `${this.licenseBannerDismissKeyPrefix}:${this.licenseIssuedApplication.referenceNumber}`;
+      localStorage.setItem(dismissKey, '1');
+    }
+    this.showLicenseApprovedBanner = false;
   }
 
   private fileToAttachment(file: File): Promise<Attachment> {

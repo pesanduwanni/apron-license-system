@@ -1,0 +1,51 @@
+<div class="dashboard" *ngIf="user">
+  <div class="dashboard-header">
+    <div>
+      <h1>Doctor Dashboard</h1>
+      <p>Review medical results and evaluate applicant fitness.</p>
+    </div>
+    <button class="btn btn-primary" (click)="goToRequests()">View Requests</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Pending Evaluations</div>
+      <div class="stat-value">{{ pendingCount }}</div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <h2>Recent Requests</h2>
+    </div>
+
+    <div class="empty" *ngIf="filteredApplications.length === 0">
+      No requests available.
+    </div>
+
+    <table class="table" *ngIf="filteredApplications.length > 0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Reference</th>
+          <th>Applicant</th>
+          <th>Staff No</th>
+          <th>Medical submitted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let app of filteredApplications; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ app.referenceNumber }}</td>
+          <td>{{ app.applicantName }}</td>
+          <td>{{ app.staffNumber }}</td>
+          <td>{{ formatDate(app.medicalTest?.submittedDate || app.submittedDate) }}</td>
+          <td>
+            <button class="btn btn-link" (click)="viewApplication(app)">View</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

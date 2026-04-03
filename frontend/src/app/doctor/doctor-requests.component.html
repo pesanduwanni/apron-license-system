@@ -18,58 +18,34 @@
     </div>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs-wrapper" *ngIf="mode === 'requests'">
-    <div class="tabs-container">
-      <button 
-        class="tab" 
-        [class.active]="activeTab === 'all'" 
-        (click)="setTab('all')">
-        All
-      </button>
-      <button 
-        class="tab" 
-        [class.active]="activeTab === 'newext'" 
-        (click)="setTab('newext')">
-        New / Ext
-      </button>
-      <button 
-        class="tab" 
-        [class.active]="activeTab === 'ongoing'" 
-        (click)="setTab('ongoing')">
-        On going
-      </button>
-    </div>
-  </div>
-  <!-- Applications List -->
   <div class="applications-list" *ngIf="filteredApplications.length; else emptyState">
     <div class="application-row" *ngFor="let app of filteredApplications; let i = index">
       <div class="row-number">{{ getItemIndex(i) }}.</div>
-      
+
       <div class="ref-info">
         <span class="ref-number">{{ app.referenceNumber }}</span>
         <span class="ref-label">(Ref No)</span>
       </div>
-      
+
       <div class="applicant-info">
         <span class="applicant-name">{{ app.applicantName }}</span>
         <span class="applicant-id">({{ app.staffNumber }})</span>
       </div>
-      
+
       <div class="department-info">
         <span class="department-name">{{ app.department }}</span>
         <span class="department-label">Department</span>
       </div>
-      
+
       <div class="date-info">
-        <span class="date-value">{{ app.submittedDate | date: 'dd-MM-yyyy' }}</span>
-        <span class="date-label">Requested date</span>
+        <span class="date-value">{{ getDisplayDate(app) | date: 'dd-MM-yyyy' }}</span>
+        <span class="date-label">{{ getDisplayDateLabel() }}</span>
       </div>
-      
-      <div class="status-badge" [ngClass]="getChipClass(app)">
-        {{ getChipLabel(app) }}
+
+      <div class="status-badge" [ngClass]="getChipClass()">
+        {{ getChipLabel() }}
       </div>
-      
+
       <button class="view-btn" (click)="viewApplication(app)">View Form</button>
     </div>
   </div>
@@ -78,31 +54,25 @@
     <div class="empty-state">No applications found.</div>
   </ng-template>
 
-  <!-- Pagination -->
   <div class="pagination" *ngIf="totalPages > 1">
-    <button 
-      class="page-nav prev" 
-      [disabled]="currentPage === 1" 
-      (click)="goToPage(currentPage - 1)">
+    <button class="page-nav prev" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
       <span class="arrow">←</span> Previous
     </button>
-    
+
     <div class="page-numbers">
-      <button 
-        *ngFor="let page of getPageNumbers()" 
+      <button
+        *ngFor="let page of getPageNumbers()"
         class="page-num"
         [class.active]="page === currentPage"
         [class.ellipsis]="page === -1"
         [disabled]="page === -1"
-        (click)="page !== -1 && goToPage(page)">
+        (click)="page !== -1 && goToPage(page)"
+      >
         {{ page === -1 ? '...' : page }}
       </button>
     </div>
-    
-    <button 
-      class="page-nav next" 
-      [disabled]="currentPage === totalPages" 
-      (click)="goToPage(currentPage + 1)">
+
+    <button class="page-nav next" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
       Next <span class="arrow">→</span>
     </button>
   </div>

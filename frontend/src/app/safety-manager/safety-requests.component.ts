@@ -68,12 +68,23 @@ export class SafetyRequestsComponent implements OnInit {
     const all = this.appsService.getApplicationsForSafetyManager(this.user.staffNumber);
 
     if (this.mode === 'requests') {
-      this.applications = all.filter(app => app.status !== 'rejected_safety');
+      // Requests view excludes anything rejected at either safety stage.
+      this.applications = all.filter(app => !['rejected_safety', 'license_rejected'].includes(app.status));
     } else {
-      this.applications = all.filter(app => app.status === 'rejected_safety');
+      // Rejected view includes both initial safety rejection and final-stage (license) rejection.
+      this.applications = all.filter(app => ['rejected_safety', 'license_rejected'].includes(app.status));
     }
 
     this.applyFilters();
+  }
+
+  private getSortDate(app: Application): string {
+    // When the doctor approves, this becomes a *new* final-stage task for safety.
+    // Use doctor reviewed date so it bubbles up as “new”.
+    if (app.status === 'doctor_approved') {
+      return app.doctorReview?.reviewedDate || app.medicalTest?.submittedDate || app.submittedDate;
+    }
+    return app.submittedDate;
   }
 
   applyFilters(): void {
@@ -91,17 +102,30 @@ export class SafetyRequestsComponent implements OnInit {
 
     if (this.mode === 'requests') {
       if (this.activeTab === 'newext') {
-        result = result.filter(app => ['approved_sectional', 'pending_safety'].includes(app.status));
+        // Safety manager receives applications in two stages:
+        // 1) Sectional manager approved -> attachments validation
+        // 2) Doctor approved -> final-stage approval/issuance
+        result = result.filter(app => ['approved_sectional', 'pending_safety', 'doctor_approved'].includes(app.status));
       } else if (this.activeTab === 'ongoing') {
         result = result.filter(app =>
-          ['orientation_assigned', 'orientation_completed', 'practical_assigned', 'practical_completed', 'medical_pending', 'medical_completed'].includes(app.status)
+          [
+            'approved_safety',
+            'orientation_assigned',
+            'orientation_completed',
+            'practical_assigned',
+            'practical_completed',
+            'medical_pending',
+            'medical_completed',
+            'license_rejected',
+            'license_issued'
+          ].includes(app.status)
         );
       }
     }
 
     result.sort((a, b) => {
-      const da = new Date(a.submittedDate).getTime();
-      const db = new Date(b.submittedDate).getTime();
+      const da = new Date(this.getSortDate(a)).getTime();
+      const db = new Date(this.getSortDate(b)).getTime();
       return this.sortOrder === 'desc' ? db - da : da - db;
     });
 
@@ -154,6 +178,13 @@ export class SafetyRequestsComponent implements OnInit {
         return 'Medical Pending';
       case 'medical_completed':
         return 'Medical Completed';
+      case 'doctor_approved':
+        // Final-stage task for safety manager
+        return 'Final Approval';
+      case 'license_rejected':
+        return 'License Rejected';
+      case 'license_issued':
+        return 'License Issued';
       case 'rejected_safety':
         return 'Rejected';
       default:
@@ -170,12 +201,15 @@ export class SafetyRequestsComponent implements OnInit {
         app.status === 'practical_completed' ||
         app.status === 'medical_pending' ||
         app.status === 'medical_completed' ||
-        app.status === 'doctor_approved' ||
         app.status === 'license_issued') {
       return 'ongoing';
     }
-    if (app.status === 'rejected_safety') {
+    if (app.status === 'rejected_safety' || app.status === 'license_rejected') {
       return 'rejected';
+    }
+    // Doctor approved should appear as a new final-stage task.
+    if (app.status === 'doctor_approved') {
+      return 'new';
     }
     if (app.licenseType === 'extension') {
       return 'extension';
