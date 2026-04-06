@@ -127,7 +127,7 @@
           <div class="field-grid-3">
             <div class="field">
               <label>Date Participation of Safety Orientation</label>
-              <div class="field-value">—</div>
+              <div class="field-value">{{ application.safetyOrientationDate ? formatDate(application.safetyOrientationDate) : '—' }}</div>
             </div>
             <div class="field">
               <label>AASL Access Permit Expiry Date</label>

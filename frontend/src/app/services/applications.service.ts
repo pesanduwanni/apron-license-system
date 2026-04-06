@@ -59,6 +59,8 @@ export interface Application {
   licenseType: 'new' | 'extension';
   currentAdpNo?: string;
   dateOfFirstIssue?: string;
+  // Date participation of Safety Orientation (provided by applicant)
+  safetyOrientationDate?: string;
   aaslAccessNo: string;
   aaslAccessExpiry: string;
   stateLicenseNo: string;
@@ -174,6 +176,46 @@ export interface Application {
 })
 export class ApplicationsService {
   private readonly storageKey = 'applications';
+
+  private normalizeCategoryKey(rawKey: string): string {
+    const key = String(rawKey || '').trim();
+    if (!key) return '';
+
+    const canonical = new Set(this.vehicleCategories.map((c) => c.key));
+    if (canonical.has(key)) return key;
+
+    const normalize = (v: string) => v.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    const lookup = new Map<string, string>();
+    this.vehicleCategories.forEach((c) => lookup.set(normalize(c.key), c.key));
+
+    return lookup.get(normalize(key)) ?? key;
+  }
+
+  private normalizeCategories(keys: string[] | undefined): string[] | undefined {
+    if (!Array.isArray(keys)) return keys;
+    const next = keys
+      .map((k) => this.normalizeCategoryKey(k))
+      .filter((k) => !!k);
+    // de-dupe while preserving order
+    return Array.from(new Set(next));
+  }
+
+  private normalizeApplication(app: Application): Application {
+    const normalized: Application = {
+      ...app,
+      selectedCategories: this.normalizeCategories(app.selectedCategories) || [],
+      approvedCategories: this.normalizeCategories(app.approvedCategories)
+    };
+
+    // If an application is only forwarded/assigned to safety, it has not been approved by safety yet.
+    // Clear any stale fields left over from previous mock logic.
+    if (normalized.status === 'pending_safety') {
+      delete normalized.safetyApprovalDate;
+      delete normalized.safetyRemarks;
+    }
+
+    return normalized;
+  }
 
   private readonly safetyPipelineStatuses: ApplicationStatus[] = [
     'approved_sectional',
@@ -612,7 +654,7 @@ export class ApplicationsService {
       if (!raw) return null;
       const parsed = JSON.parse(raw) as StorageApplication[];
       if (!Array.isArray(parsed)) return null;
-      return parsed;
+      return parsed.map((a) => this.normalizeApplication(a as Application));
     } catch {
       return null;
     }
@@ -628,6 +670,20 @@ export class ApplicationsService {
     this.applicationsSubject.next([]);
   }
 
+  /**
+   * Remove all applications for a given applicant staff number.
+   * Returns the number of removed records.
+   */
+  removeApplicationsForApplicant(staffNumber: string): number {
+    const current = this.getApplications();
+    const next = current.filter((app) => app.staffNumber !== staffNumber);
+    const removed = current.length - next.length;
+    if (removed > 0) {
+      this.saveApplications(next);
+    }
+    return removed;
+  }
+
   private saveApplications(apps: Application[]): void {
     localStorage.setItem(this.storageKey, JSON.stringify(apps));
     this.applicationsSubject.next(apps);
@@ -636,7 +692,7 @@ export class ApplicationsService {
   createApplication(payload: Omit<Application, 'id'> & { id?: string }): Application {
     const apps = this.getApplications();
     const id = payload.id ?? this.generateId();
-    const app: Application = { ...payload, id };
+    const app: Application = this.normalizeApplication({ ...payload, id } as Application);
     this.saveApplications([app, ...apps]);
     return app;
   }
@@ -707,12 +763,28 @@ export class ApplicationsService {
     const idx = apps.findIndex(a => a.id === appId);
     if (idx === -1) return false;
 
-    apps[idx].approvedCategories = categories;
+    apps[idx].approvedCategories = this.normalizeCategories(categories) || categories;
     apps[idx].sectionalRemarks = remarks;
     apps[idx].sectionalManagerId = managerId;
     apps[idx].sectionalManagerName = managerName;
     // Track category update separately from the approve/reject decision date.
     apps[idx].sectionalUpdatedDate = new Date().toISOString();
+    this.saveApplications(apps);
+    return true;
+  }
+
+  // Forward application to Safety Manager queue (after sectional approval)
+  forwardToSafetyManager(appId: string, safetyManagerId: string, safetyManagerName: string): boolean {
+    const apps = this.getApplications();
+    const idx = apps.findIndex((a) => a.id === appId);
+    if (idx === -1) return false;
+
+    apps[idx].status = 'pending_safety';
+    apps[idx].safetyManagerId = safetyManagerId;
+    apps[idx].safetyManagerName = safetyManagerName;
+    // Ensure this transition does not accidentally look like a safety approval.
+    delete apps[idx].safetyApprovalDate;
+    delete apps[idx].safetyRemarks;
     this.saveApplications(apps);
     return true;
   }
@@ -801,13 +873,13 @@ export class ApplicationsService {
         pushEvent(events, 'Upload reports', app.trainer.reportUploadedAt);
       }
 
-      if (app.safetyApprovalDate) {
-        const message = app.status === 'rejected_safety' ? 'Request Rejected' : 'Request Accepted';
+      if (app.safetyApprovalDate && app.status !== 'pending_safety') {
+        const message = app.status === 'rejected_safety' ? 'Request Rejected' : 'Validate attachments';
         pushEvent(events, message, app.safetyApprovalDate);
-      }
 
-      if (app.safetyRemarks) {
-        pushEvent(events, 'Comment added', app.safetyApprovalDate);
+        if (app.safetyRemarks) {
+          pushEvent(events, 'Comment added', app.safetyApprovalDate);
+        }
       }
 
       // Orientation
@@ -835,6 +907,9 @@ export class ApplicationsService {
       // Medical assignment
       if (app.medical?.assignedDate) {
         pushEvent(events, 'Sent to Medical', app.medical.assignedDate);
+      } else if (app.status === 'medical_pending') {
+        // Backward compatibility: some records may have the status set without the medical block.
+        pushEvent(events, 'Sent to Medical', app.practical?.date || app.submittedDate);
       }
 
       if ((app.safetyManagerName || app.safetyManagerId) && events.length) {
@@ -986,7 +1061,7 @@ export class ApplicationsService {
     apps[idx].sectionalManagerId = managerId;
     apps[idx].sectionalManagerName = managerName;
     apps[idx].sectionalApprovalDate = new Date().toISOString();
-    apps[idx].approvedCategories = categories;
+    apps[idx].approvedCategories = this.normalizeCategories(categories) || categories;
     if (remarks) {
       apps[idx].sectionalRemarks = remarks;
     }
@@ -1025,6 +1100,11 @@ export class ApplicationsService {
     const idx = apps.findIndex(a => a.id === appId);
     if (idx === -1) return false;
 
+    // Only allow safety acceptance during the attachment validation stage.
+    if (!['approved_sectional', 'pending_safety'].includes(apps[idx].status)) {
+      return false;
+    }
+
     // Safety manager accepted the application -> mark as approved by safety
     apps[idx].status = 'approved_safety';
     apps[idx].safetyManagerId = managerId;
@@ -1047,6 +1127,11 @@ export class ApplicationsService {
     const apps = this.getApplications();
     const idx = apps.findIndex(a => a.id === appId);
     if (idx === -1) return false;
+
+    // Only allow safety rejection during the attachment validation stage.
+    if (!['approved_sectional', 'pending_safety'].includes(apps[idx].status)) {
+      return false;
+    }
 
     apps[idx].status = 'rejected_safety';
     apps[idx].safetyManagerId = managerId;
@@ -1139,15 +1224,30 @@ export class ApplicationsService {
   }
 
   sendForMedical(appId: string, assignedDate: string): boolean {
-    const apps = this.getApplications();
+    const apps = [...this.getApplications()];
     const idx = apps.findIndex(a => a.id === appId);
     if (idx === -1) return false;
 
-    apps[idx].medical = {
+    const current = apps[idx];
+    const practicalStatus = current.practical?.status;
+    const canSend = current.status === 'practical_completed' || practicalStatus === 'completed';
+    if (!canSend) return false;
+
+    // Clone & update to ensure change detection reliably updates all views.
+    const next: Application = { ...current };
+    next.medical = {
+      ...(current.medical || {}),
       assignedDate,
       status: 'pending'
     };
-    apps[idx].status = 'medical_pending';
+    next.status = 'medical_pending';
+
+    // Clear downstream stages if the application is being re-sent.
+    delete next.medicalTest;
+    delete next.doctorReview;
+    delete next.safetyOfficerReview;
+
+    apps[idx] = next;
     this.saveApplications(apps);
     return true;
   }

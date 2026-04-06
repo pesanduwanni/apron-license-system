@@ -29,15 +29,17 @@
     </header>
 
     <ul class="recent-list">
-      <li class="recent-row" *ngFor="let app of filteredApplications | slice:0:5" (click)="viewApplication(app)" role="button" tabindex="0">
-        <div class="recent-main">
-          <div class="ref">{{ app.referenceNumber }} <span>(Ref No)</span></div>
-          <div class="name">{{ app.applicantName }} ({{ app.staffNumber }})</div>
-        </div>
-        <div class="recent-meta">
-          <span class="recent-date">{{ formatDate(app.medical?.assignedDate || app.submittedDate) }}</span>
-          <span class="status-chip pending">Pending</span>
-        </div>
+      <li class="recent-row" *ngFor="let app of filteredApplications | slice:0:5">
+        <button type="button" class="recent-row-btn" (click)="viewApplication(app)">
+          <div class="recent-main">
+            <div class="ref">{{ app.referenceNumber }} <span>(Ref No)</span></div>
+            <div class="name">{{ app.applicantName }} ({{ app.staffNumber }})</div>
+          </div>
+          <div class="recent-meta">
+            <span class="recent-date">{{ formatDate(app.medical?.assignedDate || app.submittedDate) }}</span>
+            <span class="status-chip pending">Pending</span>
+          </div>
+        </button>
       </li>
     </ul>
   </section>

@@ -143,6 +143,9 @@
                     No
                   </label>
                 </div>
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.hasAaslPermit')?.touched && applicantForm.get('basicInfo.hasAaslPermit')?.hasError('required')">
+                  Please select Yes or No.
+                </div>
               </div>
             </div>
 
@@ -169,11 +172,20 @@
                        type="text"
                        formControlName="currentAdpNo"
                        placeholder="Current ADP No" />
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.currentAdpNo')?.touched && applicantForm.get('basicInfo.currentAdpNo')?.hasError('required')">
+                  Current ADP No is required for extension licenses.
+                </div>
               </div>
 
               <div class="field">
                 <label for="dateOfFirstIssue">Date of First Issue</label>
                 <input id="dateOfFirstIssue" type="date" formControlName="dateOfFirstIssue" [max]="todayIso" />
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.dateOfFirstIssue')?.touched && applicantForm.get('basicInfo.dateOfFirstIssue')?.hasError('required')">
+                  Date of first issue is required for extension licenses.
+                </div>
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.dateOfFirstIssue')?.touched && applicantForm.get('basicInfo.dateOfFirstIssue')?.hasError('dateTooLate')">
+                  Date of first issue cannot be in the future.
+                </div>
               </div>
             </div>
 
@@ -181,6 +193,9 @@
               <div class="field">
                 <label for="safetyOrientationDate">Date Participation of Safety Orientation</label>
                 <input id="safetyOrientationDate" type="date" formControlName="safetyOrientationDate" />
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.safetyOrientationDate')?.touched && applicantForm.get('basicInfo.safetyOrientationDate')?.hasError('required')">
+                  Safety orientation date is required.
+                </div>
               </div>
 
               <div class="field">
@@ -188,13 +203,21 @@
                 <input id="aaslAccessNo"
                        type="text"
                        formControlName="aaslAccessNo"
-                       [disabled]="!applicantForm.get('basicInfo.hasAaslPermit')?.value"
                        placeholder="AASL Access P/No" />
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.aaslAccessNo')?.touched && applicantForm.get('basicInfo.aaslAccessNo')?.hasError('required')">
+                  AASL access number is required when you have a permit.
+                </div>
               </div>
 
               <div class="field">
                 <label for="aaslAccessExpiry">AASL Access Permit Expiry Date</label>
-                <input id="aaslAccessExpiry" type="date" formControlName="aaslAccessExpiry" [min]="tomorrowIso" [disabled]="!applicantForm.get('basicInfo.hasAaslPermit')?.value" />
+                <input id="aaslAccessExpiry" type="date" formControlName="aaslAccessExpiry" [min]="tomorrowIso" />
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.aaslAccessExpiry')?.touched && applicantForm.get('basicInfo.aaslAccessExpiry')?.hasError('required')">
+                  AASL expiry date is required when you have a permit.
+                </div>
+                <div class="field-error" *ngIf="applicantForm.get('basicInfo.aaslAccessExpiry')?.touched && applicantForm.get('basicInfo.aaslAccessExpiry')?.hasError('dateTooEarly')">
+                  AASL expiry date must be a future date.
+                </div>
               </div>
             </div>
           </div>
@@ -310,16 +333,34 @@
                        type="text"
                        formControlName="stateLicenseNo"
                        placeholder="State License Number" />
+                <div class="field-error" *ngIf="applicantForm.get('licenseInfo.stateLicenseNo')?.touched && applicantForm.get('licenseInfo.stateLicenseNo')?.hasError('required')">
+                  State license number is required.
+                </div>
+                <div class="field-error" *ngIf="applicantForm.get('licenseInfo.stateLicenseNo')?.touched && (applicantForm.get('licenseInfo.stateLicenseNo')?.hasError('maxlength') || applicantForm.get('licenseInfo.stateLicenseNo')?.hasError('pattern'))">
+                  State license number must be up to 10 alphanumeric characters.
+                </div>
               </div>
 
               <div class="field">
                 <label for="issueDate">Date of issuance of the State License</label>
                 <input id="issueDate" type="date" formControlName="issueDate" [max]="todayIso" />
+                <div class="field-error" *ngIf="applicantForm.get('licenseInfo.issueDate')?.touched && applicantForm.get('licenseInfo.issueDate')?.hasError('required')">
+                  Issue date is required.
+                </div>
+                <div class="field-error" *ngIf="applicantForm.get('licenseInfo.issueDate')?.touched && applicantForm.get('licenseInfo.issueDate')?.hasError('dateTooLate')">
+                  Issue date cannot be in the future.
+                </div>
               </div>
 
               <div class="field">
                 <label for="expiryDate">Date of Expiry of the State License</label>
                 <input id="expiryDate" type="date" formControlName="expiryDate" [min]="tomorrowIso" />
+                <div class="field-error" *ngIf="applicantForm.get('licenseInfo.expiryDate')?.touched && applicantForm.get('licenseInfo.expiryDate')?.hasError('required')">
+                  Expiry date is required.
+                </div>
+                <div class="field-error" *ngIf="applicantForm.get('licenseInfo.expiryDate')?.touched && applicantForm.get('licenseInfo.expiryDate')?.hasError('dateTooEarly')">
+                  Expiry date must be a future date.
+                </div>
               </div>
             </div>
 
@@ -333,6 +374,9 @@
                          [formControlName]="option.key" />
                   <span>{{ option.label }}</span>
                 </label>
+              </div>
+              <div class="field-error" *ngIf="applicantForm.get('equipment')?.touched && applicantForm.get('equipment')?.hasError('required')">
+                Please select at least one category.
               </div>
             </div>
           </div>
@@ -361,16 +405,49 @@
                   <div class="attachment-box" *ngFor="let control of group.controls">
                     <label class="upload-box"
                            [class.has-file]="attachmentNames[control.key]"
-                           [class.disabled]="group.title === 'Aviation Pass' && !isAaslValid">
-                      <input type="file"
-                             [attr.accept]="control.accept || '.png,.jpg,.jpeg,.pdf'"
-                             (change)="handleFileChange(control.key, $event)"
-                             [disabled]="group.title === 'Aviation Pass' && !isAaslValid" />
-                      <span class="box-label">{{ control.label }}</span>
-                      <span class="box-icon" aria-hidden="true">+</span>
-                      <span class="box-format">
-                        {{ attachmentNames[control.key] || '.png .jpg .pdf' }}
-                      </span>
+                            [class.disabled]="group.title === 'Aviation Pass' && applicantForm.get('basicInfo.hasAaslPermit')?.value === false">
+                      <ng-container *ngIf="attachmentPreviewKinds[control.key] as kind; else uploadPlaceholder">
+                        <div class="upload-preview" *ngIf="kind">
+                          <img
+                            *ngIf="kind === 'image'"
+                            [src]="attachmentPreviewUrls[control.key]"
+                            alt="{{ group.title }} {{ control.label }} preview"
+                            title="{{ group.title }} {{ control.label }} preview" />
+                          <div *ngIf="kind === 'pdf'" class="upload-preview-pdf">PDF</div>
+                        </div>
+
+                        <div class="upload-actions">
+                          <button
+                            type="button"
+                            class="upload-action"
+                            (click)="$event.preventDefault(); $event.stopPropagation(); fileInput.click()"
+                            [disabled]="group.title === 'Aviation Pass' && !isAaslValid">
+                            Change
+                          </button>
+                          <button
+                            type="button"
+                            class="upload-action danger"
+                            (click)="$event.preventDefault(); $event.stopPropagation(); clearAttachment(control.key)"
+                            [disabled]="group.title === 'Aviation Pass' && !isAaslValid">
+                            Remove
+                          </button>
+                        </div>
+                      </ng-container>
+
+                      <ng-template #uploadPlaceholder>
+                        <span class="box-label">{{ control.label }}</span>
+                        <span class="box-icon" aria-hidden="true">+</span>
+                        <span class="box-format">
+                          {{ attachmentNames[control.key] || '.png .jpg .pdf' }}
+                        </span>
+                      </ng-template>
+
+                      <input
+                        #fileInput
+                        type="file"
+                        [attr.accept]="control.accept || '.png,.jpg,.jpeg,.pdf'"
+                        (change)="handleFileChange(control.key, $event)"
+                        [disabled]="group.title === 'Aviation Pass' && applicantForm.get('basicInfo.hasAaslPermit')?.value === false" />
                     </label>
                   </div>
                 </div>
@@ -392,6 +469,10 @@
                   </span>
                 </div>
               </div>
+            </div>
+
+            <div class="field-error" *ngIf="applicantForm.get('attachments')?.touched && applicantForm.get('attachments')?.invalid">
+              Please upload all required attachments before submitting.
             </div>
           </div>
         </section>

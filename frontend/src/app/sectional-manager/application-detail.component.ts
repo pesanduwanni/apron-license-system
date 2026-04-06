@@ -236,8 +236,8 @@ export class ApplicationDetailComponent implements OnInit, OnDestroy {
 
     if (success) {
       // Frontend-only: simulate email/notification
-      // Move to safety pipeline (assign to safety manager) so it's visible to safety
-      this.applicationsService.acceptApplicationSafety(this.application.id, 'STF003', 'Nimal Fernando');
+      // Forward to safety queue (assign to safety manager) so it's visible to safety
+      this.applicationsService.forwardToSafetyManager(this.application.id, 'STF003', 'Nimal Fernando');
       this.successMessage = 'Task Updated and Sent to next level Successfully';
       // Reload application
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;

@@ -52,6 +52,15 @@ export class AuthService {
       nic: '955551234V'
     },
     {
+      username: 'pesanduwanni@ul.com',
+      password: 'pesandu123',
+      role: 'applicant',
+      name: 'Pesandu Wanniarachchi',
+      staffNumber: 'IN2253',
+      department: 'IT Projects and Systems',
+      designation: 'OJT'
+    },
+    {
       username: 'sectional@ul.com',
       password: 'sectional123',
       role: 'sectional_manager',

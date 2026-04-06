@@ -597,6 +597,7 @@
 }
 
 .upload-box {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -606,10 +607,89 @@
   border: 1px solid #b6b6b6;
   border-radius: 6px;
   background: #f7f7f7;
+  overflow: hidden;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
-  min-height: 70px;
+  min-height: 120px;
   text-align: center;
+}
+
+.upload-box.has-file {
+  padding: 0;
+  background: #ffffff;
+}
+
+.upload-box > :not(input[type="file"]):not(.upload-actions) {
+  pointer-events: none;
+}
+
+.upload-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  z-index: 0;
+}
+
+.upload-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0;
+  background: #ffffff;
+  display: block;
+}
+
+.upload-preview-pdf {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #334155;
+  font-size: 0.85rem;
+}
+
+.upload-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 3;
+  display: inline-flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.upload-action {
+  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.upload-action:hover {
+  border-color: #0d63d6;
+}
+
+.upload-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upload-action.danger {
+  border-color: #fecaca;
+  background: rgba(254, 226, 226, 0.92);
+  color: #991b1b;
 }
 
 .upload-box:hover {
@@ -625,14 +705,12 @@
 
 .upload-box input[type="file"] {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
 }
 
 .box-label {
@@ -651,6 +729,10 @@
 .box-format {
   font-size: 0.7rem;
   color: #9ca3af;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Signature row */

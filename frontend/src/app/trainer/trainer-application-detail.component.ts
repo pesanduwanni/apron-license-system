@@ -318,7 +318,7 @@ export class TrainerApplicationDetailComponent implements OnInit, OnDestroy {
 
     if (this.application.safetyManagerName && this.application.safetyApprovalDate) {
       let message = 'Reviewed request';
-      if (this.application.status === 'pending_safety') {
+      if (this.application.status === 'approved_safety') {
         message = 'Validated attachments';
       } else if (this.application.status === 'rejected_safety') {
         message = 'Rejected request';

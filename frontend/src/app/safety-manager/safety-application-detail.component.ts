@@ -147,7 +147,9 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
   }
 
   get isSafetyPending(): boolean {
-    return !!this.application && this.application.status === 'approved_sectional';
+    // Safety attachment validation step (BRD US11): application is awaiting Safety Manager decision.
+    // Older/mock flows may still use 'approved_sectional' before being forwarded to safety.
+    return !!this.application && ['approved_sectional', 'pending_safety'].includes(this.application.status);
   }
 
   get isSafetyReview(): boolean {
@@ -555,7 +557,7 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
       this.showToastMessage('Application forwarded to medical unit');
       this.application = this.applicationsService.getApplicationById(this.application.id) || null;
     } else {
-      this.showToastMessage('Unable to forward application', 'error');
+      this.showToastMessage('Unable to forward application. Mark practical as completed first.', 'error');
     }
   }
 
@@ -671,7 +673,9 @@ export class SafetyApplicationDetailComponent implements OnInit, OnDestroy {
 
     if (this.application.safetyManagerName && this.application.safetyApprovalDate) {
       let message = 'Reviewed request';
-      if (this.application.status === 'pending_safety') {
+      // Validation is considered complete once the Safety Manager accepts (approved_safety)
+      // or rejects (rejected_safety). 'pending_safety' is waiting for that decision.
+      if (this.application.status === 'approved_safety') {
         message = 'Validated attachments';
       } else if (this.application.status === 'rejected_safety') {
         message = 'Rejected request';

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, User } from '../services/auth.service';
 import { ApplicationsService, Application, Attachment } from '../services/applications.service';
@@ -51,6 +51,8 @@ export class ApplicantDashboardComponent implements OnInit {
   readonly todayIso = this.toIsoDate(new Date());
   readonly tomorrowIso = this.toIsoDate(this.addDays(new Date(), 1));
 
+  private readonly alphaNumMax10 = /^[A-Za-z0-9]{1,10}$/;
+
   get isAaslValid(): boolean {
     const hasPermit = !!this.applicantForm.get('basicInfo.hasAaslPermit')?.value;
     if (!hasPermit) return false;
@@ -67,6 +69,7 @@ export class ApplicantDashboardComponent implements OnInit {
 
   readonly departmentOptions = [
     'Information Technology',
+    'IT Projects and Systems',
     'Operations Management',
     'Safety Department',
     'Training Department',
@@ -76,34 +79,11 @@ export class ApplicantDashboardComponent implements OnInit {
     'Engineering'
   ];
 
-  readonly licenseCategories = [
-    'Tractor',
-    'Pick-up',
-    'Van',
-    'Car',
-    'Transporter',
-    'Lorry/ AIC Bus',
-    'Donkey – lift',
-    'Snorkel – lift',
-    'ACU/ASU/GPU',
-    'Toilet/Water cart',
-    'A/C Tow-tug',
-    'Maint-Plat-Lift-Truck',
-    'Pax Coach',
-    'Pax Step',
-    'JCP/MD/Loader',
-    'Sky Loader',
-    'Fork-lift/Pallet Mover',
-    'Ambu lift',
-    'Hi-lift(catering)',
-    'ETV',
-    'Buggy'
-  ];
-
-  readonly equipmentOptions = this.licenseCategories.map((category: string) => ({
-    key: category.replace(/[^a-zA-Z0-9]/g, '').toLowerCase(),
-    label: category
-  }));
+  get equipmentOptions() {
+    // Use the centralized category keys so all roles (sectional/safety/trainer/etc.)
+    // see the same selected categories.
+    return this.applicationsService.vehicleCategories;
+  }
 
   readonly attachmentGroups: AttachmentGroup[] = [
     {
@@ -148,6 +128,8 @@ export class ApplicantDashboardComponent implements OnInit {
   ];
 
   attachmentNames: Record<string, string> = {};
+  attachmentPreviewUrls: Record<string, string> = {};
+  attachmentPreviewKinds: Record<string, 'image' | 'pdf' | ''> = {};
   historyEntries: RequestHistory[] = [];
 
   constructor(
@@ -162,8 +144,9 @@ export class ApplicantDashboardComponent implements OnInit {
         sectionalManagerId: ['STF002', Validators.required],
         currentAdpNo: [''],
         dateOfFirstIssue: [''],
-        safetyOrientationDate: [''],
-        hasAaslPermit: [false, Validators.required],
+        safetyOrientationDate: ['', Validators.required],
+        // must explicitly choose Yes/No
+        hasAaslPermit: [null, this.requiredNonNull()],
         aaslAccessNo: [''],
         aaslAccessExpiry: ['']
       }),
@@ -177,9 +160,9 @@ export class ApplicantDashboardComponent implements OnInit {
         currentDate: [{value: '', disabled: true}, Validators.required]
       }),
       licenseInfo: this.fb.group({
-        stateLicenseNo: ['', Validators.required],
-        issueDate: ['', Validators.required],
-        expiryDate: ['', Validators.required]
+        stateLicenseNo: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(this.alphaNumMax10)]],
+        issueDate: ['', [Validators.required, this.dateNotAfter(this.todayIso)]],
+        expiryDate: ['', [Validators.required, this.dateAfter(this.todayIso)]]
       }),
       equipment: this.buildEquipmentGroup(),
       attachments: this.buildAttachmentsGroup()
@@ -282,6 +265,18 @@ export class ApplicantDashboardComponent implements OnInit {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files?.[0] ?? null;
 
+    // Reset existing preview (avoid leaking object URLs)
+    const existingPreview = this.attachmentPreviewUrls[controlKey];
+    if (existingPreview) {
+      try {
+        URL.revokeObjectURL(existingPreview);
+      } catch {
+        // ignore
+      }
+    }
+    this.attachmentPreviewUrls[controlKey] = '';
+    this.attachmentPreviewKinds[controlKey] = '';
+
     if (file) {
       const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
       const ext = (file.name.split('.').pop() || '').toLowerCase();
@@ -305,7 +300,38 @@ export class ApplicantDashboardComponent implements OnInit {
 
     this.applicantForm.get(['attachments', controlKey])?.setValue(file);
     this.attachmentNames[controlKey] = file ? file.name : '';
+
+    if (file) {
+      const mime = (file.type || '').toLowerCase();
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const isPdf = mime.includes('pdf') || ext === 'pdf';
+      const isImage = mime.startsWith('image/') || ['png', 'jpg', 'jpeg'].includes(ext);
+
+      if (isPdf) {
+        this.attachmentPreviewKinds[controlKey] = 'pdf';
+      } else if (isImage) {
+        this.attachmentPreviewKinds[controlKey] = 'image';
+        this.attachmentPreviewUrls[controlKey] = URL.createObjectURL(file);
+      }
+    }
+
     fileInput.value = '';
+  }
+
+  clearAttachment(controlKey: string): void {
+    const existingPreview = this.attachmentPreviewUrls[controlKey];
+    if (existingPreview) {
+      try {
+        URL.revokeObjectURL(existingPreview);
+      } catch {
+        // ignore
+      }
+    }
+
+    this.attachmentPreviewUrls[controlKey] = '';
+    this.attachmentPreviewKinds[controlKey] = '';
+    this.attachmentNames[controlKey] = '';
+    this.applicantForm.get(['attachments', controlKey])?.setValue(null);
   }
 
   onClear(): void {
@@ -318,6 +344,8 @@ export class ApplicantDashboardComponent implements OnInit {
   async onSubmit(): Promise<void> {
     if (this.applicantForm.invalid) {
       this.applicantForm.markAllAsTouched();
+      this.applicantForm.get('equipment')?.markAsTouched();
+      this.applicantForm.get('attachments')?.markAsTouched();
       return;
     }
 
@@ -328,7 +356,7 @@ export class ApplicantDashboardComponent implements OnInit {
     const referenceNumber = `AL-${new Date().getFullYear()}-${Math.floor(Math.random() * 9000 + 1000)}`;
 
     const selectedCategories = this.getSelectedCategories(submission.equipment);
-    const submittedDate = new Date().toISOString().split('T')[0];
+    const submittedDate = new Date().toISOString();
 
     const attachmentFiles = (submission.attachments || {}) as Record<string, File | null>;
     const attachmentEntries = Object.entries(attachmentFiles).filter(([, file]) => file instanceof File) as Array<[
@@ -363,6 +391,7 @@ export class ApplicantDashboardComponent implements OnInit {
         stateLicenseIssueDate: submission.licenseInfo.issueDate,
         stateLicenseExpiryDate: submission.licenseInfo.expiryDate,
         selectedCategories,
+        safetyOrientationDate: submission.basicInfo.safetyOrientationDate,
         attachments,
         sectionalManagerId: submission.basicInfo.sectionalManagerId
       };
@@ -394,7 +423,7 @@ export class ApplicantDashboardComponent implements OnInit {
     this.equipmentOptions.forEach((option) => {
       controls[option.key] = this.fb.control(false);
     });
-    return this.fb.group(controls);
+    return this.fb.group(controls, { validators: [this.atLeastOneTrue()] });
   }
 
   private buildAttachmentsGroup(): FormGroup {
@@ -412,18 +441,34 @@ export class ApplicantDashboardComponent implements OnInit {
           ? this.fb.control<File | null>(null, Validators.required)
           : this.fb.control<File | null>(null);
         this.attachmentNames[control.key] = '';
+        this.attachmentPreviewUrls[control.key] = '';
+        this.attachmentPreviewKinds[control.key] = '';
       });
     });
 
     controls[this.signatureControl.key] = this.fb.control<File | null>(null);
     this.attachmentNames[this.signatureControl.key] = '';
+    this.attachmentPreviewUrls[this.signatureControl.key] = '';
+    this.attachmentPreviewKinds[this.signatureControl.key] = '';
 
     return this.fb.group(controls);
   }
 
   private resetAttachments(): void {
+    // Cleanup preview object URLs
+    Object.values(this.attachmentPreviewUrls).forEach((url) => {
+      if (!url) return;
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        // ignore
+      }
+    });
+
     Object.keys(this.attachmentNames).forEach((key) => {
       this.attachmentNames[key] = '';
+      this.attachmentPreviewUrls[key] = '';
+      this.attachmentPreviewKinds[key] = '';
       this.applicantForm.get(['attachments', key])?.setValue(null);
     });
   }
@@ -481,12 +526,18 @@ export class ApplicantDashboardComponent implements OnInit {
       const isExtension = type === 'extension';
       if (isExtension) {
         currentAdpCtrl?.setValidators([Validators.required]);
-        firstIssueCtrl?.setValidators([Validators.required]);
+        firstIssueCtrl?.setValidators([Validators.required, this.dateNotAfter(this.todayIso)]);
+        currentAdpCtrl?.enable({ emitEvent: false });
+        firstIssueCtrl?.enable({ emitEvent: false });
       } else {
         currentAdpCtrl?.clearValidators();
         firstIssueCtrl?.clearValidators();
         currentAdpCtrl?.setValue('');
         firstIssueCtrl?.setValue('');
+
+        // not applicable for new applicants
+        currentAdpCtrl?.disable({ emitEvent: false });
+        firstIssueCtrl?.disable({ emitEvent: false });
       }
       currentAdpCtrl?.updateValueAndValidity();
       firstIssueCtrl?.updateValueAndValidity();
@@ -496,29 +547,83 @@ export class ApplicantDashboardComponent implements OnInit {
       const permit = !!hasPermit;
       if (permit) {
         aaslNoCtrl?.setValidators([Validators.required]);
-        aaslExpiryCtrl?.setValidators([Validators.required]);
+        aaslExpiryCtrl?.setValidators([Validators.required, this.dateAfter(this.todayIso)]);
+        aaslNoCtrl?.enable({ emitEvent: false });
+        aaslExpiryCtrl?.enable({ emitEvent: false });
       } else {
         aaslNoCtrl?.clearValidators();
         aaslExpiryCtrl?.clearValidators();
         aaslNoCtrl?.setValue('');
         aaslExpiryCtrl?.setValue('');
 
-        aviationPassFrontCtrl?.setValue(null);
-        aviationPassBackCtrl?.setValue(null);
-        this.attachmentNames['aviationPassFront'] = '';
-        this.attachmentNames['aviationPassBack'] = '';
+        aaslNoCtrl?.disable({ emitEvent: false });
+        aaslExpiryCtrl?.disable({ emitEvent: false });
+
+        this.clearAttachment('aviationPassFront');
+        this.clearAttachment('aviationPassBack');
       }
 
       aaslNoCtrl?.updateValueAndValidity();
       aaslExpiryCtrl?.updateValueAndValidity();
     };
 
+    const applyAviationPassRules = () => {
+      // Only drop aviation pass uploads when the user does not have a permit.
+      // Permit validity/expiry is validated separately.
+      if (!hasPermitCtrl?.value) {
+        this.clearAttachment('aviationPassFront');
+        this.clearAttachment('aviationPassBack');
+      }
+    };
+
     licenseTypeCtrl?.valueChanges.subscribe((type) => applyLicenseTypeRules(type));
-    hasPermitCtrl?.valueChanges.subscribe((hasPermit) => applyPermitRules(hasPermit));
+    hasPermitCtrl?.valueChanges.subscribe((hasPermit) => {
+      applyPermitRules(hasPermit);
+      applyAviationPassRules();
+    });
+    aaslExpiryCtrl?.valueChanges.subscribe(() => applyAviationPassRules());
 
     // Apply rules immediately on first render
     applyLicenseTypeRules(licenseTypeCtrl?.value);
     applyPermitRules(hasPermitCtrl?.value);
+    applyAviationPassRules();
+  }
+
+  private atLeastOneTrue(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value as Record<string, unknown> | null;
+      if (!value) return { required: true };
+      const anySelected = Object.values(value).some((v) => v === true);
+      return anySelected ? null : { required: true };
+    };
+  }
+
+  private requiredNonNull(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      return control.value === null || control.value === undefined ? { required: true } : null;
+    };
+  }
+
+  private dateNotAfter(maxIsoDate: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const raw = String(control.value || '').trim();
+      if (!raw) return null;
+      const selected = new Date(raw);
+      const max = new Date(maxIsoDate);
+      if (Number.isNaN(selected.getTime())) return { invalidDate: true };
+      return selected.getTime() <= max.getTime() ? null : { dateTooLate: true };
+    };
+  }
+
+  private dateAfter(minIsoDateExclusive: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const raw = String(control.value || '').trim();
+      if (!raw) return null;
+      const selected = new Date(raw);
+      const min = new Date(minIsoDateExclusive);
+      if (Number.isNaN(selected.getTime())) return { invalidDate: true };
+      return selected.getTime() > min.getTime() ? null : { dateTooEarly: true };
+    };
   }
 
   private toIsoDate(d: Date): string {
