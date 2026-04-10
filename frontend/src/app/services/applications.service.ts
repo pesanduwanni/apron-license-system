@@ -207,9 +207,14 @@ export class ApplicationsService {
       approvedCategories: this.normalizeCategories(app.approvedCategories)
     };
 
-    // If an application is only forwarded/assigned to safety, it has not been approved by safety yet.
-    // Clear any stale fields left over from previous mock logic.
-    if (normalized.status === 'pending_safety') {
+    // Clear stale safety-approval fields until a real safety decision exists.
+    // This prevents historical/localStorage data from making summaries look like Safety already approved.
+    if (
+      normalized.status === 'pending_sectional' ||
+      normalized.status === 'approved_sectional' ||
+      normalized.status === 'rejected_sectional' ||
+      normalized.status === 'pending_safety'
+    ) {
       delete normalized.safetyApprovalDate;
       delete normalized.safetyRemarks;
     }
@@ -685,8 +690,9 @@ export class ApplicationsService {
   }
 
   private saveApplications(apps: Application[]): void {
-    localStorage.setItem(this.storageKey, JSON.stringify(apps));
-    this.applicationsSubject.next(apps);
+    const normalized = apps.map((a) => this.normalizeApplication(a));
+    localStorage.setItem(this.storageKey, JSON.stringify(normalized));
+    this.applicationsSubject.next(normalized);
   }
 
   createApplication(payload: Omit<Application, 'id'> & { id?: string }): Application {
@@ -869,12 +875,26 @@ export class ApplicationsService {
     {
       const events: SummaryEvent[] = [];
 
+      const safetyDecisionStage =
+        app.status === 'approved_safety' ||
+        app.status === 'rejected_safety' ||
+        app.status === 'orientation_assigned' ||
+        app.status === 'orientation_completed' ||
+        app.status === 'practical_assigned' ||
+        app.status === 'practical_completed' ||
+        app.status === 'medical_pending' ||
+        app.status === 'medical_completed' ||
+        app.status === 'doctor_approved' ||
+        app.status === 'doctor_rejected' ||
+        app.status === 'license_rejected' ||
+        app.status === 'license_issued';
+
       if (app.trainer?.reportUploadedAt) {
         pushEvent(events, 'Upload reports', app.trainer.reportUploadedAt);
       }
 
-      if (app.safetyApprovalDate && app.status !== 'pending_safety') {
-        const message = app.status === 'rejected_safety' ? 'Request Rejected' : 'Validate attachments';
+      if (safetyDecisionStage && app.safetyApprovalDate) {
+        const message = app.status === 'rejected_safety' ? 'Request Rejected' : 'Request Accepted';
         pushEvent(events, message, app.safetyApprovalDate);
 
         if (app.safetyRemarks) {
